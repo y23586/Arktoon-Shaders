@@ -153,6 +153,8 @@ float4 frag(VertexOutput i) : COLOR {
         directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * _ShadowStrength;
     #endif
 
+    directContribution *= i.lightIntensityIfBackface;
+
     // 頂点ライティング：PixelLightから溢れた4光源をそれぞれ計算
     #ifdef USE_VERTEX_LIGHT
         float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur/2.0);
@@ -161,6 +163,7 @@ float4 frag(VertexOutput i) : COLOR {
         #ifdef USE_POINT_SHADOW_STEPS
             directContributionVertex = min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1));
         #endif
+        directContributionVertex *= i.lightIntensityIfBackface;
         float3 coloredLight_0 = max(directContributionVertex.r * i.lightColor0 * i.ambientAttenuation.r, i.lightColor0 * i.ambientIndirect.r * (1-_PointShadowStrength));
         float3 coloredLight_1 = max(directContributionVertex.g * i.lightColor1 * i.ambientAttenuation.g, i.lightColor1 * i.ambientIndirect.g * (1-_PointShadowStrength));
         float3 coloredLight_2 = max(directContributionVertex.b * i.lightColor2 * i.ambientAttenuation.b, i.lightColor2 * i.ambientIndirect.b * (1-_PointShadowStrength));
@@ -188,6 +191,7 @@ float4 frag(VertexOutput i) : COLOR {
             float ShadowborderMin2 = max(0, (_ShadowPlanB2border * _Shadowborder) - _ShadowPlanB2borderBlur/2);
             float ShadowborderMax2 = min(1, (_ShadowPlanB2border * _Shadowborder) + _ShadowPlanB2borderBlur/2);
             float directContribution2 = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin2)) / (ShadowborderMax2 - ShadowborderMin2))));  // /2の部分をパラメーターにしたい
+            directContribution2 *= i.lightIntensityIfBackface;
             #ifdef USE_CUSTOM_SHADOW_TEXTURE_2ND
                 float4 _ShadowPlanB2CustomShadowTexture_var = tex2D(_ShadowPlanB2CustomShadowTexture,TRANSFORM_TEX(i.uv0, _ShadowPlanB2CustomShadowTexture));
                 float3 shadowCustomTexture2 = _ShadowPlanB2CustomShadowTexture_var.rgb * _ShadowPlanB2CustomShadowTextureRGB.rgb;
@@ -288,7 +292,14 @@ float4 frag(VertexOutput i) : COLOR {
         // オプション：MatCap
         #ifdef USE_MATCAP
             float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rgb.rg*0.5+0.5);
+            #ifdef USE_LEGACY_CAP_CALC
+                float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
+            #else
+                float3 transformMatcapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
+                float3 transformMatcapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz * float3(-1,-1,1);
+                float3 transformMatcapCombined = transformMatcapViewDir * dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z - transformMatcapNormal;
+                float2 transformMatcap = ((transformMatcapCombined.rg*0.5)+0.5);
+            #endif
             float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
             float4 _MatcapBlendMask_var = tex2D(_MatcapBlendMask,TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
             matcap = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
@@ -316,7 +327,14 @@ float4 frag(VertexOutput i) : COLOR {
         // オプション:ShadeCap
         #ifdef USE_SHADOWCAP
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rgb.rg*0.5+0.5);
+            #ifdef USE_LEGACY_CAP_CALC
+                float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
+            #else
+                float3 transformShadowCapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
+                float3 transformShadowCapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz * float3(-1,-1,1);
+                float3 transformShadowCapCombined = transformShadowCapViewDir * dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z - transformShadowCapNormal;
+                float2 transformShadowCap = ((transformShadowCapCombined.rg*0.5)+0.5);
+            #endif
             float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
             float4 _ShadowCapBlendMask_var = tex2D(_ShadowCapBlendMask,TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);

@@ -70,6 +70,7 @@ struct VertexOutput {
     fixed4 col : COLOR0;
 	bool isOutline : IS_OUTLINE;
     int faceSign : FACE_SIGN;
+    float lightIntensityIfBackface : LIGHT_INTENSITY;
     SHADOW_COORDS(6)
     UNITY_FOG_COORDS(7)
     fixed4 color : COLOR1;
@@ -86,6 +87,7 @@ struct VertexOutput {
 uniform float _OutlineWidth;
 uniform float4 _OutlineColor;
 uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST;
+uniform float _DoubleSidedBackfaceLightIntensity;
 
 [maxvertexcount(9)]
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
@@ -110,6 +112,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 		o.bitangentDir = IN[i].bitangentDir;
 		o.isOutline = true;
         o.faceSign = -1;
+        o.lightIntensityIfBackface = 1;
 
 		// Pass-through the shadow coordinates if this pass has shadows.
 		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -180,6 +183,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 		o.bitangentDir = IN[iii].bitangentDir;
 		o.isOutline = false;
         o.faceSign = -1;
+        o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
 
 		// Pass-through the shadow coordinates if this pass has shadows.
 		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -255,6 +259,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 		o.bitangentDir = IN[ii].bitangentDir;
 		o.isOutline = false;
         o.faceSign = 1;
+        o.lightIntensityIfBackface = 1;
 
 		// Pass-through the shadow coordinates if this pass has shadows.
 		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)

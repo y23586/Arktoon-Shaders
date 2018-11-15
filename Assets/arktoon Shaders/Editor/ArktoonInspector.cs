@@ -16,8 +16,6 @@ namespace ArktoonShaders
 {
     public class ArktoonInspector : ShaderGUI
     {
-        string version = "0.9.4.b-experimental";
-
         #region MaterialProperties
         MaterialProperty BaseTexture;
         MaterialProperty BaseColor;
@@ -107,6 +105,7 @@ namespace ArktoonShaders
         MaterialProperty StencilMaskAdjust;
         MaterialProperty UseDoubleSided;
         MaterialProperty DoubleSidedFlipBackfaceNormal;
+        MaterialProperty DoubleSidedBackfaceLightIntensity;
         MaterialProperty ShadowCasterCulling;
         MaterialProperty ZWrite;
         MaterialProperty VertexColorBlendDiffuse;
@@ -116,10 +115,11 @@ namespace ArktoonShaders
         MaterialProperty UseVertexLight;
         MaterialProperty BackfaceColorMultiply;
         MaterialProperty LightSampling;
+        MaterialProperty UseLegacyCapCalc;
 
         #endregion
 
-        bool _isOpenAdvance;
+        GUIStyle style = new GUIStyle();
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
         {
@@ -227,6 +227,7 @@ namespace ArktoonShaders
             // Cull = FindProperty("_Cull", props);
             UseDoubleSided = FindProperty("_UseDoubleSided", props);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props);
+            DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props);
             ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props);
             VertexColorBlendDiffuse = FindProperty("_VertexColorBlendDiffuse", props);
             VertexColorBlendEmissive = FindProperty("_VertexColorBlendEmissive", props);
@@ -234,6 +235,7 @@ namespace ArktoonShaders
             OtherShadowAdjust = FindProperty("_OtherShadowAdjust", props);
             UseVertexLight = FindProperty("_UseVertexLight", props);
             LightSampling = FindProperty("_LightSampling", props);
+            UseLegacyCapCalc = FindProperty("_UseLegacyCapCalc", props);
             if(isFade) ZWrite = FindProperty("_ZWrite", props);
             // BackfaceColorMultiply = FindProperty("_BackfaceColorMultiply", props);
 
@@ -253,7 +255,8 @@ namespace ArktoonShaders
                     if(doublesided > 0){
                         ShadowCasterCulling.floatValue = 0;
                         EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(DoubleSidedFlipBackfaceNormal, "Flip backside normal");
+                        materialEditor.ShaderProperty(DoubleSidedFlipBackfaceNormal, "Flip backface normal");
+                        materialEditor.ShaderProperty(DoubleSidedBackfaceLightIntensity, "Backface Light Intensity");
                         EditorGUI.indentLevel --;
                     } else {
                         ShadowCasterCulling.floatValue = 2;
@@ -556,11 +559,48 @@ namespace ArktoonShaders
                         materialEditor.ShaderProperty(OtherShadowBorderSharpness, "Sharpness(def:3)");
                         EditorGUI.indentLevel --;
                     }
+                    EditorGUILayout.LabelField("MatCap / ShadeCap", EditorStyles.boldLabel);
+                    {
+                        EditorGUI.indentLevel ++;
+                        materialEditor.ShaderProperty(UseLegacyCapCalc, "Use Legacy Style (def:no)");
+                        EditorGUI.indentLevel --;
+                    }
                     EditorGUI.indentLevel --;
                     // materialEditor.ShaderProperty(BackfaceColorMultiply, "Backface Color Multiply (def:white)");
                 }
                 EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Arktoon-Shaders Ver." + version, EditorStyles.boldLabel);
+                {
+                    string localVersion =  EditorUserSettings.GetConfigValue ("arktoon_version_local");
+                    string remoteVersion = EditorUserSettings.GetConfigValue ("arktoon_version_remote");
+
+                    EditorGUILayout.LabelField("Arktoon-Shaders", EditorStyles.boldLabel);
+                    style.alignment = TextAnchor.MiddleRight;
+                    style.normal.textColor = Color.black;
+                    EditorGUILayout.LabelField("Your Version : " + localVersion, style);
+
+                    if (!string.IsNullOrEmpty(remoteVersion))
+                    {
+                        Version local_v = new Version(localVersion);
+                        Version remote_v = new Version(remoteVersion);
+
+                        if(remote_v > local_v) {
+                            style.normal.textColor = Color.blue;
+                            EditorGUILayout.LabelField("Remote Version : " + remoteVersion, style);
+                            EditorGUILayout.BeginHorizontal( GUI.skin.box );
+                            {
+                                style.alignment = TextAnchor.MiddleLeft;
+                                EditorGUILayout.LabelField("New version available : ", style);
+                                if(GUILayout.Button("Open download page."))
+                                {
+                                    System.Diagnostics.Process.Start("https://github.com/synqark/Arktoon-Shaders/releases");
+                                }
+                            }
+                            GUILayout.EndHorizontal();
+                        } else {
+                            EditorGUILayout.LabelField("Remote Version : " + remoteVersion, style);
+                        }
+                    }
+                }
             }
             EditorGUI.EndChangeCheck();
         }

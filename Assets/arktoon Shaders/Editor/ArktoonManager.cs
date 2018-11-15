@@ -12,12 +12,27 @@ namespace ArktoonShaders
     {
         static string url = "https://api.github.com/repos/synqark/Arktoon-Shaders/releases/latest";
         static UnityWebRequest www;
+        static string version = "0.9.4.0";
 
         [DidReloadScripts(0)]
-        static void BeginCheckUpdate ()
+        static void CheckVersion ()
         {
-            Debug.Log ("アップデートをチェック中");
+            if(EditorApplication.isPlayingOrWillChangePlaymode) return;
+            Debug.Log ("[Arktoon] Checking local version.");
+            string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
 
+            if (!localVersion.Equals(version)) {
+                // 直前のバージョンと異なるか新規インポートなので、とりあえずReimportを走らせる
+                Debug.Log ("[Arktoon] Version change detected : Force reimport.");
+                string guidArktoonManager   = AssetDatabase.FindAssets("ArktoonManager t:script")[0];
+                string pathToArktoonManager = AssetDatabase.GUIDToAssetPath(guidArktoonManager);
+                string pathToShaderDir      = Directory.GetParent(Path.GetDirectoryName(pathToArktoonManager)) + "/Shaders";
+                AssetDatabase.ImportAsset(pathToShaderDir, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
+            }
+
+            // 更新後ローカルバージョンをセット
+            EditorUserSettings.SetConfigValue("arktoon_version_local", version);
+            Debug.Log ("[Arktoon] Checking remote version.");
             www = UnityWebRequest.Get(url);
             www.Send();
             EditorApplication.update += EditorUpdate;
@@ -25,37 +40,26 @@ namespace ArktoonShaders
 
         static void EditorUpdate()
         {
-            while (!www.isDone)
-                return;
-
-            if (www.isError)
+            while (!www.isDone) return;
+            if (www.isError) {
                 Debug.Log(www.error);
-            else
+            } else {
                 updateHandler(www.downloadHandler.text);
-
+            }
             EditorApplication.update -= EditorUpdate;
         }
 
-
         static void updateHandler(string apiResult)
         {
-            gitAPI git = JsonUtility.FromJson<gitAPI>(apiResult);
+            gitJson git = JsonUtility.FromJson<gitJson>(apiResult);
             string version = git.tag_name;
-
-            Debug.Log("version: " + version);
-
+            EditorUserSettings.SetConfigValue ("arktoon_version_remote", version);
+            Debug.Log("[Arktoon] Remote version : " + version);
         }
 
-        public class gitAPI
+        public class gitJson
         {
-            public string name;
             public string tag_name;
-            public string assets_url;
-            public string html_url;
-            public string published_at;
-            public string zipball_url;
-            public string body;
-            public string assets;
         }
     }
 }

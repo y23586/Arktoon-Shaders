@@ -9,6 +9,7 @@ Shader "arktoon/AlphaCutout" {
         // Double Sided
         [Toggle(DOUBLE_SIDED)]_UseDoubleSided ("Double Sided", Float ) = 0
         [Toggle(FLIP_BACKFACE_NORMAL)]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
+        _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
         // Common
         _MainTex ("[Common] Base Texture", 2D) = "white" {}
@@ -115,6 +116,8 @@ Shader "arktoon/AlphaCutout" {
         [Toggle(USE_VERTEX_LIGHT)]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Float) = 1
         // Light Sampling
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
+        // Legacy MatCap/ShadeCap Calculation
+        [Toggle(USE_LEGACY_CAP_CALC)]_UseLegacyCapCalc ("[Mat/ShadowCap] Use Legacy Calculation", Float) = 0
         // Backface Color Multiply
         // _BackfaceColorMultiply ("[Advancced] Backface Color Multiply", Color) = (1,1,1,1)
     }
@@ -149,6 +152,7 @@ Shader "arktoon/AlphaCutout" {
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature FLIP_BACKFACE_NORMAL
+            #pragma shader_feature USE_LEGACY_CAP_CALC
 
             #pragma multi_compile _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma multi_compile _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
@@ -186,6 +190,7 @@ Shader "arktoon/AlphaCutout" {
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature FLIP_BACKFACE_NORMAL
+            #pragma shader_feature USE_LEGACY_CAP_CALC
             #pragma multi_compile _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
             #pragma multi_compile _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
 
