@@ -570,6 +570,24 @@ namespace ArktoonShaders
                 }
                 EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
                 {
+                    EditorGUILayout.LabelField("Docs", EditorStyles.boldLabel);
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.BeginHorizontal( GUI.skin.box );
+                        if(GUILayout.Button("How to use (Japanese)"))
+                        {
+                            System.Diagnostics.Process.Start("https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing");
+                        }
+                        EditorGUI.BeginDisabledGroup(true);
+                        GUILayout.Button("(english - wip)");
+                        EditorGUI.EndDisabledGroup();
+
+                        GUILayout.EndHorizontal();
+                        EditorGUI.indentLevel--;
+                    }
+                }
+                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                {
                     string localVersion =  EditorUserSettings.GetConfigValue ("arktoon_version_local");
                     string remoteVersion = EditorUserSettings.GetConfigValue ("arktoon_version_remote");
 
