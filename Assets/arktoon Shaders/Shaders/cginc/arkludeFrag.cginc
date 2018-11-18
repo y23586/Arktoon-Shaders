@@ -1,81 +1,6 @@
-uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
-uniform float4 _Color;
-uniform float _GlossPower;
-uniform float4 _GlossColor;
-uniform float _CutoutCutoutAdjust;
-uniform float _ShadowPlanBDefaultShadowMix;
-uniform float _ShadowPlanBHueShiftFromBase;
-uniform float _ShadowPlanBSaturationFromBase;
-uniform float _ShadowPlanBValueFromBase;
-
-uniform float _ShadowPlanB2border;
-uniform float _ShadowPlanB2borderBlur;
-uniform float _ShadowPlanB2HueShiftFromBase;
-uniform float _ShadowPlanB2SaturationFromBase;
-uniform float _ShadowPlanB2ValueFromBase;
-uniform sampler2D _ShadowPlanB2CustomShadowTexture; uniform float4 _ShadowPlanB2CustomShadowTexture_ST;
-uniform float4 _ShadowPlanB2CustomShadowTextureRGB;
-
-uniform float _Shadowborder;
-uniform float _ShadowborderBlur;
-uniform float _ShadowStrength;
-uniform float _ShadowIndirectIntensity;
-uniform int _ShadowSteps;
-uniform float _PointAddIntensity;
-uniform float _PointShadowStrength;
-uniform float _PointShadowborder;
-uniform float _PointShadowborderBlur;
-uniform int _PointShadowSteps;
-uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
-uniform sampler2D _BumpMap; uniform float4 _BumpMap_ST;
-uniform float _BumpScale;
-uniform sampler2D _EmissionMap; uniform float4 _EmissionMap_ST;
-uniform float4 _EmissionColor;
-uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
-uniform float _MatcapBlend;
-uniform sampler2D _MatcapBlendMask; uniform float4 _MatcapBlendMask_ST;
-uniform float4 _MatcapColor;
-uniform float _MatcapNormalMix;
-uniform float _MatcapShadeMix;
-
-uniform float _ReflectionReflectionPower;
-uniform sampler2D _ReflectionReflectionMask; uniform float4 _ReflectionReflectionMask_ST;
-uniform float _ReflectionNormalMix;
-uniform float _ReflectionShadeMix;
-uniform float _ReflectionSuppressBaseColorValue;
-uniform samplerCUBE _ReflectionCubemap;
-uniform half4  _ReflectionCubemap_HDR;
-
-uniform float _GlossBlend;
-uniform sampler2D _GlossBlendMask; uniform float4 _GlossBlendMask_ST;
-uniform float _RimFresnelPower;
-uniform float _RimUpperSideWidth;
-uniform float4 _RimColor;
-uniform fixed _RimUseBaseTexture;
-uniform float _RimBlend;
-uniform float _RimShadeMix;
-uniform sampler2D _RimBlendMask; uniform float4 _RimBlendMask_ST;
-uniform sampler2D _RimTexture; uniform float4 _RimTexture_ST;
-uniform sampler2D _ShadowPlanBCustomShadowTexture; uniform float4 _ShadowPlanBCustomShadowTexture_ST;
-uniform float4 _ShadowPlanBCustomShadowTextureRGB;
-uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
-uniform sampler2D _ShadowCapBlendMask; uniform float4 _ShadowCapBlendMask_ST;
-uniform float _ShadowCapBlend;
-uniform float _ShadowCapNormalMix;
-uniform float _VertexColorBlendDiffuse;
-uniform float _VertexColorBlendEmissive;
-uniform float _OtherShadowAdjust;
-uniform float _OtherShadowBorderSharpness;
-// uniform float4 _BackfaceColorMultiply;
-uniform sampler2D _OutlineMask; uniform float4 _OutlineMask_ST;
-uniform float _OutlineCutoffRange;
-uniform float _OutlineTextureColorRate;
-uniform float _OutlineShadeMix;
-
 float4 frag(VertexOutput i) : COLOR {
 
-    // i.normalDir = normalize(i.normalDir);
-    float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir);
+    float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, i.faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
     float3 _BumpMap_var = UnpackScaleNormal(tex2D(_BumpMap,TRANSFORM_TEX(i.uv0, _BumpMap)), _BumpScale);
     float3 normalLocal = _BumpMap_var.rgb;
@@ -84,7 +9,7 @@ float4 frag(VertexOutput i) : COLOR {
     float3 lightColor = _LightColor0.rgb;
     float3 halfDirection = normalize(viewDirection+lightDirection);
 
-    UNITY_LIGHT_ATTENUATION(attenuation,i, i.posWorld.xyz);
+    UNITY_LIGHT_ATTENUATION(attenuation, i, i.posWorld.xyz);
 
     float4 _MainTex_var = tex2D(_MainTex,TRANSFORM_TEX(i.uv0, _MainTex));
     float3 Diffuse = (_MainTex_var.rgb*_Color.rgb);
@@ -115,6 +40,7 @@ float4 frag(VertexOutput i) : COLOR {
         float3 ShadeSH9Minus = ShadeSH9Indirect();
     #endif
 
+    // 陰の計算
     float3 directLighting = saturate((ShadeSH9Plus+lightColor));
     ShadeSH9Minus *= _ShadowIndirectIntensity;
     float3 indirectLighting = saturate(ShadeSH9Minus);
@@ -130,7 +56,6 @@ float4 frag(VertexOutput i) : COLOR {
 
     float ShadowborderMin = max(0, _Shadowborder - _ShadowborderBlur/2);
     float ShadowborderMax = min(1, _Shadowborder + _ShadowborderBlur/2);
-
     float grayscaleDirectLighting2 = (((dot(lightDirection,normalDirection)*0.5+0.5)*grayscalelightcolor) + dot(ShadeSH9Normal( normalDirection ),grayscale_vector));
     float remappedLight2 = ((grayscaleDirectLighting2-bottomIndirectLighting)/lightDifference);
     float directContribution = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin)) / (ShadowborderMax - ShadowborderMin))));
@@ -139,9 +64,9 @@ float4 frag(VertexOutput i) : COLOR {
     float otherShadow = saturate(saturate((attenuation-0.5)*2)+(1-selfShade)*_OtherShadowBorderSharpness);
     directContribution = lerp(0, directContribution, saturate(1-((1-otherShadow) * saturate(dot(lightColor,grayscale_for_light())*1.5))));
 
-    #ifdef USE_SHADOW_STEPS
-        directContribution = min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1));
-    #endif
+    // #ifdef USE_SHADOW_STEPS
+        directContribution = lerp(directContribution, min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1)), _ShadowUseStep);
+    // #endif
 
     #ifdef USE_SHADE_TEXTURE
         directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * 1;
@@ -149,14 +74,17 @@ float4 frag(VertexOutput i) : COLOR {
         directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * _ShadowStrength;
     #endif
 
+    directContribution *= i.lightIntensityIfBackface;
+
     // 頂点ライティング：PixelLightから溢れた4光源をそれぞれ計算
     #ifdef USE_VERTEX_LIGHT
         float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur/2.0);
         float VertexShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur/2.0);
         float4 directContributionVertex = 1.0 - ((1.0 - saturate(( (saturate(i.ambientAttenuation) - VertexShadowborderMin)) / (VertexShadowborderMax - VertexShadowborderMin))));
-        #ifdef USE_POINT_SHADOW_STEPS
-            directContributionVertex = min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1));
-        #endif
+        // #ifdef USE_POINT_SHADOW_STEPS
+            directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
+        // #endif
+        directContributionVertex *= i.lightIntensityIfBackface;
         float3 coloredLight_0 = max(directContributionVertex.r * i.lightColor0 * i.ambientAttenuation.r, i.lightColor0 * i.ambientIndirect.r * (1-_PointShadowStrength));
         float3 coloredLight_1 = max(directContributionVertex.g * i.lightColor1 * i.ambientAttenuation.g, i.lightColor1 * i.ambientIndirect.g * (1-_PointShadowStrength));
         float3 coloredLight_2 = max(directContributionVertex.b * i.lightColor2 * i.ambientAttenuation.b, i.lightColor2 * i.ambientIndirect.b * (1-_PointShadowStrength));
@@ -184,6 +112,7 @@ float4 frag(VertexOutput i) : COLOR {
             float ShadowborderMin2 = max(0, (_ShadowPlanB2border * _Shadowborder) - _ShadowPlanB2borderBlur/2);
             float ShadowborderMax2 = min(1, (_ShadowPlanB2border * _Shadowborder) + _ShadowPlanB2borderBlur/2);
             float directContribution2 = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin2)) / (ShadowborderMax2 - ShadowborderMin2))));  // /2の部分をパラメーターにしたい
+            directContribution2 *= i.lightIntensityIfBackface;
             #ifdef USE_CUSTOM_SHADOW_TEXTURE_2ND
                 float4 _ShadowPlanB2CustomShadowTexture_var = tex2D(_ShadowPlanB2CustomShadowTexture,TRANSFORM_TEX(i.uv0, _ShadowPlanB2CustomShadowTexture));
                 float3 shadowCustomTexture2 = _ShadowPlanB2CustomShadowTexture_var.rgb * _ShadowPlanB2CustomShadowTextureRGB.rgb;
@@ -214,6 +143,7 @@ float4 frag(VertexOutput i) : COLOR {
     #ifdef USE_OUTLINE
     if (!i.isOutline) {
     #endif
+
         // オプション：Reflection
         #ifdef USE_REFLECTION
             float3 normalDirectionReflection = normalize(mul( float3(normalLocal.r*_ReflectionNormalMix,normalLocal.g*_ReflectionNormalMix,normalLocal.b), tangentTransform ));
@@ -248,6 +178,7 @@ float4 frag(VertexOutput i) : COLOR {
             ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
         #endif
+
         // オプション：Gloss
         #ifdef USE_GLOSS
             float glossNdotV = abs(dot( normalDirection, viewDirection ));
@@ -281,14 +212,22 @@ float4 frag(VertexOutput i) : COLOR {
             half grazingTerm = saturate( gloss + specularMonochrome );
             specular = attenuation * directSpecular * _GlossColor.rgb;
         #endif
+
         // オプション：MatCap
-        #ifdef USE_MATCAP
-            float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rgb.rg*0.5+0.5);
-            float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
-            float4 _MatcapBlendMask_var = tex2D(_MatcapBlendMask,TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
-            matcap = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
+        float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
+        #ifdef USE_LEGACY_CAP_CALC
+            float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
+        #else
+            float3 transformMatcapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
+            float3 transformMatcapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz * float3(-1,-1,1);
+            float3 transformMatcapCombined = transformMatcapViewDir * dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z - transformMatcapNormal;
+            float2 transformMatcap = ((transformMatcapCombined.rg*0.5)+0.5);
         #endif
+        float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
+        float4 _MatcapBlendMask_var = tex2D(_MatcapBlendMask,TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
+        float3 matcapResult = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
+        matcap = lerp(0, matcapResult, _UseMatcap);
+
         // オプション：Rim
         #ifdef USE_RIM
             float _RimBlendMask_var = tex2D(_RimBlendMask, TRANSFORM_TEX(i.uv0, _RimBlendMask));
@@ -296,7 +235,7 @@ float4 frag(VertexOutput i) : COLOR {
             RimLight = (
                             lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
                             * pow(
-                                min(1.0, 1.0 - max(0, dot(normalDirection * i.faceSign, viewDirection) ) + _RimUpperSideWidth)
+                                min(1.0, 1.0 - max(0, dot(normalDirection * lerp(i.faceSign, 1, _DoubleSidedFlipBackfaceNormal), viewDirection) ) + _RimUpperSideWidth)
                                 , _RimFresnelPower
                                 )
                             * _RimBlend
@@ -305,10 +244,18 @@ float4 frag(VertexOutput i) : COLOR {
                             * lerp(float3(1,1,1), finalLight,_RimShadeMix)
                         );
         #endif
+
         // オプション:ShadeCap
         #ifdef USE_SHADOWCAP
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rgb.rg*0.5+0.5);
+            #ifdef USE_LEGACY_CAP_CALC
+                float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
+            #else
+                float3 transformShadowCapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
+                float3 transformShadowCapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz * float3(-1,-1,1);
+                float3 transformShadowCapCombined = transformShadowCapViewDir * dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z - transformShadowCapNormal;
+                float2 transformShadowCap = ((transformShadowCapCombined.rg*0.5)+0.5);
+            #endif
             float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
             float4 _ShadowCapBlendMask_var = tex2D(_ShadowCapBlendMask,TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
@@ -320,7 +267,6 @@ float4 frag(VertexOutput i) : COLOR {
 
     float3 finalcolor2 = ToonedMap+ReflectionMap + specular;
 
-
     // ShadeCapのブレンドモード
     #ifdef USE_SHADOWCAP
         #ifdef _SHADOWCAPBLENDMODE_DARKEN
@@ -331,20 +277,17 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
 
     // MatCapのブレンドモード
-    #ifdef USE_MATCAP
-        #ifdef _MATCAPBLENDMODE_LIGHTEN
-            finalcolor2 = max(finalcolor2, matcap);
-        #elif _MATCAPBLENDMODE_ADD
-            finalcolor2 = finalcolor2 + matcap;
-        #elif _MATCAPBLENDMODE_SCREEN
-            finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
-        #endif
+    #ifdef _MATCAPBLENDMODE_LIGHTEN
+        finalcolor2 = max(finalcolor2, matcap);
+    #elif _MATCAPBLENDMODE_ADD
+        finalcolor2 = finalcolor2 + matcap;
+    #elif _MATCAPBLENDMODE_SCREEN
+        finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
     #endif
 
-    // EmissiveColorはこのタイミングで合成
+    // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(_EmissionMap,TRANSFORM_TEX(i.uv0, _EmissionMap)).rgb *_EmissionColor.rgb;
     float3 emissive = max(lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive), RimLight) * !i.isOutline;
-
     float3 finalColor = emissive + finalcolor2;
 
     #ifdef ARKTOON_FADE

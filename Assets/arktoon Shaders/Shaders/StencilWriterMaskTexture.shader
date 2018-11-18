@@ -8,6 +8,9 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
     Properties {
         // Double Sided
         [Toggle(DOUBLE_SIDED)]_UseDoubleSided ("Double Sided", Float ) = 0
+        [Toggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
+        _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
+        [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
         // Common
         _MainTex ("[Common] Base Texture", 2D) = "white" {}
         _Color ("[Common] Base Color", Color) = (1,1,1,1)
@@ -24,14 +27,14 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _ShadowStrengthMask ("[Shadow] Strength Mask", 2D) = "white" {}
         _ShadowIndirectIntensity ("[Shadow] Indirect face Intensity", Range(0,0.5)) = 0.25
         // Shadow steps
-        [Toggle(USE_SHADOW_STEPS)]_ShadowUseStep ("[Shadow] use step", Float ) = 0
+        [Toggle]_ShadowUseStep ("[Shadow] use step", Float ) = 0
         _ShadowSteps("[Shadow] steps between borders", Range(2, 10)) = 4
         // PointShadow (received from Point/Spot Lights as Pixel/Vertex Lights)
         _PointAddIntensity ("[PointShadow] Light Intensity", Range(0,1)) = 1
         _PointShadowStrength ("[PointShadow] Strength", Range(0, 1)) = 0.5
         _PointShadowborder ("[PointShadow] border ", Range(0, 1)) = 0.5
         _PointShadowborderBlur ("[PointShadow] border Blur", Range(0, 1)) = 0.01
-        [Toggle(USE_POINT_SHADOW_STEPS)]_PointShadowUseStep ("[PointShadow] use step", Float ) = 0
+        [Toggle]_PointShadowUseStep ("[PointShadow] use step", Float ) = 0
         _PointShadowSteps("[PointShadow] steps between borders", Range(2, 10)) = 2
         // Plan B
         [Toggle(USE_SHADE_TEXTURE)]_ShadowPlanBUsePlanB ("[Plan B] Use Plan B", Float ) = 0
@@ -70,7 +73,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         [Toggle(USE_OUTLINE_WIDTH_MASK)]_UseOutlineWidthMask ("[Outline] Use Width Mask", Float) = 0
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
         // MatCap
-        [Toggle(USE_MATCAP)]_UseMatcap ("[MatCap] Enabled", Float) = 0
+        [Toggle]_UseMatcap ("[MatCap] Enabled", Float) = 0
         [KeywordEnum(Add, Lighten, Screen)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 0
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
         _MatcapBlendMask ("[MatCap] Blend Mask", 2D) = "white" {}
@@ -118,6 +121,8 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         [Toggle(USE_VERTEX_LIGHT)]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Float) = 1
         // Light Sampling
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
+        // Legacy MatCap/ShadeCap Calculation
+        [Toggle(USE_LEGACY_CAP_CALC)]_UseLegacyCapCalc ("[Mat/ShadowCap] Use Legacy Calculation", Float) = 0
         // Backface Color Multiply
         // _BackfaceColorMultiply ("[Advancced] Backface Color Multiply", Color) = (1,1,1,1)
     }
@@ -149,6 +154,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma target 5.0
             #define ARKTOON_CUTOUT
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeFragOnlyStencilWrite.cginc"
@@ -164,24 +170,22 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
             #pragma shader_feature USE_GLOSS
-            #pragma shader_feature USE_MATCAP
             #pragma shader_feature USE_REFLECTION
             #pragma shader_feature USE_REFLECTION_PROBE
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
-            #pragma shader_feature USE_SHADOW_STEPS
-            #pragma shader_feature USE_POINT_SHADOW_STEPS
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
+            #pragma shader_feature USE_LEGACY_CAP_CALC
 
-            #pragma multi_compile _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
-            #pragma multi_compile _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
-            #pragma multi_compile _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
+            #pragma shader_feature _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
+            #pragma shader_feature _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
 
             #pragma vertex vert
             #pragma geometry geom
@@ -192,6 +196,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma target 5.0
             #define ARKTOON_CUTOUT
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeFrag.cginc"
@@ -209,13 +214,12 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_RIM
-            #pragma shader_feature USE_MATCAP
-            #pragma shader_feature USE_POINT_SHADOW_STEPS
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
-            #pragma multi_compile _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
-            #pragma multi_compile _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
+            #pragma shader_feature USE_LEGACY_CAP_CALC
+            #pragma shader_feature _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
 
             #pragma vertex vert
             #pragma geometry geom
@@ -227,6 +231,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #define ARKTOON_CUTOUT
             #define ARKTOON_ADD
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeAdd.cginc"
@@ -238,7 +243,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
                 "LightMode"="ShadowCaster"
             }
             Offset 1, 1
-            Cull Back
+            Cull [_ShadowCasterCulling]
 
             CGPROGRAM
             #pragma vertex vert

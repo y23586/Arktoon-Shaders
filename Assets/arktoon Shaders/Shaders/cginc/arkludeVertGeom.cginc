@@ -1,6 +1,3 @@
-#include "UnityCG.cginc"
-#include "AutoLight.cginc"
-#include "Lighting.cginc"
 
 struct v2g
 {
@@ -21,8 +18,6 @@ struct v2g
         float3 lightColor1 : LIGHT_COLOR1;
         float3 lightColor2 : LIGHT_COLOR2;
         float3 lightColor3 : LIGHT_COLOR3;
-        float4 ambientAttenuation : AMBIENT_ATTEN;
-        float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
 };
 
@@ -46,56 +41,16 @@ v2g vert(appdata_full v) {
 
     #ifndef ARKTOON_ADD
         // 頂点ライティングが必要な場合に取得
-        #if UNITY_SHOULD_SAMPLE_SH
-            #if defined(VERTEXLIGHT_ON) && defined(USE_VERTEX_LIGHT)
-                o.lightColor0 = unity_LightColor[0].rgb;
-                o.lightColor1 = unity_LightColor[1].rgb;
-                o.lightColor2 = unity_LightColor[2].rgb;
-                o.lightColor3 = unity_LightColor[3].rgb;
-
-                // Shade4PointLightsを展開して改変
-                // {
-                    // to light vectors
-                    float4 toLightX = unity_4LightPosX0 - o.posWorld.x;
-                    float4 toLightY = unity_4LightPosY0 - o.posWorld.y;
-                    float4 toLightZ = unity_4LightPosZ0 - o.posWorld.z;
-                    // squared lengths
-                    float4 lengthSq = 0;
-                    lengthSq += toLightX * toLightX;
-                    lengthSq += toLightY * toLightY;
-                    lengthSq += toLightZ * toLightZ;
-                    // don't produce NaNs if some vertex position overlaps with the light
-                    lengthSq = max(lengthSq, 0.000001);
-
-                    // NdotL
-                    float4 ndotl = 0;
-                    ndotl += toLightX * o.normalDir.x;
-                    ndotl += toLightY * o.normalDir.y;
-                    ndotl += toLightZ * o.normalDir.z;
-                    // correct NdotL
-                    float4 corr = rsqrt(lengthSq);
-                    ndotl = max (float4(0,0,0,0), ndotl * corr);
-                    // attenuation
-                    float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
-                    float4 diff = ndotl * atten;
-                // }
-
-                o.ambientAttenuation = diff;
-                o.ambientIndirect = sqrt(min(1,corr* atten));
-
-            #else
-                o.lightColor0 = 0;
-                o.lightColor1 = 0;
-                o.lightColor2 = 0;
-                o.lightColor3 = 0;
-                o.ambientIndirect = o.ambientAttenuation = 0;
-            #endif
+        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON) && defined(USE_VERTEX_LIGHT)
+            o.lightColor0 = unity_LightColor[0].rgb;
+            o.lightColor1 = unity_LightColor[1].rgb;
+            o.lightColor2 = unity_LightColor[2].rgb;
+            o.lightColor3 = unity_LightColor[3].rgb;
         #else
             o.lightColor0 = 0;
             o.lightColor1 = 0;
             o.lightColor2 = 0;
             o.lightColor3 = 0;
-            o.ambientIndirect = o.ambientAttenuation = 0;
         #endif
     #endif
 
@@ -112,6 +67,7 @@ struct VertexOutput {
     fixed4 col : COLOR0;
 	bool isOutline : IS_OUTLINE;
     int faceSign : FACE_SIGN;
+    float lightIntensityIfBackface : LIGHT_INTENSITY;
     SHADOW_COORDS(6)
     UNITY_FOG_COORDS(7)
     fixed4 color : COLOR1;
@@ -125,9 +81,39 @@ struct VertexOutput {
     #endif
 };
 
-uniform float _OutlineWidth;
-uniform float4 _OutlineColor;
-uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST;
+#ifndef ARKTOON_ADD
+    inline void calcAmbientByShade4PointLights(float flipNormal, inout VertexOutput o) {
+        // Shade4PointLightsを展開して改変
+        // {
+            // to light vectors
+            float4 toLightX = unity_4LightPosX0 - o.posWorld.x;
+            float4 toLightY = unity_4LightPosY0 - o.posWorld.y;
+            float4 toLightZ = unity_4LightPosZ0 - o.posWorld.z;
+            // squared lengths
+            float4 lengthSq = 0;
+            lengthSq += toLightX * toLightX;
+            lengthSq += toLightY * toLightY;
+            lengthSq += toLightZ * toLightZ;
+            // don't produce NaNs if some vertex position overlaps with the light
+            lengthSq = max(lengthSq, 0.000001);
+
+            // NdotL
+            float4 ndotl = 0;
+            ndotl += toLightX * (o.normalDir.x * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+            ndotl += toLightY * (o.normalDir.y * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+            ndotl += toLightZ * (o.normalDir.z * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+
+            // correct NdotL
+            float4 corr = rsqrt(lengthSq);
+            ndotl = max (float4(0,0,0,0), ndotl * corr);
+            // attenuation
+            float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
+            float4 diff = ndotl * atten;
+        // }
+        o.ambientAttenuation = diff;
+        o.ambientIndirect = sqrt(min(1,corr* atten));
+    }
+#endif
 
 [maxvertexcount(9)]
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
@@ -150,9 +136,9 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 		o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
 		o.tangentDir = IN[i].tangentDir;
 		o.bitangentDir = IN[i].bitangentDir;
-		o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
 		o.isOutline = true;
         o.faceSign = -1;
+        o.lightIntensityIfBackface = 1;
 
 		// Pass-through the shadow coordinates if this pass has shadows.
 		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -169,8 +155,11 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor1          = IN[i].lightColor1;
             o.lightColor2          = IN[i].lightColor2;
             o.lightColor3          = IN[i].lightColor3;
-            o.ambientAttenuation   = IN[i].ambientAttenuation;
-            o.ambientIndirect      = IN[i].ambientIndirect;
+            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
+                calcAmbientByShade4PointLights(0, o);
+            #else
+                o.ambientAttenuation = o.ambientIndirect = 0;
+            #endif
         #endif
 
 		tristream.Append(o);
@@ -190,9 +179,9 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 		o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
 		o.tangentDir = IN[iii].tangentDir;
 		o.bitangentDir = IN[iii].bitangentDir;
-		o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
 		o.isOutline = false;
         o.faceSign = -1;
+        o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
 
 		// Pass-through the shadow coordinates if this pass has shadows.
 		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -209,8 +198,11 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor1          = IN[iii].lightColor1;
             o.lightColor2          = IN[iii].lightColor2;
             o.lightColor3          = IN[iii].lightColor3;
-            o.ambientAttenuation   = IN[iii].ambientAttenuation;
-            o.ambientIndirect      = IN[iii].ambientIndirect;
+            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
+                calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
+            #else
+                o.ambientAttenuation = o.ambientIndirect = 0;
+            #endif
         #endif
 
 		tristream.Append(o);
@@ -229,9 +221,9 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 		o.normalDir = UnityObjectToWorldNormal(IN[ii].normal);
 		o.tangentDir = IN[ii].tangentDir;
 		o.bitangentDir = IN[ii].bitangentDir;
-		o.posWorld = mul(unity_ObjectToWorld, IN[ii].vertex);
 		o.isOutline = false;
         o.faceSign = 1;
+        o.lightIntensityIfBackface = 1;
 
 		// Pass-through the shadow coordinates if this pass has shadows.
 		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -248,8 +240,11 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor1          = IN[ii].lightColor1;
             o.lightColor2          = IN[ii].lightColor2;
             o.lightColor3          = IN[ii].lightColor3;
-            o.ambientAttenuation   = IN[ii].ambientAttenuation;
-            o.ambientIndirect      = IN[ii].ambientIndirect;
+            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
+                calcAmbientByShade4PointLights(0, o);
+            #else
+                o.ambientAttenuation = o.ambientIndirect = 0;
+            #endif
         #endif
 
 		tristream.Append(o);
