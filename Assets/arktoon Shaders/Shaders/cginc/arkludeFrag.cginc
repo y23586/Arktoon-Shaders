@@ -20,11 +20,13 @@ uniform float _Shadowborder;
 uniform float _ShadowborderBlur;
 uniform float _ShadowStrength;
 uniform float _ShadowIndirectIntensity;
+uniform float _ShadowUseStep;
 uniform int _ShadowSteps;
 uniform float _PointAddIntensity;
 uniform float _PointShadowStrength;
 uniform float _PointShadowborder;
 uniform float _PointShadowborderBlur;
+uniform float _PointShadowUseStep;
 uniform int _PointShadowSteps;
 uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
 uniform sampler2D _BumpMap; uniform float4 _BumpMap_ST;
@@ -140,9 +142,9 @@ float4 frag(VertexOutput i) : COLOR {
     float otherShadow = saturate(saturate((attenuation-0.5)*2)+(1-selfShade)*_OtherShadowBorderSharpness);
     directContribution = lerp(0, directContribution, saturate(1-((1-otherShadow) * saturate(dot(lightColor,grayscale_for_light())*1.5))));
 
-    #ifdef USE_SHADOW_STEPS
-        directContribution = min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1));
-    #endif
+    // #ifdef USE_SHADOW_STEPS
+        directContribution = lerp(directContribution, min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1)), _ShadowUseStep);
+    // #endif
 
     #ifdef USE_SHADE_TEXTURE
         directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * 1;
@@ -157,9 +159,9 @@ float4 frag(VertexOutput i) : COLOR {
         float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur/2.0);
         float VertexShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur/2.0);
         float4 directContributionVertex = 1.0 - ((1.0 - saturate(( (saturate(i.ambientAttenuation) - VertexShadowborderMin)) / (VertexShadowborderMax - VertexShadowborderMin))));
-        #ifdef USE_POINT_SHADOW_STEPS
-            directContributionVertex = min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1));
-        #endif
+        // #ifdef USE_POINT_SHADOW_STEPS
+            directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
+        // #endif
         directContributionVertex *= i.lightIntensityIfBackface;
         float3 coloredLight_0 = max(directContributionVertex.r * i.lightColor0 * i.ambientAttenuation.r, i.lightColor0 * i.ambientIndirect.r * (1-_PointShadowStrength));
         float3 coloredLight_1 = max(directContributionVertex.g * i.lightColor1 * i.ambientAttenuation.g, i.lightColor1 * i.ambientIndirect.g * (1-_PointShadowStrength));
@@ -286,6 +288,7 @@ float4 frag(VertexOutput i) : COLOR {
             half grazingTerm = saturate( gloss + specularMonochrome );
             specular = attenuation * directSpecular * _GlossColor.rgb;
         #endif
+
         // オプション：MatCap
         float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
         #ifdef USE_LEGACY_CAP_CALC

@@ -504,7 +504,6 @@ namespace ArktoonShaders
                     OtherShadowAdjust.floatValue = -0.1f;
                     OtherShadowBorderSharpness.floatValue = 3;
                     PointShadowUseStep.floatValue = 0;
-                    material.DisableKeyword("USE_POINT_SHADOW_STEPS");
                     PointShadowSteps.floatValue = 2;
                     ShadowIndirectIntensity.floatValue = 0.25f;
                     VertexColorBlendDiffuse.floatValue = 0f;

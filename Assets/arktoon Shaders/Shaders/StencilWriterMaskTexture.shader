@@ -27,14 +27,14 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _ShadowStrengthMask ("[Shadow] Strength Mask", 2D) = "white" {}
         _ShadowIndirectIntensity ("[Shadow] Indirect face Intensity", Range(0,0.5)) = 0.25
         // Shadow steps
-        [Toggle(USE_SHADOW_STEPS)]_ShadowUseStep ("[Shadow] use step", Float ) = 0
+        [Toggle]_ShadowUseStep ("[Shadow] use step", Float ) = 0
         _ShadowSteps("[Shadow] steps between borders", Range(2, 10)) = 4
         // PointShadow (received from Point/Spot Lights as Pixel/Vertex Lights)
         _PointAddIntensity ("[PointShadow] Light Intensity", Range(0,1)) = 1
         _PointShadowStrength ("[PointShadow] Strength", Range(0, 1)) = 0.5
         _PointShadowborder ("[PointShadow] border ", Range(0, 1)) = 0.5
         _PointShadowborderBlur ("[PointShadow] border Blur", Range(0, 1)) = 0.01
-        [Toggle(USE_POINT_SHADOW_STEPS)]_PointShadowUseStep ("[PointShadow] use step", Float ) = 0
+        [Toggle]_PointShadowUseStep ("[PointShadow] use step", Float ) = 0
         _PointShadowSteps("[PointShadow] steps between borders", Range(2, 10)) = 2
         // Plan B
         [Toggle(USE_SHADE_TEXTURE)]_ShadowPlanBUsePlanB ("[Plan B] Use Plan B", Float ) = 0
@@ -174,8 +174,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
-            #pragma shader_feature USE_SHADOW_STEPS
-            #pragma shader_feature USE_POINT_SHADOW_STEPS
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
@@ -214,7 +212,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_RIM
-            #pragma shader_feature USE_POINT_SHADOW_STEPS
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED

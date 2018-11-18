@@ -12,6 +12,7 @@ uniform float _PointAddIntensity;
 uniform float _PointShadowStrength;
 uniform float _PointShadowborder;
 uniform float _PointShadowborderBlur;
+uniform float _PointShadowUseStep;
 uniform int _PointShadowSteps;
 uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
 uniform sampler2D _BumpMap; uniform float4 _BumpMap_ST;
@@ -85,9 +86,9 @@ float4 frag(VertexOutput i) : COLOR {
 
     float lightContribution = dot(normalize(_WorldSpaceLightPos0.xyz - i.posWorld.xyz),normalDirection)*attenuation;
     float directContribution = 1.0 - ((1.0 - saturate(( (saturate(lightContribution) - ShadowborderMin)) / (ShadowborderMax - ShadowborderMin))));
-    #ifdef USE_POINT_SHADOW_STEPS
-        directContribution = min(1,floor(directContribution * _PointShadowSteps) / (_PointShadowSteps - 1));
-    #endif
+    // #ifdef USE_POINT_SHADOW_STEPS
+        directContribution = lerp(directContribution, min(1,floor(directContribution * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
+    // #endif
     directContribution *= i.lightIntensityIfBackface;
     float _ShadowStrengthMask_var = tex2D(_ShadowStrengthMask, TRANSFORM_TEX(i.uv0, _ShadowStrengthMask));
     float3 finalLight = saturate(directContribution + ((1 - (_PointShadowStrength * _ShadowStrengthMask_var)) * attenuation));
