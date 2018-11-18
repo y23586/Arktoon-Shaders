@@ -221,6 +221,7 @@ float4 frag(VertexOutput i) : COLOR {
     #ifdef USE_OUTLINE
     if (!i.isOutline) {
     #endif
+
         // オプション：Reflection
         #ifdef USE_REFLECTION
             float3 normalDirectionReflection = normalize(mul( float3(normalLocal.r*_ReflectionNormalMix,normalLocal.g*_ReflectionNormalMix,normalLocal.b), tangentTransform ));
@@ -255,6 +256,7 @@ float4 frag(VertexOutput i) : COLOR {
             ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
         #endif
+
         // オプション：Gloss
         #ifdef USE_GLOSS
             float glossNdotV = abs(dot( normalDirection, viewDirection ));
@@ -342,7 +344,6 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
 
     float3 finalcolor2 = ToonedMap+ReflectionMap + specular;
-
 
     // ShadeCapのブレンドモード
     #ifdef USE_SHADOWCAP

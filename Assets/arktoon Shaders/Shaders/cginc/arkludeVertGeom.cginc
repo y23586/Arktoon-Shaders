@@ -90,6 +90,40 @@ uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST;
 uniform float _DoubleSidedBackfaceLightIntensity;
 uniform float _DoubleSidedFlipBackfaceNormal;
 
+#ifndef ARKTOON_ADD
+    inline void calcAmbientByShade4PointLights(float flipNormal, inout VertexOutput o) {
+        // Shade4PointLightsを展開して改変
+        // {
+            // to light vectors
+            float4 toLightX = unity_4LightPosX0 - o.posWorld.x;
+            float4 toLightY = unity_4LightPosY0 - o.posWorld.y;
+            float4 toLightZ = unity_4LightPosZ0 - o.posWorld.z;
+            // squared lengths
+            float4 lengthSq = 0;
+            lengthSq += toLightX * toLightX;
+            lengthSq += toLightY * toLightY;
+            lengthSq += toLightZ * toLightZ;
+            // don't produce NaNs if some vertex position overlaps with the light
+            lengthSq = max(lengthSq, 0.000001);
+
+            // NdotL
+            float4 ndotl = 0;
+            ndotl += toLightX * (o.normalDir.x * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+            ndotl += toLightY * (o.normalDir.y * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+            ndotl += toLightZ * (o.normalDir.z * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+
+            // correct NdotL
+            float4 corr = rsqrt(lengthSq);
+            ndotl = max (float4(0,0,0,0), ndotl * corr);
+            // attenuation
+            float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
+            float4 diff = ndotl * atten;
+        // }
+        o.ambientAttenuation = diff;
+        o.ambientIndirect = sqrt(min(1,corr* atten));
+    }
+#endif
+
 [maxvertexcount(9)]
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 {
@@ -131,35 +165,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor2          = IN[i].lightColor2;
             o.lightColor3          = IN[i].lightColor3;
             #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                // Shade4PointLightsを展開して改変
-                // {
-                    // to light vectors
-                    float4 toLightX = unity_4LightPosX0 - o.posWorld.x;
-                    float4 toLightY = unity_4LightPosY0 - o.posWorld.y;
-                    float4 toLightZ = unity_4LightPosZ0 - o.posWorld.z;
-                    // squared lengths
-                    float4 lengthSq = 0;
-                    lengthSq += toLightX * toLightX;
-                    lengthSq += toLightY * toLightY;
-                    lengthSq += toLightZ * toLightZ;
-                    // don't produce NaNs if some vertex position overlaps with the light
-                    lengthSq = max(lengthSq, 0.000001);
-
-                    // NdotL
-                    float4 ndotl = 0;
-                    ndotl += toLightX * o.normalDir.x;
-                    ndotl += toLightY * o.normalDir.y;
-                    ndotl += toLightZ * o.normalDir.z;
-                    // correct NdotL
-                    float4 corr = rsqrt(lengthSq);
-                    ndotl = max (float4(0,0,0,0), ndotl * corr);
-                    // attenuation
-                    float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
-                    float4 diff = ndotl * atten;
-                // }
-
-                o.ambientAttenuation = diff;
-                o.ambientIndirect = sqrt(min(1,corr* atten));
+                calcAmbientByShade4PointLights(0, o);
             #else
                 o.ambientAttenuation = o.ambientIndirect = 0;
             #endif
@@ -202,36 +208,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor2          = IN[iii].lightColor2;
             o.lightColor3          = IN[iii].lightColor3;
             #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                // Shade4PointLightsを展開して改変
-                // {
-                    // to light vectors
-                    float4 toLightX = unity_4LightPosX0 - o.posWorld.x;
-                    float4 toLightY = unity_4LightPosY0 - o.posWorld.y;
-                    float4 toLightZ = unity_4LightPosZ0 - o.posWorld.z;
-                    // squared lengths
-                    float4 lengthSq = 0;
-                    lengthSq += toLightX * toLightX;
-                    lengthSq += toLightY * toLightY;
-                    lengthSq += toLightZ * toLightZ;
-                    // don't produce NaNs if some vertex position overlaps with the light
-                    lengthSq = max(lengthSq, 0.000001);
-
-                    // NdotL
-                    float4 ndotl = 0;
-                    ndotl += toLightX * (o.normalDir.x * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
-                    ndotl += toLightY * (o.normalDir.y * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
-                    ndotl += toLightZ * (o.normalDir.z * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
-
-                    // correct NdotL
-                    float4 corr = rsqrt(lengthSq);
-                    ndotl = max (float4(0,0,0,0), ndotl * corr);
-                    // attenuation
-                    float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
-                    float4 diff = ndotl * atten;
-                // }
-
-                o.ambientAttenuation = diff;
-                o.ambientIndirect = sqrt(min(1,corr* atten));
+                calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
             #else
                 o.ambientAttenuation = o.ambientIndirect = 0;
             #endif
@@ -273,35 +250,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor2          = IN[ii].lightColor2;
             o.lightColor3          = IN[ii].lightColor3;
             #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                // Shade4PointLightsを展開して改変
-                // {
-                    // to light vectors
-                    float4 toLightX = unity_4LightPosX0 - o.posWorld.x;
-                    float4 toLightY = unity_4LightPosY0 - o.posWorld.y;
-                    float4 toLightZ = unity_4LightPosZ0 - o.posWorld.z;
-                    // squared lengths
-                    float4 lengthSq = 0;
-                    lengthSq += toLightX * toLightX;
-                    lengthSq += toLightY * toLightY;
-                    lengthSq += toLightZ * toLightZ;
-                    // don't produce NaNs if some vertex position overlaps with the light
-                    lengthSq = max(lengthSq, 0.000001);
-
-                    // NdotL
-                    float4 ndotl = 0;
-                    ndotl += toLightX * o.normalDir.x;
-                    ndotl += toLightY * o.normalDir.y;
-                    ndotl += toLightZ * o.normalDir.z;
-                    // correct NdotL
-                    float4 corr = rsqrt(lengthSq);
-                    ndotl = max (float4(0,0,0,0), ndotl * corr);
-                    // attenuation
-                    float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
-                    float4 diff = ndotl * atten;
-                // }
-
-                o.ambientAttenuation = diff;
-                o.ambientIndirect = sqrt(min(1,corr* atten));
+                calcAmbientByShade4PointLights(0, o);
             #else
                 o.ambientAttenuation = o.ambientIndirect = 0;
             #endif

@@ -103,7 +103,7 @@ float4 frag(VertexOutput i) : COLOR {
     #ifdef USE_OUTLINE
     if (!i.isOutline) {
     #endif
-
+        // オプション：Gloss
         #ifdef USE_GLOSS
             float _GlossBlendMask_var = tex2D(_GlossBlendMask, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
 
@@ -139,6 +139,7 @@ float4 frag(VertexOutput i) : COLOR {
             specular = attenuation * directSpecular * _GlossColor.rgb;
         #endif
 
+        // オプション:ShadeCap
         #ifdef USE_SHADOWCAP
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
             #ifdef USE_LEGACY_CAP_CALC
@@ -154,6 +155,7 @@ float4 frag(VertexOutput i) : COLOR {
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
         #endif
 
+        // オプション：MatCap
         float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
         #ifdef USE_LEGACY_CAP_CALC
             float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
@@ -169,13 +171,13 @@ float4 frag(VertexOutput i) : COLOR {
         matcapResult = min(matcapResult, matcapResult * (coloredLight * _MatcapShadeMix));
         matcap = lerp(0, matcapResult, _UseMatcap);
 
+        // オプション：Rim
         #ifdef USE_RIM
             float _RimBlendMask_var = tex2D(_RimBlendMask, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
             RimLight = (lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )*pow(1.0-max(0,dot(normalDirection, viewDirection)),_RimFresnelPower)*_RimBlend*_RimColor.rgb*_RimBlendMask_var);
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
         #endif
-
     #ifdef USE_OUTLINE
     }
     #endif
