@@ -1,53 +1,3 @@
-#include "UnityCG.cginc"
-#include "AutoLight.cginc"
-#include "Lighting.cginc"
-
-uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
-uniform float4 _Color;
-uniform float _GlossPower;
-uniform float4 _GlossColor;
-
-uniform float _CutoutCutoutAdjust;
-uniform float _PointAddIntensity;
-uniform float _PointShadowStrength;
-uniform float _PointShadowborder;
-uniform float _PointShadowborderBlur;
-uniform float _PointShadowUseStep;
-uniform int _PointShadowSteps;
-uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
-uniform sampler2D _BumpMap; uniform float4 _BumpMap_ST;
-uniform float _BumpScale;
-
-uniform float _RimFresnelPower;
-uniform float4 _RimColor;
-uniform fixed _RimUseBaseTexture;
-uniform float _RimBlend;
-uniform float _RimShadeMix;
-uniform sampler2D _RimBlendMask; uniform float4 _RimBlendMask_ST;
-uniform sampler2D _RimTexture; uniform float4 _RimTexture_ST;
-
-uniform float _UseMatcap;
-uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
-uniform float _MatcapBlend;
-uniform sampler2D _MatcapBlendMask; uniform float4 _MatcapBlendMask_ST;
-uniform float4 _MatcapColor;
-uniform float _MatcapNormalMix;
-uniform float _MatcapShadeMix;
-
-uniform float _GlossBlend;
-uniform sampler2D _GlossBlendMask; uniform float4 _GlossBlendMask_ST;
-uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
-uniform sampler2D _ShadowCapBlendMask; uniform float4 _ShadowCapBlendMask_ST;
-uniform float _ShadowCapBlend;
-uniform float _ShadowCapNormalMix;
-
-uniform float _VertexColorBlendDiffuse;
-
-uniform sampler2D _OutlineMask; uniform float4 _OutlineMask_ST;
-uniform float _OutlineCutoffRange;
-uniform float _OutlineTextureColorRate;
-uniform float _OutlineShadeMix;
-
 float4 frag(VertexOutput i) : COLOR {
 
     i.normalDir = normalize(i.normalDir);
@@ -175,7 +125,16 @@ float4 frag(VertexOutput i) : COLOR {
         #ifdef USE_RIM
             float _RimBlendMask_var = tex2D(_RimBlendMask, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
-            RimLight = (lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )*pow(1.0-max(0,dot(normalDirection, viewDirection)),_RimFresnelPower)*_RimBlend*_RimColor.rgb*_RimBlendMask_var);
+            RimLight = (
+                lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
+                * pow(
+                    min(1.0, 1.0 - max(0, dot(normalDirection, viewDirection)) + _RimUpperSideWidth)
+                    , _RimFresnelPower
+                )
+                * _RimBlend
+                * _RimColor.rgb
+                * _RimBlendMask_var
+            );
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
         #endif
     #ifdef USE_OUTLINE

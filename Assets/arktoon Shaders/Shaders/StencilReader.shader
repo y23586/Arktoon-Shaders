@@ -171,6 +171,7 @@ Shader "arktoon/Stencil/Reader/Cutout" {
             #pragma target 5.0
             #define ARKTOON_CUTOUT
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeFrag.cginc"
@@ -210,6 +211,7 @@ Shader "arktoon/Stencil/Reader/Cutout" {
             #define ARKTOON_CUTOUT
             #define ARKTOON_ADD
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeAdd.cginc"

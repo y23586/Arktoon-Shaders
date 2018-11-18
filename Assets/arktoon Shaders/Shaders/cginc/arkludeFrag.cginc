@@ -1,83 +1,5 @@
-uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
-uniform float4 _Color;
-uniform float _GlossPower;
-uniform float4 _GlossColor;
-uniform float _CutoutCutoutAdjust;
-uniform float _ShadowPlanBDefaultShadowMix;
-uniform float _ShadowPlanBHueShiftFromBase;
-uniform float _ShadowPlanBSaturationFromBase;
-uniform float _ShadowPlanBValueFromBase;
-
-uniform float _ShadowPlanB2border;
-uniform float _ShadowPlanB2borderBlur;
-uniform float _ShadowPlanB2HueShiftFromBase;
-uniform float _ShadowPlanB2SaturationFromBase;
-uniform float _ShadowPlanB2ValueFromBase;
-uniform sampler2D _ShadowPlanB2CustomShadowTexture; uniform float4 _ShadowPlanB2CustomShadowTexture_ST;
-uniform float4 _ShadowPlanB2CustomShadowTextureRGB;
-
-uniform float _Shadowborder;
-uniform float _ShadowborderBlur;
-uniform float _ShadowStrength;
-uniform float _ShadowIndirectIntensity;
-uniform float _ShadowUseStep;
-uniform int _ShadowSteps;
-uniform float _PointAddIntensity;
-uniform float _PointShadowStrength;
-uniform float _PointShadowborder;
-uniform float _PointShadowborderBlur;
-uniform float _PointShadowUseStep;
-uniform int _PointShadowSteps;
-uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
-uniform sampler2D _BumpMap; uniform float4 _BumpMap_ST;
-uniform float _BumpScale;
-uniform sampler2D _EmissionMap; uniform float4 _EmissionMap_ST;
-uniform float4 _EmissionColor;
-uniform float _UseMatcap;
-uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
-uniform float _MatcapBlend;
-uniform sampler2D _MatcapBlendMask; uniform float4 _MatcapBlendMask_ST;
-uniform float4 _MatcapColor;
-uniform float _MatcapNormalMix;
-uniform float _MatcapShadeMix;
-
-uniform float _ReflectionReflectionPower;
-uniform sampler2D _ReflectionReflectionMask; uniform float4 _ReflectionReflectionMask_ST;
-uniform float _ReflectionNormalMix;
-uniform float _ReflectionShadeMix;
-uniform float _ReflectionSuppressBaseColorValue;
-uniform samplerCUBE _ReflectionCubemap;
-uniform half4  _ReflectionCubemap_HDR;
-
-uniform float _GlossBlend;
-uniform sampler2D _GlossBlendMask; uniform float4 _GlossBlendMask_ST;
-uniform float _RimFresnelPower;
-uniform float _RimUpperSideWidth;
-uniform float4 _RimColor;
-uniform fixed _RimUseBaseTexture;
-uniform float _RimBlend;
-uniform float _RimShadeMix;
-uniform sampler2D _RimBlendMask; uniform float4 _RimBlendMask_ST;
-uniform sampler2D _RimTexture; uniform float4 _RimTexture_ST;
-uniform sampler2D _ShadowPlanBCustomShadowTexture; uniform float4 _ShadowPlanBCustomShadowTexture_ST;
-uniform float4 _ShadowPlanBCustomShadowTextureRGB;
-uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
-uniform sampler2D _ShadowCapBlendMask; uniform float4 _ShadowCapBlendMask_ST;
-uniform float _ShadowCapBlend;
-uniform float _ShadowCapNormalMix;
-uniform float _VertexColorBlendDiffuse;
-uniform float _VertexColorBlendEmissive;
-uniform float _OtherShadowAdjust;
-uniform float _OtherShadowBorderSharpness;
-// uniform float4 _BackfaceColorMultiply;
-uniform sampler2D _OutlineMask; uniform float4 _OutlineMask_ST;
-uniform float _OutlineCutoffRange;
-uniform float _OutlineTextureColorRate;
-uniform float _OutlineShadeMix;
-
 float4 frag(VertexOutput i) : COLOR {
 
-    // i.normalDir = normalize(i.normalDir);
     float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, i.faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
     float3 _BumpMap_var = UnpackScaleNormal(tex2D(_BumpMap,TRANSFORM_TEX(i.uv0, _BumpMap)), _BumpScale);
@@ -118,6 +40,7 @@ float4 frag(VertexOutput i) : COLOR {
         float3 ShadeSH9Minus = ShadeSH9Indirect();
     #endif
 
+    // 陰の計算
     float3 directLighting = saturate((ShadeSH9Plus+lightColor));
     ShadeSH9Minus *= _ShadowIndirectIntensity;
     float3 indirectLighting = saturate(ShadeSH9Minus);
@@ -133,7 +56,6 @@ float4 frag(VertexOutput i) : COLOR {
 
     float ShadowborderMin = max(0, _Shadowborder - _ShadowborderBlur/2);
     float ShadowborderMax = min(1, _Shadowborder + _ShadowborderBlur/2);
-
     float grayscaleDirectLighting2 = (((dot(lightDirection,normalDirection)*0.5+0.5)*grayscalelightcolor) + dot(ShadeSH9Normal( normalDirection ),grayscale_vector));
     float remappedLight2 = ((grayscaleDirectLighting2-bottomIndirectLighting)/lightDifference);
     float directContribution = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin)) / (ShadowborderMax - ShadowborderMin))));
@@ -363,10 +285,9 @@ float4 frag(VertexOutput i) : COLOR {
         finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
     #endif
 
-    // EmissiveColorはこのタイミングで合成
+    // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(_EmissionMap,TRANSFORM_TEX(i.uv0, _EmissionMap)).rgb *_EmissionColor.rgb;
     float3 emissive = max(lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive), RimLight) * !i.isOutline;
-
     float3 finalColor = emissive + finalcolor2;
 
     #ifdef ARKTOON_FADE

@@ -1,6 +1,3 @@
-#include "UnityCG.cginc"
-#include "AutoLight.cginc"
-#include "Lighting.cginc"
 
 struct v2g
 {
@@ -83,12 +80,6 @@ struct VertexOutput {
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
 };
-
-uniform float _OutlineWidth;
-uniform float4 _OutlineColor;
-uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST;
-uniform float _DoubleSidedBackfaceLightIntensity;
-uniform float _DoubleSidedFlipBackfaceNormal;
 
 #ifndef ARKTOON_ADD
     inline void calcAmbientByShade4PointLights(float flipNormal, inout VertexOutput o) {

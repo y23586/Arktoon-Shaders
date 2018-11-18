@@ -163,6 +163,7 @@ Shader "arktoon/Fade" {
             #pragma target 5.0
             #define ARKTOON_FADE
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeFrag.cginc"
@@ -198,6 +199,7 @@ Shader "arktoon/Fade" {
             #define ARKTOON_FADE
             #define ARKTOON_ADD
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeAdd.cginc"

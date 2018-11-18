@@ -158,6 +158,7 @@ Shader "arktoon/Opaque" {
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 5.0
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeFrag.cginc"
@@ -191,6 +192,7 @@ Shader "arktoon/Opaque" {
             #pragma target 5.0
             #define ARKTOON_ADD
 
+            #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
             #include "cginc/arkludeVertGeom.cginc"
             #include "cginc/arkludeAdd.cginc"
