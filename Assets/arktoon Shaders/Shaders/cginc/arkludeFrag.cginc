@@ -31,6 +31,7 @@ uniform sampler2D _BumpMap; uniform float4 _BumpMap_ST;
 uniform float _BumpScale;
 uniform sampler2D _EmissionMap; uniform float4 _EmissionMap_ST;
 uniform float4 _EmissionColor;
+uniform float _UseMatcap;
 uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
 uniform float _MatcapBlend;
 uniform sampler2D _MatcapBlendMask; uniform float4 _MatcapBlendMask_ST;
@@ -75,11 +76,7 @@ uniform float _OutlineShadeMix;
 float4 frag(VertexOutput i) : COLOR {
 
     // i.normalDir = normalize(i.normalDir);
-    #ifdef FLIP_BACKFACE_NORMAL
-        float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * i.faceSign);
-    #else
-        float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir);
-    #endif
+    float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, i.faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
     float3 _BumpMap_var = UnpackScaleNormal(tex2D(_BumpMap,TRANSFORM_TEX(i.uv0, _BumpMap)), _BumpScale);
     float3 normalLocal = _BumpMap_var.rgb;
@@ -290,20 +287,20 @@ float4 frag(VertexOutput i) : COLOR {
             specular = attenuation * directSpecular * _GlossColor.rgb;
         #endif
         // オプション：MatCap
-        #ifdef USE_MATCAP
-            float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            #ifdef USE_LEGACY_CAP_CALC
-                float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
-            #else
-                float3 transformMatcapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
-                float3 transformMatcapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz * float3(-1,-1,1);
-                float3 transformMatcapCombined = transformMatcapViewDir * dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z - transformMatcapNormal;
-                float2 transformMatcap = ((transformMatcapCombined.rg*0.5)+0.5);
-            #endif
-            float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
-            float4 _MatcapBlendMask_var = tex2D(_MatcapBlendMask,TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
-            matcap = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
+        float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
+        #ifdef USE_LEGACY_CAP_CALC
+            float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
+        #else
+            float3 transformMatcapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
+            float3 transformMatcapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz * float3(-1,-1,1);
+            float3 transformMatcapCombined = transformMatcapViewDir * dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z - transformMatcapNormal;
+            float2 transformMatcap = ((transformMatcapCombined.rg*0.5)+0.5);
         #endif
+        float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
+        float4 _MatcapBlendMask_var = tex2D(_MatcapBlendMask,TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
+        float3 matcapResult = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
+        matcap = lerp(0, matcapResult, _UseMatcap);
+
         // オプション：Rim
         #ifdef USE_RIM
             float _RimBlendMask_var = tex2D(_RimBlendMask, TRANSFORM_TEX(i.uv0, _RimBlendMask));
@@ -311,11 +308,7 @@ float4 frag(VertexOutput i) : COLOR {
             RimLight = (
                             lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
                             * pow(
-                                #ifdef FLIP_BACKFACE_NORMAL
-                                    min(1.0, 1.0 - max(0, dot(normalDirection, viewDirection) ) + _RimUpperSideWidth)
-                                #else
-                                    min(1.0, 1.0 - max(0, dot(normalDirection * i.faceSign, viewDirection) ) + _RimUpperSideWidth)
-                                #endif
+                                min(1.0, 1.0 - max(0, dot(normalDirection * lerp(i.faceSign, 1, _DoubleSidedFlipBackfaceNormal), viewDirection) ) + _RimUpperSideWidth)
                                 , _RimFresnelPower
                                 )
                             * _RimBlend
@@ -324,6 +317,7 @@ float4 frag(VertexOutput i) : COLOR {
                             * lerp(float3(1,1,1), finalLight,_RimShadeMix)
                         );
         #endif
+
         // オプション:ShadeCap
         #ifdef USE_SHADOWCAP
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
@@ -357,14 +351,12 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
 
     // MatCapのブレンドモード
-    #ifdef USE_MATCAP
-        #ifdef _MATCAPBLENDMODE_LIGHTEN
-            finalcolor2 = max(finalcolor2, matcap);
-        #elif _MATCAPBLENDMODE_ADD
-            finalcolor2 = finalcolor2 + matcap;
-        #elif _MATCAPBLENDMODE_SCREEN
-            finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
-        #endif
+    #ifdef _MATCAPBLENDMODE_LIGHTEN
+        finalcolor2 = max(finalcolor2, matcap);
+    #elif _MATCAPBLENDMODE_ADD
+        finalcolor2 = finalcolor2 + matcap;
+    #elif _MATCAPBLENDMODE_SCREEN
+        finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
     #endif
 
     // EmissiveColorはこのタイミングで合成

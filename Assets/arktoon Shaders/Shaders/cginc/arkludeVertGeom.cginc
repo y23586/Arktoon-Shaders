@@ -88,6 +88,7 @@ uniform float _OutlineWidth;
 uniform float4 _OutlineColor;
 uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST;
 uniform float _DoubleSidedBackfaceLightIntensity;
+uniform float _DoubleSidedFlipBackfaceNormal;
 
 [maxvertexcount(9)]
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
@@ -217,15 +218,10 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 
                     // NdotL
                     float4 ndotl = 0;
-                    #ifdef FLIP_BACKFACE_NORMAL
-                        ndotl += toLightX * -o.normalDir.x;
-                        ndotl += toLightY * -o.normalDir.y;
-                        ndotl += toLightZ * -o.normalDir.z;
-                    #else
-                        ndotl += toLightX * o.normalDir.x;
-                        ndotl += toLightY * o.normalDir.y;
-                        ndotl += toLightZ * o.normalDir.z;
-                    #endif
+                    ndotl += toLightX * (o.normalDir.x * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+                    ndotl += toLightY * (o.normalDir.y * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+                    ndotl += toLightZ * (o.normalDir.z * lerp(1, -1, _DoubleSidedFlipBackfaceNormal));
+
                     // correct NdotL
                     float4 corr = rsqrt(lengthSq);
                     ndotl = max (float4(0,0,0,0), ndotl * corr);

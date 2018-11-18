@@ -8,7 +8,7 @@ Shader "arktoon/Opaque" {
     Properties {
         // Double Sided
         [Toggle(DOUBLE_SIDED)]_UseDoubleSided ("Double Sided", Float ) = 0
-        [Toggle(FLIP_BACKFACE_NORMAL)]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
+        [Toggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
         // Common
@@ -69,7 +69,7 @@ Shader "arktoon/Opaque" {
         [Toggle(USE_OUTLINE_WIDTH_MASK)]_UseOutlineWidthMask ("[Outline] Use Width Mask", Float) = 0
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
         // MatCap
-        [Toggle(USE_MATCAP)]_UseMatcap ("[MatCap] Enabled", Float) = 0
+        [Toggle]_UseMatcap ("[MatCap] Enabled", Float) = 0
         [KeywordEnum(Add, Lighten, Screen)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 0
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
         _MatcapBlendMask ("[MatCap] Blend Mask", 2D) = "white" {}
@@ -133,7 +133,6 @@ Shader "arktoon/Opaque" {
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
             #pragma shader_feature USE_GLOSS
-            #pragma shader_feature USE_MATCAP
             #pragma shader_feature USE_REFLECTION
             #pragma shader_feature USE_REFLECTION_PROBE
             #pragma shader_feature USE_RIM
@@ -147,12 +146,11 @@ Shader "arktoon/Opaque" {
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
-            #pragma shader_feature FLIP_BACKFACE_NORMAL
             #pragma shader_feature USE_LEGACY_CAP_CALC
 
-            #pragma multi_compile _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
-            #pragma multi_compile _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
-            #pragma multi_compile _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
+            #pragma shader_feature _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
+            #pragma shader_feature _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
 
             #pragma vertex vert
             #pragma geometry geom
@@ -179,15 +177,13 @@ Shader "arktoon/Opaque" {
             #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_RIM
-            #pragma shader_feature USE_MATCAP
             #pragma shader_feature USE_POINT_SHADOW_STEPS
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
-            #pragma shader_feature FLIP_BACKFACE_NORMAL
             #pragma shader_feature USE_LEGACY_CAP_CALC
-            #pragma multi_compile _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
-            #pragma multi_compile _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
+            #pragma shader_feature _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
 
             #pragma vertex vert
 			#pragma geometry geom
