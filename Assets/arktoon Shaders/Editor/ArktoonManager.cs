@@ -34,22 +34,38 @@ namespace ArktoonShaders
             EditorUserSettings.SetConfigValue("arktoon_version_local", version);
             Debug.Log ("[Arktoon] Checking remote version.");
             www = UnityWebRequest.Get(url);
+
+            #if UNITY_2017_OR_NEWER
+            www.SendWebRequest();
+            #else
+            #pragma warning disable 0618
             www.Send();
+            #pragma warning restore 0618
+            #endif
+
             EditorApplication.update += EditorUpdate;
         }
 
         static void EditorUpdate()
         {
             while (!www.isDone) return;
+
             #if UNITY_2017_OR_NEWER
-            if (www.isNetworkError || www.isHttpError) {
+                if (www.isNetworkError || www.isHttpError) {
+                    Debug.Log(www.error);
+                } else {
+                    updateHandler(www.downloadHandler.text);
+                }
             #else
-            if (www.isError) {
+                #pragma warning disable 0618
+                if (www.isError) {
+                    Debug.Log(www.error);
+                } else {
+                    updateHandler(www.downloadHandler.text);
+                }
+                #pragma warning restore 0618
             #endif
-                Debug.Log(www.error);
-            } else {
-                updateHandler(www.downloadHandler.text);
-            }
+
             EditorApplication.update -= EditorUpdate;
         }
 
