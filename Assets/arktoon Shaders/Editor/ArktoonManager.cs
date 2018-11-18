@@ -41,7 +41,11 @@ namespace ArktoonShaders
         static void EditorUpdate()
         {
             while (!www.isDone) return;
+            #if UNITY_2017_OR_NEWER
+            if (www.isNetworkError || www.isHttpError) {
+            #else
             if (www.isError) {
+            #endif
                 Debug.Log(www.error);
             } else {
                 updateHandler(www.downloadHandler.text);
