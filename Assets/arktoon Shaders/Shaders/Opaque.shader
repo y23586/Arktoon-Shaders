@@ -70,7 +70,7 @@ Shader "arktoon/Opaque" {
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
         // MatCap
         [Toggle]_UseMatcap ("[MatCap] Enabled", Float) = 0
-        [KeywordEnum(Add, Lighten, Screen)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 0
+        [KeywordEnum(Unused, Add, Lighten, Screen)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 0
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
         _MatcapBlendMask ("[MatCap] Blend Mask", 2D) = "white" {}
         _MatcapNormalMix ("[MatCap] Normal map mix", Range(0, 2)) = 1
@@ -97,8 +97,8 @@ Shader "arktoon/Opaque" {
         _RimTexture ("[Rim] Texture", 2D) = "white" {}
         [MaterialToggle] _RimUseBaseTexture ("[Rim] Use Base Texture", Float ) = 0
         // ShadowCap
-        [Toggle(USE_SHADOWCAP)]_UseShadowCap ("[ShadowCap] Enabled", Float) = 0
-        [KeywordEnum(Darken, Multiply)] _ShadowCapBlendMode ("[ShadowCap] Blend Mode", Float) = 0
+        [Toggle]_UseShadowCap ("[ShadowCap] Enabled", Float) = 0
+        [KeywordEnum(Unused, Darken, Multiply, Light Shutter)] _ShadowCapBlendMode ("[ShadowCap] Blend Mode", Float) = 0
         _ShadowCapBlend ("[ShadowCap] Blend", Range(0, 3)) = 1
         _ShadowCapBlendMask ("[ShadowCap] Blend Mask", 2D) = "white" {}
         _ShadowCapNormalMix ("[ShadowCap] Normal map mix", Range(0, 2)) = 1
@@ -136,7 +136,6 @@ Shader "arktoon/Opaque" {
             #pragma shader_feature USE_REFLECTION
             #pragma shader_feature USE_REFLECTION_PROBE
             #pragma shader_feature USE_RIM
-            #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
@@ -146,8 +145,8 @@ Shader "arktoon/Opaque" {
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_LEGACY_CAP_CALC
 
-            #pragma shader_feature _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
-            #pragma shader_feature _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
+            #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
             #pragma shader_feature _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
 
             #pragma vertex vert
@@ -174,14 +173,13 @@ Shader "arktoon/Opaque" {
 
             CGPROGRAM
             #pragma shader_feature USE_GLOSS
-            #pragma shader_feature USE_SHADOWCAP
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_LEGACY_CAP_CALC
             #pragma shader_feature _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
-            #pragma shader_feature _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY
+            #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 
             #pragma vertex vert
 			#pragma geometry geom
