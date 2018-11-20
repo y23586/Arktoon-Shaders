@@ -168,7 +168,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
             #pragma multi_compile_fwdbase_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             #define ARKTOON_CUTOUT
 
             #include "cginc/arkludeDecl.cginc"
@@ -208,7 +208,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
             #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             #define ARKTOON_CUTOUT
             #define ARKTOON_ADD
 
@@ -235,7 +235,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             uniform float _CutoutCutoutAdjust;
             uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
             uniform float4 _Color;

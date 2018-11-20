@@ -160,7 +160,7 @@ Shader "arktoon/Fade" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             #define ARKTOON_FADE
 
             #include "cginc/arkludeDecl.cginc"
@@ -195,7 +195,7 @@ Shader "arktoon/Fade" {
             #pragma multi_compile_fwdadd
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             #define ARKTOON_FADE
             #define ARKTOON_ADD
 

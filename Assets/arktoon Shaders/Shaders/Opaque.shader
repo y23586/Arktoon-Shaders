@@ -156,7 +156,7 @@ Shader "arktoon/Opaque" {
             #pragma multi_compile_fwdbase_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -189,7 +189,7 @@ Shader "arktoon/Opaque" {
             #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             #define ARKTOON_ADD
 
             #include "cginc/arkludeDecl.cginc"
@@ -215,7 +215,7 @@ Shader "arktoon/Opaque" {
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 5.0
+            #pragma target 4.0
             struct VertexInput {
                 float4 vertex : POSITION;
                 float2 texcoord0 : TEXCOORD0;
