@@ -13,7 +13,7 @@ float4 frag(VertexOutput i) : COLOR {
     float3 halfDirection = normalize(viewDirection+lightDirection);
 
     UNITY_LIGHT_ATTENUATION(attenuation,i, i.posWorld.xyz);
-    float4 _MainTex_var = tex2D(_MainTex,TRANSFORM_TEX(i.uv0, _MainTex));
+    float4 _MainTex_var = UNITY_SAMPLE_TEX2D(_MainTex, TRANSFORM_TEX(i.uv0, _MainTex));
     float3 Diffuse = (_MainTex_var.rgb*_Color.rgb);
     Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse); // 頂点カラーを合成
 
@@ -26,7 +26,7 @@ float4 frag(VertexOutput i) : COLOR {
 
     #if defined(ARKTOON_CUTOUT) || defined(ARKTOON_FADE)
         if (i.isOutline) {
-            float _OutlineMask_var = tex2D(_OutlineMask,TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
+            float _OutlineMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineMask, _MainTex, TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
             clip(_OutlineMask_var.r - _OutlineCutoffRange);
         }
     #endif
@@ -55,7 +55,7 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
         // オプション：Gloss
         #ifdef USE_GLOSS
-            float _GlossBlendMask_var = tex2D(_GlossBlendMask, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
+            float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
 
             float gloss = _GlossBlend * _GlossBlendMask_var;
             float perceptualRoughness = 1.0 - gloss;
@@ -101,7 +101,7 @@ float4 frag(VertexOutput i) : COLOR {
                 float2 transformShadowCap = ((transformShadowCapCombined.rg*0.5)+0.5);
             #endif
             float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
-            float4 _ShadowCapBlendMask_var = tex2D(_ShadowCapBlendMask,TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
+            float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
         #endif
 
@@ -116,14 +116,14 @@ float4 frag(VertexOutput i) : COLOR {
             float2 transformMatcap = ((transformMatcapCombined.rg*0.5)+0.5);
         #endif
         float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
-        float4 _MatcapBlendMask_var = tex2D(_MatcapBlendMask,TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
+        float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
         float3 matcapResult = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend);
         matcapResult = min(matcapResult, matcapResult * (coloredLight * _MatcapShadeMix));
         matcap = lerp(0, matcapResult, _UseMatcap);
 
         // オプション：Rim
         #ifdef USE_RIM
-            float _RimBlendMask_var = tex2D(_RimBlendMask, TRANSFORM_TEX(i.uv0, _RimBlendMask));
+            float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
             RimLight = (
                 lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
