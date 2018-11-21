@@ -68,7 +68,6 @@ namespace ArktoonShaders
         MaterialProperty OutlineTextureColorRate;
         MaterialProperty UseOutlineWidthMask;
         MaterialProperty OutlineWidthMask;
-        MaterialProperty UseMatcap;
         MaterialProperty MatcapBlendMode;
         MaterialProperty MatcapBlend;
         MaterialProperty MatcapTexture;
@@ -93,7 +92,6 @@ namespace ArktoonShaders
         MaterialProperty RimColor;
         MaterialProperty RimTexture;
         MaterialProperty RimUseBaseTexture;
-        MaterialProperty UseShadowCap;
         MaterialProperty ShadowCapBlendMode;
         MaterialProperty ShadowCapBlend;
         MaterialProperty ShadowCapBlendMask;
@@ -189,7 +187,6 @@ namespace ArktoonShaders
             OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
             UseOutlineWidthMask = FindProperty("_UseOutlineWidthMask", props);
             OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
-            UseMatcap = FindProperty("_UseMatcap", props);
             MatcapBlendMode = FindProperty("_MatcapBlendMode", props);
             MatcapBlend = FindProperty("_MatcapBlend", props);
             MatcapTexture = FindProperty("_MatcapTexture", props);
@@ -214,7 +211,6 @@ namespace ArktoonShaders
             RimColor = FindProperty("_RimColor", props);
             RimTexture = FindProperty("_RimTexture", props);
             RimUseBaseTexture = FindProperty("_RimUseBaseTexture", props);
-            UseShadowCap = FindProperty("_UseShadowCap", props);
             ShadowCapBlendMode = FindProperty("_ShadowCapBlendMode", props);
             ShadowCapBlend = FindProperty("_ShadowCapBlend", props);
             ShadowCapBlendMask = FindProperty("_ShadowCapBlendMask", props);
@@ -392,11 +388,10 @@ namespace ArktoonShaders
                 EditorGUILayout.LabelField("MatCap", EditorStyles.boldLabel);
                 {
                     EditorGUI.indentLevel++;
-                    materialEditor.ShaderProperty(UseMatcap, "Use");
-                    var useMatcap = UseMatcap.floatValue;
-                    if(useMatcap > 0)
+                    materialEditor.ShaderProperty(MatcapBlendMode,"MatCap Mode");
+                    var useMatcap = MatcapBlendMode.floatValue;
+                    if(useMatcap != 3) // Not 'Unused'
                     {
-                        materialEditor.ShaderProperty(MatcapBlendMode,"Blend Mode");
                         materialEditor.ShaderProperty(MatcapBlend,"Blend");
                         materialEditor.ShaderProperty(MatcapBlendMask,"Blend Mask");
                         materialEditor.ShaderProperty(MatcapNormalMix, "Normal Map mix");
@@ -455,11 +450,10 @@ namespace ArktoonShaders
                 EditorGUILayout.LabelField("Shade Cap", EditorStyles.boldLabel);
                 {
                     EditorGUI.indentLevel++;
-                    materialEditor.ShaderProperty(UseShadowCap, "Use");
-                    var useShadowCap = UseShadowCap.floatValue;
-                    if(useShadowCap > 0)
+                    materialEditor.ShaderProperty(ShadowCapBlendMode,"Shade Cap Mode");
+                    var useShadowCap = ShadowCapBlendMode.floatValue;
+                    if(useShadowCap != 3) // Not 'Unused'
                     {
-                        materialEditor.ShaderProperty(ShadowCapBlendMode,"Blend Mode");
                         materialEditor.ShaderProperty(ShadowCapBlend,"Blend");
                         materialEditor.ShaderProperty(ShadowCapBlendMask,"Blend Mask");
                         materialEditor.ShaderProperty(ShadowCapNormalMix,"Normal Map mix");

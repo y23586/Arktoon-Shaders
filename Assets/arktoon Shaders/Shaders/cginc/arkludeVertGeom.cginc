@@ -123,7 +123,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 	for (int i = 2; i >= 0; i--)
 	{
         #ifdef USE_OUTLINE_WIDTH_MASK
-            float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask,float4(IN[i].uv0, 0, 0));
+            float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
             float width = _OutlineWidth * _OutlineWidthMask_var;
         #else
             float width = _OutlineWidth;
