@@ -141,8 +141,7 @@ float4 frag(VertexOutput i) : COLOR {
             float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
             float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
             float3 matcapResult = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend);
-            matcapResult = min(matcapResult, matcapResult * (coloredLight * _MatcapShadeMix));
-            matcap = lerp(0, matcapResult, _UseMatcap);
+            matcap = min(matcapResult, matcapResult * (coloredLight * _MatcapShadeMix));
         #endif
 
         // オプション：Rim

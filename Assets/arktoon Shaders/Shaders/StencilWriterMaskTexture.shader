@@ -73,8 +73,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         [Toggle(USE_OUTLINE_WIDTH_MASK)]_UseOutlineWidthMask ("[Outline] Use Width Mask", Float) = 0
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
         // MatCap
-        [Toggle]_UseMatcap ("[MatCap] Enabled", Float) = 0
-        [KeywordEnum(Unused, Add, Lighten, Screen)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 0
+        [KeywordEnum(Add, Lighten, Screen, Unused)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 3
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
         _MatcapBlendMask ("[MatCap] Blend Mask", 2D) = "white" {}
         _MatcapNormalMix ("[MatCap] Normal map mix", Range(0, 2)) = 1
@@ -101,8 +100,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _RimTexture ("[Rim] Texture", 2D) = "white" {}
         [MaterialToggle] _RimUseBaseTexture ("[Rim] Use Base Texture", Float ) = 0
         // ShadowCap
-        [Toggle]_UseShadowCap ("[ShadowCap] Enabled", Float) = 0
-        [KeywordEnum(Unused, Darken, Multiply, Light Shutter)] _ShadowCapBlendMode ("[ShadowCap] Blend Mode", Float) = 0
+        [KeywordEnum(Darken, Multiply, Light Shutter, Unused)] _ShadowCapBlendMode ("[ShadowCap] Blend Mode", Float) = 3
         _ShadowCapBlend ("[ShadowCap] Blend", Range(0, 3)) = 1
         _ShadowCapBlendMask ("[ShadowCap] Blend Mask", 2D) = "white" {}
         _ShadowCapNormalMix ("[ShadowCap] Normal map mix", Range(0, 2)) = 1

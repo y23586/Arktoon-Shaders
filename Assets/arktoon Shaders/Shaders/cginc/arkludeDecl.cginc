@@ -65,7 +65,6 @@ uniform float _PointShadowUseStep;
 uniform int _PointShadowSteps;
 
 // MatCap
-uniform float _UseMatcap;
 uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
 uniform float _MatcapBlend;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_MatcapBlendMask); uniform float4 _MatcapBlendMask_ST;
