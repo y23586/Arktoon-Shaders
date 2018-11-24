@@ -113,7 +113,7 @@ namespace ArktoonShaders
         MaterialProperty UseVertexLight;
         MaterialProperty BackfaceColorMultiply;
         MaterialProperty LightSampling;
-        MaterialProperty UseLegacyCapCalc;
+        MaterialProperty UsePositionRelatedCalc;
 
         #endregion
 
@@ -231,7 +231,7 @@ namespace ArktoonShaders
             OtherShadowAdjust = FindProperty("_OtherShadowAdjust", props);
             UseVertexLight = FindProperty("_UseVertexLight", props);
             LightSampling = FindProperty("_LightSampling", props);
-            UseLegacyCapCalc = FindProperty("_UseLegacyCapCalc", props);
+            UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props);
             if(isFade) ZWrite = FindProperty("_ZWrite", props);
             // BackfaceColorMultiply = FindProperty("_BackfaceColorMultiply", props);
 
@@ -488,7 +488,7 @@ namespace ArktoonShaders
                 }
 
                 EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Advanced", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Advanced / Experimental", EditorStyles.boldLabel);
                 EditorGUILayout.HelpBox("These are some shade tweaking. no need to change usually." + Environment.NewLine + "ほとんどのケースで触る必要のないやつら。",MessageType.Info);
                 if (GUILayout.Button("Revert advanced params.")){
                     PointAddIntensity.floatValue = 1f;
@@ -555,7 +555,7 @@ namespace ArktoonShaders
                     EditorGUILayout.LabelField("MatCap / ShadeCap", EditorStyles.boldLabel);
                     {
                         EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(UseLegacyCapCalc, "Use Legacy Style (def:no)");
+                        materialEditor.ShaderProperty(UsePositionRelatedCalc, "Use Position Related Calc(def: no)");
                         EditorGUI.indentLevel --;
                     }
                     EditorGUI.indentLevel --;

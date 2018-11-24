@@ -118,7 +118,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
         // Light Sampling
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
         // Legacy MatCap/ShadeCap Calculation
-        [Toggle(USE_LEGACY_CAP_CALC)]_UseLegacyCapCalc ("[Mat/ShadowCap] Use Legacy Calculation", Float) = 0
+        [Toggle(USE_POSITION_RELATED_CALC)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Float) = 0
         // Backface Color Multiply
         // _BackfaceColorMultiply ("[Advancced] Backface Color Multiply", Color) = (1,1,1,1)
     }
@@ -153,7 +153,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
-            #pragma shader_feature USE_LEGACY_CAP_CALC
+            #pragma shader_feature USE_POSITION_RELATED_CALC
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
@@ -194,7 +194,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
-            #pragma shader_feature USE_LEGACY_CAP_CALC
+            #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 

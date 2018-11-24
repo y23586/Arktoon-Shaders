@@ -5,7 +5,6 @@ struct v2g
 	float3 normal : NORMAL;
 	float4 tangent : TANGENT;
 	float2 uv0 : TEXCOORD0;
-	float4 posWorld : TEXCOORD2;
 	float3 normalDir : TEXCOORD3;
 	float3 tangentDir : TEXCOORD4;
 	float3 bitangentDir : TEXCOORD5;
@@ -31,9 +30,6 @@ v2g vert(appdata_full v) {
 	o.normalDir = normalize(UnityObjectToWorldNormal(v.normal));
 	o.tangentDir = normalize(mul(unity_ObjectToWorld, float4(v.tangent.xyz, 0.0)).xyz);
 	o.bitangentDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
-	float4 objPos = mul(unity_ObjectToWorld, float4(0, 0, 0, 1));
-	o.posWorld = mul(unity_ObjectToWorld, v.vertex);
-	float3 lightColor = _LightColor0.rgb;
 	o.vertex = v.vertex;
 	o.pos = UnityObjectToClipPos(v.vertex);
 	TRANSFER_SHADOW(o);
@@ -128,12 +124,13 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
         #else
             float width = _OutlineWidth;
         #endif
-		o.pos = UnityObjectToClipPos(IN[i].vertex + normalize(IN[i].normal) * (width * .01));
+
+        o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
+        o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
 		o.uv0 = IN[i].uv0;
 		o.col = fixed4( _OutlineColor.r, _OutlineColor.g, _OutlineColor.b, 1);
         o.color = IN[i].color;
 		o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
-		o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
 		o.tangentDir = IN[i].tangentDir;
 		o.bitangentDir = IN[i].bitangentDir;
 		o.isOutline = true;
