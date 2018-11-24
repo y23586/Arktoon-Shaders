@@ -62,7 +62,7 @@ Shader "arktoon/Opaque" {
         _GlossColor ("[Gloss] Color", Color) = (1,1,1,1)
         // Outline
         [Toggle(USE_OUTLINE)]_UseOutline ("[Outline] Enabled", Float) = 0
-        _OutlineWidth ("[Outline] Width", Range(0, 10)) = 0.05
+        _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
         _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
         _OutlineShadeMix ("[Outline] Shade Mix", Range(0, 1)) = 0
         _OutlineTextureColorRate ("[Outline] Texture Color Rate", Range(0, 1)) = 0.05

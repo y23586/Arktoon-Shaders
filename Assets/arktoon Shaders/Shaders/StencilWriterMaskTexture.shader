@@ -64,7 +64,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _GlossColor ("[Gloss] Color", Color) = (1,1,1,1)
         // Outline
         [Toggle(USE_OUTLINE)]_UseOutline ("[Outline] Enabled", Float) = 0
-        _OutlineWidth ("[Outline] Width", Range(0, 10)) = 0.05
+        _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
         _OutlineMask ("[Outline] Outline Mask", 2D) = "white" {}
         _OutlineCutoffRange ("[Outline] Cutoff Range", Range(0, 1)) = 0
         _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
