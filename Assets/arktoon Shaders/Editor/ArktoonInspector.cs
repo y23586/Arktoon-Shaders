@@ -501,6 +501,8 @@ namespace ArktoonShaders
                         LightSampling.floatValue = 0f;
                         material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
                         material.DisableKeyword("_LIGHTSAMPLING_CUBED");
+                        UsePositionRelatedCalc.floatValue = 0f;
+                        material.DisableKeyword("USE_POSITION_RELATED_CALC");
                     }
                     {
                         EditorGUI.indentLevel ++;
