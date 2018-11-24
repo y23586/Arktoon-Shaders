@@ -117,7 +117,9 @@ namespace ArktoonShaders
 
         #endregion
 
+	    static bool IsShowAdvanced = false;
         GUIStyle style = new GUIStyle();
+
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
         {
@@ -239,7 +241,7 @@ namespace ArktoonShaders
 
             EditorGUI.BeginChangeCheck();
             {
-                EditorGUILayout.LabelField("Common", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Common");
                 {
                     EditorGUI.indentLevel ++;
                     materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Base Color Texture (RGB)"), BaseTexture, BaseColor);
@@ -271,8 +273,7 @@ namespace ArktoonShaders
                     }
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Shadow", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Shadow");
                 {
                     EditorGUI.indentLevel ++;
                     materialEditor.ShaderProperty(Shadowborder, "Border pos");
@@ -341,8 +342,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel --;
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Gloss", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Gloss");
                 {
                     EditorGUI.indentLevel ++;
                     materialEditor.ShaderProperty(UseGloss, "Use");
@@ -357,8 +357,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel --;
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Outline", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Outline");
                 {
                     EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(UseOutline, "Use");
@@ -384,8 +383,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("MatCap", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("MatCap");
                 {
                     EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(MatcapBlendMode,"MatCap Mode");
@@ -402,8 +400,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Reflection", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Reflection");
                 {
                     EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(UseReflection, "Use");
@@ -426,8 +423,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Rim", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Rim");
                 {
                     EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(UseRim, "Use");
@@ -446,8 +442,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Shade Cap", EditorStyles.boldLabel);
+                UIHelper.ShurikenHeader("Shade Cap");
                 {
                     EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(ShadowCapBlendMode,"Shade Cap Mode");
@@ -464,8 +459,7 @@ namespace ArktoonShaders
 
                 if(isStencilWriter)
                 {
-                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                    EditorGUILayout.LabelField("Stencil Writer", EditorStyles.boldLabel);
+                    UIHelper.ShurikenHeader("Stencil Writer");
                     {
                         EditorGUI.indentLevel++;
                         materialEditor.ShaderProperty(StencilNumber,"Number");
@@ -477,8 +471,7 @@ namespace ArktoonShaders
 
                 if(isStencilReader)
                 {
-                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                    EditorGUILayout.LabelField("Stencil Reader", EditorStyles.boldLabel);
+                    UIHelper.ShurikenHeader("Stencil Reader");
                     {
                         EditorGUI.indentLevel++;
                         materialEditor.ShaderProperty(StencilNumber,"Number");
@@ -487,104 +480,90 @@ namespace ArktoonShaders
                     }
                 }
 
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                EditorGUILayout.LabelField("Advanced / Experimental", EditorStyles.boldLabel);
-                EditorGUILayout.HelpBox("These are some shade tweaking. no need to change usually." + Environment.NewLine + "ほとんどのケースで触る必要のないやつら。",MessageType.Info);
-                if (GUILayout.Button("Revert advanced params.")){
-                    PointAddIntensity.floatValue = 1f;
-                    PointShadowStrength.floatValue = 0.5f;
-                    PointShadowborder.floatValue = 0.5f;
-                    PointShadowborderBlur.floatValue = 0.01f;
-                    OtherShadowAdjust.floatValue = -0.1f;
-                    OtherShadowBorderSharpness.floatValue = 3;
-                    PointShadowUseStep.floatValue = 0;
-                    PointShadowSteps.floatValue = 2;
-                    ShadowIndirectIntensity.floatValue = 0.25f;
-                    VertexColorBlendDiffuse.floatValue = 0f;
-                    VertexColorBlendEmissive.floatValue = 0f;
-                    UseVertexLight.floatValue = 1f;
-                    material.EnableKeyword("USE_VERTEX_LIGHT");
-                    LightSampling.floatValue = 0f;
-                    material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
-                    material.DisableKeyword("_LIGHTSAMPLING_CUBED");
-                }
-                {
-                    EditorGUI.indentLevel ++;
-                    EditorGUILayout.LabelField("Lights", EditorStyles.boldLabel);
-                    {
-                        EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(LightSampling, "Sampling Style (def:arktoon)");
-                        EditorGUI.indentLevel --;
+                IsShowAdvanced = UIHelper.ShurikenFoldout("Advanced / Experimental (Click to Open)", IsShowAdvanced);
+                if (IsShowAdvanced) {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.HelpBox("These are some shade tweaking. no need to change usually." + Environment.NewLine + "ほとんどのケースで触る必要のないやつら。",MessageType.Info);
+                    if (GUILayout.Button("Revert advanced params.")){
+                        PointAddIntensity.floatValue = 1f;
+                        PointShadowStrength.floatValue = 0.5f;
+                        PointShadowborder.floatValue = 0.5f;
+                        PointShadowborderBlur.floatValue = 0.01f;
+                        OtherShadowAdjust.floatValue = -0.1f;
+                        OtherShadowBorderSharpness.floatValue = 3;
+                        PointShadowUseStep.floatValue = 0;
+                        PointShadowSteps.floatValue = 2;
+                        ShadowIndirectIntensity.floatValue = 0.25f;
+                        VertexColorBlendDiffuse.floatValue = 0f;
+                        VertexColorBlendEmissive.floatValue = 0f;
+                        UseVertexLight.floatValue = 1f;
+                        material.EnableKeyword("USE_VERTEX_LIGHT");
+                        LightSampling.floatValue = 0f;
+                        material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
+                        material.DisableKeyword("_LIGHTSAMPLING_CUBED");
                     }
-                    EditorGUILayout.LabelField("Directional Shadow", EditorStyles.boldLabel);
                     {
                         EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(ShadowIndirectIntensity, "Indirect face Intensity (0.25)");
-                        EditorGUI.indentLevel --;
-                    }
-                    EditorGUILayout.LabelField("Vertex Colors", EditorStyles.boldLabel);
-                    {
-                        EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(VertexColorBlendDiffuse, "Color blend to diffuse (def:0) ");
-                        materialEditor.ShaderProperty(VertexColorBlendEmissive, "Color blend to emissive (def:0) ");
-                        EditorGUI.indentLevel --;
-                    }
-                    EditorGUILayout.LabelField("PointLights", EditorStyles.boldLabel);
-                    {
-                        EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(PointAddIntensity, "Intensity (def:1)");
-                        materialEditor.ShaderProperty(PointShadowStrength, "Shadow Strength (def:0.5)");
-                        materialEditor.ShaderProperty(PointShadowborder, "Shadow Border (def:0.5)");
-                        materialEditor.ShaderProperty(PointShadowborderBlur, "Shadow Border blur (def:0.01)");
-                        materialEditor.ShaderProperty(PointShadowUseStep, "Use Shadow Steps");
-                        var usePointStep = PointShadowUseStep.floatValue;
-                        if(usePointStep > 0)
+                        EditorGUILayout.LabelField("Lights", EditorStyles.boldLabel);
                         {
-                            materialEditor.ShaderProperty(PointShadowSteps, " ");
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(LightSampling, "Sampling Style (def:arktoon)");
+                            EditorGUI.indentLevel --;
                         }
-                        materialEditor.ShaderProperty(UseVertexLight, "Use Per-vertex Light");
-                        EditorGUI.indentLevel --;
-                    }
-                    EditorGUILayout.LabelField("Shade from other meshes", EditorStyles.boldLabel);
-                    {
-                        EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(OtherShadowAdjust, "Adjust (def:-0.1)");
-                        materialEditor.ShaderProperty(OtherShadowBorderSharpness, "Sharpness(def:3)");
-                        EditorGUI.indentLevel --;
-                    }
-                    EditorGUILayout.LabelField("MatCap / ShadeCap", EditorStyles.boldLabel);
-                    {
-                        EditorGUI.indentLevel ++;
-                        materialEditor.ShaderProperty(UsePositionRelatedCalc, "Use Position Related Calc(def: no)");
-                        EditorGUI.indentLevel --;
-                    }
-                    EditorGUI.indentLevel --;
-                    // materialEditor.ShaderProperty(BackfaceColorMultiply, "Backface Color Multiply (def:white)");
-                }
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                {
-                    EditorGUILayout.LabelField("Docs", EditorStyles.boldLabel);
-                    {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.BeginHorizontal( GUI.skin.box );
-                        if(GUILayout.Button("How to use (Japanese)"))
+                        EditorGUILayout.LabelField("Directional Shadow", EditorStyles.boldLabel);
                         {
-                            System.Diagnostics.Process.Start("https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing");
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(ShadowIndirectIntensity, "Indirect face Intensity (0.25)");
+                            EditorGUI.indentLevel --;
                         }
-                        EditorGUI.BeginDisabledGroup(true);
-                        GUILayout.Button("(english - wip)");
-                        EditorGUI.EndDisabledGroup();
+                        EditorGUILayout.LabelField("Vertex Colors", EditorStyles.boldLabel);
+                        {
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(VertexColorBlendDiffuse, "Color blend to diffuse (def:0) ");
+                            materialEditor.ShaderProperty(VertexColorBlendEmissive, "Color blend to emissive (def:0) ");
+                            EditorGUI.indentLevel --;
+                        }
+                        EditorGUILayout.LabelField("PointLights", EditorStyles.boldLabel);
+                        {
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(PointAddIntensity, "Intensity (def:1)");
+                            materialEditor.ShaderProperty(PointShadowStrength, "Shadow Strength (def:0.5)");
+                            materialEditor.ShaderProperty(PointShadowborder, "Shadow Border (def:0.5)");
+                            materialEditor.ShaderProperty(PointShadowborderBlur, "Shadow Border blur (def:0.01)");
+                            materialEditor.ShaderProperty(PointShadowUseStep, "Use Shadow Steps");
+                            var usePointStep = PointShadowUseStep.floatValue;
+                            if(usePointStep > 0)
+                            {
+                                materialEditor.ShaderProperty(PointShadowSteps, " ");
+                            }
+                            materialEditor.ShaderProperty(UseVertexLight, "Use Per-vertex Light");
+                            EditorGUI.indentLevel --;
+                        }
+                        EditorGUILayout.LabelField("Shade from other meshes", EditorStyles.boldLabel);
+                        {
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(OtherShadowAdjust, "Adjust (def:-0.1)");
+                            materialEditor.ShaderProperty(OtherShadowBorderSharpness, "Sharpness(def:3)");
+                            EditorGUI.indentLevel --;
+                        }
+                        EditorGUILayout.LabelField("MatCap / ShadeCap", EditorStyles.boldLabel);
+                        {
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(UsePositionRelatedCalc, "Use Position Related Calc(def: no)");
+                            EditorGUI.indentLevel --;
+                        }
+                        EditorGUI.indentLevel --;
+                        // materialEditor.ShaderProperty(BackfaceColorMultiply, "Backface Color Multiply (def:white)");
+                    }
+                    EditorGUI.indentLevel--;
+                }
 
-                        GUILayout.EndHorizontal();
-                        EditorGUI.indentLevel--;
-                    }
-                }
-                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                // Arktoon version info
                 {
                     string localVersion =  EditorUserSettings.GetConfigValue ("arktoon_version_local");
                     string remoteVersion = EditorUserSettings.GetConfigValue ("arktoon_version_remote");
 
-                    EditorGUILayout.LabelField("Arktoon-Shaders", EditorStyles.boldLabel);
+                    UIHelper.ShurikenHeader("Arktoon-Shaders");
                     style.alignment = TextAnchor.MiddleRight;
                     style.normal.textColor = Color.black;
                     EditorGUILayout.LabelField("Your Version : " + localVersion, style);
@@ -594,7 +573,7 @@ namespace ArktoonShaders
                         Version local_v = new Version(localVersion);
                         Version remote_v = new Version(remoteVersion);
 
-                        if(remote_v > local_v) {
+                        if(remote_v > local_v)  {
                             style.normal.textColor = Color.blue;
                             EditorGUILayout.LabelField("Remote Version : " + remoteVersion, style);
                             EditorGUILayout.BeginHorizontal( GUI.skin.box );
@@ -612,8 +591,57 @@ namespace ArktoonShaders
                         }
                     }
                 }
+
+                // Docs
+                {
+                    EditorGUILayout.BeginHorizontal( GUI.skin.box );
+                    if(GUILayout.Button("How to use (Japanese)"))
+                    {
+                        System.Diagnostics.Process.Start("https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing");
+                    }
+                    EditorGUI.BeginDisabledGroup(true);
+                    GUILayout.Button("(english - wip)");
+                    EditorGUI.EndDisabledGroup();
+
+                    GUILayout.EndHorizontal();
+                }
             }
             EditorGUI.EndChangeCheck();
+        }
+    }
+
+    class UIHelper
+    {        private static Rect DrawShuriken(string title, Vector2 contentOffset) {
+            var style = new GUIStyle("ShurikenModuleTitle");
+            style.margin = new RectOffset(0, 0, 10, 0);
+            style.font = new GUIStyle(EditorStyles.boldLabel).font;
+            style.border = new RectOffset(15, 7, 4, 4);
+            style.fixedHeight = 22;
+            style.contentOffset = contentOffset;
+            var rect = GUILayoutUtility.GetRect(16f, 22f, style);
+            GUI.Box(rect, title, style);
+            return rect;
+        }
+        public static void ShurikenHeader(string title)
+        {
+            DrawShuriken(title,new Vector2(6f, -2f));
+        }
+        public static bool ShurikenFoldout(string title, bool display)
+        {
+            var rect = DrawShuriken(title,new Vector2(20f, -2f));
+
+            var e = Event.current;
+
+            var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
+            if (e.type == EventType.Repaint) {
+                EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
+            }
+
+            if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition)) {
+                display = !display;
+                e.Use();
+            }
+            return display;
         }
     }
 }
