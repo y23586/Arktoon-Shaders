@@ -1,4 +1,8 @@
 
+# Have a Question ?
+Please Contact me! : https://twitter.com/synqark/  
+or Discord server: https://discord.gg/ZeqMBut 
+
 # Arktoon-Shaders
 <img src="https://raw.githubusercontent.com/synqark/Arktoon-Shaders/master/Media/logo_1024.png" width="384">
 Alternative Unity shaders made by synqark
@@ -44,6 +48,4 @@ This repository is under MIT License. see LICENSE.
  - 上記2項目が遵守されている限り、Arktoon-Shadersを使って作成した成果物は、ソースコードが提供されるどうかに関わらず、公開・改造・販売・再配布などが無条件で可能であり、またそれに伴うArktoon-Shaderに関する追加の手続きはありません。
  - 著作権の表記は任意です
  
-# Have a Question ?
-Please Contact me! : https://twitter.com/synqark/
-or Discord server: https://discord.gg/ZeqMBut 
+
