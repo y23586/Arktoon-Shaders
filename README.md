@@ -23,7 +23,7 @@ Here : https://github.com/synqark/Arktoon-Shaders/releases
 # Hot to use?  
  In Japanese. I'm sorry!  
  https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing
-   
+
 # Inspector Window
 
 ### Default
@@ -43,3 +43,7 @@ This repository is under MIT License. see LICENSE.
  - Arktoon-Shadersを使って発生した面倒ごとに対応する義務は、リポジトリ管理者のsynqarkにありません。
  - 上記2項目が遵守されている限り、Arktoon-Shadersを使って作成した成果物は、ソースコードが提供されるどうかに関わらず、公開・改造・販売・再配布などが無条件で可能であり、またそれに伴うArktoon-Shaderに関する追加の手続きはありません。
  - 著作権の表記は任意です
+ 
+# Have a Question ?
+Please Contact me! : https://twitter.com/synqark/
+or Discord server: https://discord.gg/ZeqMBut 
