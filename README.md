@@ -1,4 +1,6 @@
+
 # Arktoon-Shaders
+<img src="https://raw.githubusercontent.com/synqark/Arktoon-Shaders/master/Media/logo_1024.png" width="384">
 Alternative Unity shaders made by synqark
 
 # Downloads
