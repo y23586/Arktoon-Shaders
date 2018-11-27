@@ -1,16 +1,16 @@
 
 struct v2g
 {
-	float4 vertex : POSITION;
-	float3 normal : NORMAL;
-	float4 tangent : TANGENT;
-	float2 uv0 : TEXCOORD0;
-	float3 normalDir : TEXCOORD3;
-	float3 tangentDir : TEXCOORD4;
-	float3 bitangentDir : TEXCOORD5;
-	float4 pos : CLIP_POS;
-	SHADOW_COORDS(6)
-	UNITY_FOG_COORDS(7)
+    float4 vertex : POSITION;
+    float3 normal : NORMAL;
+    float4 tangent : TANGENT;
+    float2 uv0 : TEXCOORD0;
+    float3 normalDir : TEXCOORD3;
+    float3 tangentDir : TEXCOORD4;
+    float3 bitangentDir : TEXCOORD5;
+    float4 pos : CLIP_POS;
+    SHADOW_COORDS(6)
+    UNITY_FOG_COORDS(7)
     fixed4 color : COLOR;
     #ifndef ARKTOON_ADD
         float3 lightColor0 : LIGHT_COLOR0;
@@ -22,18 +22,18 @@ struct v2g
 
 
 v2g vert(appdata_full v) {
-	v2g o;
-	o.uv0 = v.texcoord;
-	o.normal = v.normal;
-	o.tangent = v.tangent;
+    v2g o;
+    o.uv0 = v.texcoord;
+    o.normal = v.normal;
+    o.tangent = v.tangent;
     o.color = v.color;
-	o.normalDir = normalize(UnityObjectToWorldNormal(v.normal));
-	o.tangentDir = normalize(mul(unity_ObjectToWorld, float4(v.tangent.xyz, 0.0)).xyz);
-	o.bitangentDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
-	o.vertex = v.vertex;
-	o.pos = UnityObjectToClipPos(v.vertex);
-	TRANSFER_SHADOW(o);
-	UNITY_TRANSFER_FOG(o, o.pos);
+    o.normalDir = normalize(UnityObjectToWorldNormal(v.normal));
+    o.tangentDir = normalize(mul(unity_ObjectToWorld, float4(v.tangent.xyz, 0.0)).xyz);
+    o.bitangentDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
+    o.vertex = v.vertex;
+    o.pos = UnityObjectToClipPos(v.vertex);
+    TRANSFER_SHADOW(o);
+    UNITY_TRANSFER_FOG(o, o.pos);
 
     #ifndef ARKTOON_ADD
         // 頂点ライティングが必要な場合に取得
@@ -61,8 +61,8 @@ struct VertexOutput {
     float3 tangentDir : TEXCOORD4;
     float3 bitangentDir : TEXCOORD5;
     fixed4 col : COLOR0;
-	bool isOutline : IS_OUTLINE;
-    int faceSign : FACE_SIGN;
+    fixed isOutline : IS_OUTLINE;
+    fixed faceSign : FACE_SIGN;
     float lightIntensityIfBackface : LIGHT_INTENSITY;
     SHADOW_COORDS(6)
     UNITY_FOG_COORDS(7)
@@ -114,10 +114,10 @@ struct VertexOutput {
 [maxvertexcount(9)]
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 {
-	VertexOutput o;
-	#ifdef USE_OUTLINE
-	for (int i = 2; i >= 0; i--)
-	{
+    VertexOutput o;
+    #ifdef USE_OUTLINE
+    for (int i = 2; i >= 0; i--)
+    {
         #ifdef USE_OUTLINE_WIDTH_MASK
             float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
             float width = _OutlineWidth * _OutlineWidthMask_var;
@@ -127,25 +127,25 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 
         o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
         o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
-		o.uv0 = IN[i].uv0;
-		o.col = fixed4( _OutlineColor.r, _OutlineColor.g, _OutlineColor.b, 1);
+        o.uv0 = IN[i].uv0;
+        o.col = fixed4( _OutlineColor.r, _OutlineColor.g, _OutlineColor.b, 1);
         o.color = IN[i].color;
-		o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
-		o.tangentDir = IN[i].tangentDir;
-		o.bitangentDir = IN[i].bitangentDir;
-		o.isOutline = true;
+        o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
+        o.tangentDir = IN[i].tangentDir;
+        o.bitangentDir = IN[i].bitangentDir;
+        o.isOutline = true;
         o.faceSign = -1;
         o.lightIntensityIfBackface = 1;
 
-		// Pass-through the shadow coordinates if this pass has shadows.
-		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-		o._ShadowCoord = IN[i]._ShadowCoord;
-		#endif
+        // Pass-through the shadow coordinates if this pass has shadows.
+        #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
+        o._ShadowCoord = IN[i]._ShadowCoord;
+        #endif
 
-		// Pass-through the fog coordinates if this pass has shadows.
-		#if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-		o.fogCoord = IN[i].fogCoord;
-		#endif
+        // Pass-through the fog coordinates if this pass has shadows.
+        #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+        o.fogCoord = IN[i].fogCoord;
+        #endif
 
         #ifndef ARKTOON_ADD
             o.lightColor0          = IN[i].lightColor0;
@@ -159,36 +159,36 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             #endif
         #endif
 
-		tristream.Append(o);
-	}
+        tristream.Append(o);
+    }
 
-	tristream.RestartStrip();
-	#endif
+    tristream.RestartStrip();
+    #endif
 
-	#ifdef DOUBLE_SIDED
-	for (int iii = 2; iii >= 0; iii--)
-	{
-		o.pos = UnityObjectToClipPos(IN[iii].vertex);
-		o.uv0 = IN[iii].uv0;
-		o.col = fixed4(1., 1., 1., 0.);
+    #ifdef DOUBLE_SIDED
+    for (int iii = 2; iii >= 0; iii--)
+    {
+        o.pos = UnityObjectToClipPos(IN[iii].vertex);
+        o.uv0 = IN[iii].uv0;
+        o.col = fixed4(1., 1., 1., 0.);
         o.color = IN[iii].color;
-		o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
-		o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
-		o.tangentDir = IN[iii].tangentDir;
-		o.bitangentDir = IN[iii].bitangentDir;
-		o.isOutline = false;
+        o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
+        o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
+        o.tangentDir = IN[iii].tangentDir;
+        o.bitangentDir = IN[iii].bitangentDir;
+        o.isOutline = false;
         o.faceSign = -1;
         o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
 
-		// Pass-through the shadow coordinates if this pass has shadows.
-		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-		o._ShadowCoord = IN[iii]._ShadowCoord;
-		#endif
+        // Pass-through the shadow coordinates if this pass has shadows.
+        #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
+        o._ShadowCoord = IN[iii]._ShadowCoord;
+        #endif
 
-		// Pass-through the fog coordinates if this pass has shadows.
-		#if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-		o.fogCoord = IN[iii].fogCoord;
-		#endif
+        // Pass-through the fog coordinates if this pass has shadows.
+        #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+        o.fogCoord = IN[iii].fogCoord;
+        #endif
 
         #ifndef ARKTOON_ADD
             o.lightColor0          = IN[iii].lightColor0;
@@ -202,35 +202,35 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             #endif
         #endif
 
-		tristream.Append(o);
-	}
+        tristream.Append(o);
+    }
 
-	tristream.RestartStrip();
-	#endif
+    tristream.RestartStrip();
+    #endif
 
-	for (int ii = 0; ii < 3; ii++)
-	{
-		o.pos = UnityObjectToClipPos(IN[ii].vertex);
-		o.uv0 = IN[ii].uv0;
-		o.col = fixed4(1., 1., 1., 0.);
+    for (int ii = 0; ii < 3; ii++)
+    {
+        o.pos = UnityObjectToClipPos(IN[ii].vertex);
+        o.uv0 = IN[ii].uv0;
+        o.col = fixed4(1., 1., 1., 0.);
         o.color = IN[ii].color;
-		o.posWorld = mul(unity_ObjectToWorld, IN[ii].vertex);
-		o.normalDir = UnityObjectToWorldNormal(IN[ii].normal);
-		o.tangentDir = IN[ii].tangentDir;
-		o.bitangentDir = IN[ii].bitangentDir;
-		o.isOutline = false;
+        o.posWorld = mul(unity_ObjectToWorld, IN[ii].vertex);
+        o.normalDir = UnityObjectToWorldNormal(IN[ii].normal);
+        o.tangentDir = IN[ii].tangentDir;
+        o.bitangentDir = IN[ii].bitangentDir;
+        o.isOutline = false;
         o.faceSign = 1;
         o.lightIntensityIfBackface = 1;
 
-		// Pass-through the shadow coordinates if this pass has shadows.
-		#if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-		o._ShadowCoord = IN[ii]._ShadowCoord;
-		#endif
+        // Pass-through the shadow coordinates if this pass has shadows.
+        #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
+        o._ShadowCoord = IN[ii]._ShadowCoord;
+        #endif
 
-		// Pass-through the fog coordinates if this pass has shadows.
-		#if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-		o.fogCoord = IN[ii].fogCoord;
-		#endif
+        // Pass-through the fog coordinates if this pass has shadows.
+        #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+        o.fogCoord = IN[ii].fogCoord;
+        #endif
 
         #ifndef ARKTOON_ADD
             o.lightColor0          = IN[ii].lightColor0;
@@ -244,8 +244,8 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             #endif
         #endif
 
-		tristream.Append(o);
-	}
+        tristream.Append(o);
+    }
 
-	tristream.RestartStrip();
+    tristream.RestartStrip();
 }

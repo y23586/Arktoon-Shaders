@@ -9,11 +9,11 @@ float4 frag(VertexOutput i) : COLOR {
     float3 lightColor = _LightColor0.rgb;
     float3 halfDirection = normalize(viewDirection+lightDirection);
 
-	#if !defined(SHADOWS_SCREEN)
-		float attenuation = 1;
-	#else
-		UNITY_LIGHT_ATTENUATION(attenuation, i, i.posWorld.xyz);
-	#endif
+    #if !defined(SHADOWS_SCREEN)
+        float attenuation = 1;
+    #else
+        UNITY_LIGHT_ATTENUATION(attenuation, i, i.posWorld.xyz);
+    #endif
 
     float4 _MainTex_var = UNITY_SAMPLE_TEX2D(_MainTex, TRANSFORM_TEX(i.uv0, _MainTex));
     float3 Diffuse = (_MainTex_var.rgb*_Color.rgb);
