@@ -264,8 +264,7 @@ namespace ArktoonShaders
                 }
 
                 if(isCutout){
-                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                    EditorGUILayout.LabelField("Alpha Cutout", EditorStyles.boldLabel);
+                    UIHelper.ShurikenHeader("Alpha Cutout");
                     {
                         EditorGUI.indentLevel ++;
                         materialEditor.ShaderProperty(CutoutCutoutAdjust, "Cutoff Adjust");

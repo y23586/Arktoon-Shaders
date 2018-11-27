@@ -61,8 +61,8 @@ struct VertexOutput {
     float3 tangentDir : TEXCOORD4;
     float3 bitangentDir : TEXCOORD5;
     fixed4 col : COLOR0;
-	bool isOutline : IS_OUTLINE;
-    int faceSign : FACE_SIGN;
+	fixed isOutline : IS_OUTLINE;
+    fixed faceSign : FACE_SIGN;
     float lightIntensityIfBackface : LIGHT_INTENSITY;
     SHADOW_COORDS(6)
     UNITY_FOG_COORDS(7)
