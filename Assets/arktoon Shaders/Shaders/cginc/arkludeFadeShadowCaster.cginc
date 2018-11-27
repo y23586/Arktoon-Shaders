@@ -55,7 +55,7 @@ void vertShadowCaster (VertexInputS v,
     out float4 opos : SV_POSITION)
 {
     #ifdef UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT
-	    UNITY_INITIALIZE_OUTPUT(VertexOutputShadowCaster, o);
+        UNITY_INITIALIZE_OUTPUT(VertexOutputShadowCaster, o);
     #endif
 
     TRANSFER_SHADOW_CASTER_NOPOS(o,opos)
@@ -81,8 +81,8 @@ half4 fragShadowCaster (
                 half alphaRef = tex3D(_DitherMaskLOD, float3(vpos.xy*0.25,alpha*0.9375)).a;
                 clip (alphaRef - 0.01);
             #else
-				clip (alpha - _CutoutCutoutAdjust);
-			#endif
+                clip (alpha - _CutoutCutoutAdjust);
+            #endif
         #endif
     #endif
     SHADOW_CASTER_FRAGMENT(i)

@@ -117,7 +117,7 @@ namespace ArktoonShaders
 
         #endregion
 
-	    static bool IsShowAdvanced = false;
+        static bool IsShowAdvanced = false;
         GUIStyle style = new GUIStyle();
 
 
