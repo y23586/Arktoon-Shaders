@@ -12,7 +12,7 @@ namespace ArktoonShaders
     {
         static string url = "https://api.github.com/repos/synqark/Arktoon-Shaders/releases/latest";
         static UnityWebRequest www;
-        static string version = "0.9.5.2";
+        static string version = "0.9.5.3";
 
         [DidReloadScripts(0)]
         static void CheckVersion ()
