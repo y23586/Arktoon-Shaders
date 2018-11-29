@@ -177,7 +177,7 @@ float4 frag(VertexOutput i) : COLOR {
             float reflNdotV = abs(dot( normalDirectionReflection, viewDirection ));
             float _ReflectionSmoothnessMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectionReflectionMask, _MainTex, TRANSFORM_TEX(i.uv0, _ReflectionReflectionMask));
             float reflectionSmoothness = _ReflectionReflectionPower*_ReflectionSmoothnessMask_var;
-            float perceptualRoughnessRefl = 1.0 - _ReflectionReflectionPower;
+            float perceptualRoughnessRefl = 1.0 - reflectionSmoothness;
             float3 reflDir = reflect(-viewDirection, normalDirectionReflection);
             float roughnessRefl = SmoothnessToRoughness(reflectionSmoothness);
             #ifdef USE_REFLECTION_PROBE
@@ -188,20 +188,20 @@ float4 frag(VertexOutput i) : COLOR {
             #else
                 float3 indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
             #endif
-            float3 specularColorRefl = _ReflectionReflectionPower;
+            float3 specularColorRefl = reflectionSmoothness;
             float specularMonochromeRefl;
             float3 diffuseColorRefl = Diffuse;
             diffuseColorRefl = DiffuseAndSpecularFromMetallic( diffuseColorRefl, specularColorRefl, specularColorRefl, specularMonochromeRefl );
             specularMonochromeRefl = 1.0-specularMonochromeRefl;
             half grazingTermRefl = saturate( reflectionSmoothness + specularMonochromeRefl );
             #ifdef UNITY_COLORSPACE_GAMMA
-                half surfaceReduction = 1.0-0.28*roughness*perceptualRoughnessRefl;
+                half surfaceReduction = 1.0-0.28*roughnessRefl*perceptualRoughnessRefl;
             #else
                 half surfaceReduction = 1.0/(roughnessRefl*roughnessRefl + 1.0);
             #endif
             indirectSpecular *= FresnelLerp (specularColorRefl, grazingTermRefl, reflNdotV);
             indirectSpecular *= surfaceReduction *lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
-            float reflSuppress = _ReflectionSuppressBaseColorValue * _ReflectionSmoothnessMask_var;
+            float reflSuppress = _ReflectionSuppressBaseColorValue * reflectionSmoothness;
             ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
         #endif
