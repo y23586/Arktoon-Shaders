@@ -167,7 +167,7 @@ float4 frag(VertexOutput i) : COLOR {
     float3 RimLight = float3(0,0,0);
     float3 shadowcap = float3(1000,1000,1000);
 
-    #ifdef USE_OUTLINE
+    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
     if (!i.isOutline) {
     #endif
 
@@ -177,7 +177,7 @@ float4 frag(VertexOutput i) : COLOR {
             float reflNdotV = abs(dot( normalDirectionReflection, viewDirection ));
             float _ReflectionSmoothnessMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectionReflectionMask, _MainTex, TRANSFORM_TEX(i.uv0, _ReflectionReflectionMask));
             float reflectionSmoothness = _ReflectionReflectionPower*_ReflectionSmoothnessMask_var;
-            float perceptualRoughnessRefl = 1.0 - _ReflectionReflectionPower;
+            float perceptualRoughnessRefl = 1.0 - reflectionSmoothness;
             float3 reflDir = reflect(-viewDirection, normalDirectionReflection);
             float roughnessRefl = SmoothnessToRoughness(reflectionSmoothness);
             #ifdef USE_REFLECTION_PROBE
@@ -188,20 +188,20 @@ float4 frag(VertexOutput i) : COLOR {
             #else
                 float3 indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
             #endif
-            float3 specularColorRefl = _ReflectionReflectionPower;
+            float3 specularColorRefl = reflectionSmoothness;
             float specularMonochromeRefl;
             float3 diffuseColorRefl = Diffuse;
             diffuseColorRefl = DiffuseAndSpecularFromMetallic( diffuseColorRefl, specularColorRefl, specularColorRefl, specularMonochromeRefl );
             specularMonochromeRefl = 1.0-specularMonochromeRefl;
             half grazingTermRefl = saturate( reflectionSmoothness + specularMonochromeRefl );
             #ifdef UNITY_COLORSPACE_GAMMA
-                half surfaceReduction = 1.0-0.28*roughness*perceptualRoughnessRefl;
+                half surfaceReduction = 1.0-0.28*roughnessRefl*perceptualRoughnessRefl;
             #else
                 half surfaceReduction = 1.0/(roughnessRefl*roughnessRefl + 1.0);
             #endif
             indirectSpecular *= FresnelLerp (specularColorRefl, grazingTermRefl, reflNdotV);
             indirectSpecular *= surfaceReduction *lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
-            float reflSuppress = _ReflectionSuppressBaseColorValue * _ReflectionSmoothnessMask_var;
+            float reflSuppress = _ReflectionSuppressBaseColorValue * reflectionSmoothness;
             ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
         #endif
@@ -293,7 +293,7 @@ float4 frag(VertexOutput i) : COLOR {
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
         #endif
 
-    #ifdef USE_OUTLINE
+    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
     }
     #endif
 
@@ -315,13 +315,24 @@ float4 frag(VertexOutput i) : COLOR {
         finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
     #endif
 
+    // 屈折
+    #ifdef ARKTOON_REFRACTED
+        float refractionValue = pow(1.0-max(0,dot(normalDirection, viewDirection)),_RefractionFresnelExp);
+        float2 sceneUVs = (i.projPos.xy / i.projPos.w) + ((refractionValue*_RefractionStrength) * mul( UNITY_MATRIX_V, float4(normalDirection,0) ).xyz.rgb.rg);
+        float4 sceneColor = tex2D(_GrabTexture, sceneUVs);
+    #endif
+
     // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(_EmissionMap,TRANSFORM_TEX(i.uv0, _EmissionMap)).rgb *_EmissionColor.rgb;
     float3 emissive = max(lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive), RimLight) * !i.isOutline;
     float3 finalColor = emissive + finalcolor2;
 
     #ifdef ARKTOON_FADE
-        fixed4 finalRGBA = fixed4(finalColor,(_MainTex_var.a*_Color.a));
+        #ifdef ARKTOON_REFRACTED
+            fixed4 finalRGBA = fixed4(lerp(sceneColor, finalColor, (_MainTex_var.a*_Color.a)),1);
+        #else
+            fixed4 finalRGBA = fixed4(finalColor,(_MainTex_var.a*_Color.a));
+        #endif
     #else
         fixed4 finalRGBA = fixed4(finalColor,1);
     #endif

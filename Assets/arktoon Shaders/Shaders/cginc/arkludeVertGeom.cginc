@@ -18,6 +18,9 @@ struct v2g
         float3 lightColor2 : LIGHT_COLOR2;
         float3 lightColor3 : LIGHT_COLOR3;
     #endif
+    #ifdef ARKTOON_REFRACTED
+        float4 projPos : TEXCOORD8;
+    #endif
 };
 
 
@@ -49,6 +52,10 @@ v2g vert(appdata_full v) {
             o.lightColor3 = 0;
         #endif
     #endif
+    #ifdef ARKTOON_REFRACTED
+        o.projPos = ComputeScreenPos (o.pos);
+        COMPUTE_EYEDEPTH(o.projPos.z);
+    #endif
 
     return o;
 }
@@ -61,8 +68,8 @@ struct VertexOutput {
     float3 tangentDir : TEXCOORD4;
     float3 bitangentDir : TEXCOORD5;
     fixed4 col : COLOR0;
-    fixed isOutline : IS_OUTLINE;
-    fixed faceSign : FACE_SIGN;
+    fixed isOutline : IS_OUTLINE; // bool(GLSL対応でfixed)
+    fixed faceSign : FACE_SIGN; // int(GLSL対応でfixed)
     float lightIntensityIfBackface : LIGHT_INTENSITY;
     SHADOW_COORDS(6)
     UNITY_FOG_COORDS(7)
@@ -74,6 +81,9 @@ struct VertexOutput {
         float3 lightColor3 : LIGHT_COLOR3;
         float4 ambientAttenuation : AMBIENT_ATTEN;
         float4 ambientIndirect : AMBIENT_INDIRECT;
+    #endif
+    #ifdef ARKTOON_REFRACTED
+        float4 projPos : TEXCOORD8;
     #endif
 };
 
@@ -115,7 +125,7 @@ struct VertexOutput {
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 {
     VertexOutput o;
-    #ifdef USE_OUTLINE
+    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
     for (int i = 2; i >= 0; i--)
     {
         #ifdef USE_OUTLINE_WIDTH_MASK
@@ -145,6 +155,10 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
         // Pass-through the fog coordinates if this pass has shadows.
         #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
         o.fogCoord = IN[i].fogCoord;
+        #endif
+
+        #ifdef ARKTOON_REFRACTED
+            o.projPos = IN[i].projPos;
         #endif
 
         #ifndef ARKTOON_ADD
@@ -190,6 +204,10 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
         o.fogCoord = IN[iii].fogCoord;
         #endif
 
+        #ifdef ARKTOON_REFRACTED
+            o.projPos = IN[iii].projPos;
+        #endif
+
         #ifndef ARKTOON_ADD
             o.lightColor0          = IN[iii].lightColor0;
             o.lightColor1          = IN[iii].lightColor1;
@@ -230,6 +248,10 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
         // Pass-through the fog coordinates if this pass has shadows.
         #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
         o.fogCoord = IN[ii].fogCoord;
+        #endif
+
+        #ifdef ARKTOON_REFRACTED
+            o.projPos = IN[ii].projPos;
         #endif
 
         #ifndef ARKTOON_ADD
