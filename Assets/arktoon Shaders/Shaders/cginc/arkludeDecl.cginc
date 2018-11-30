@@ -104,3 +104,10 @@ uniform float _VertexColorBlendEmissive;
 // Shade from other objects.
 uniform float _OtherShadowAdjust;
 uniform float _OtherShadowBorderSharpness;
+
+// Refraction IF refracted
+#ifdef ARKTOON_REFRACTED
+uniform sampler2D _GrabTexture;
+uniform float _RefractionFresnelExp;
+uniform float _RefractionStrength;
+#endif

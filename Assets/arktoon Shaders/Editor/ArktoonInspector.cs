@@ -83,6 +83,8 @@ namespace ArktoonShaders
         MaterialProperty ReflectionShadeMix;
         MaterialProperty ReflectionCubemap;
         MaterialProperty ReflectionSuppressBaseColorValue;
+        MaterialProperty RefractionFresnelExp;
+        MaterialProperty RefractionStrength;
         MaterialProperty UseRim;
         MaterialProperty RimBlend;
         MaterialProperty RimBlendMask;
@@ -133,6 +135,7 @@ namespace ArktoonShaders
             bool isStencilWriter = shader.name.Contains("Stencil/Writer");
             bool isStencilReader = shader.name.Contains("Stencil/Reader");
             bool isStencilWriterMask = shader.name.Contains("Stencil/WriterMask");
+            bool isRefracted = shader.name.Contains("Refracted");
 
             // FindProperties
             BaseTexture = FindProperty("_MainTex", props);
@@ -204,6 +207,8 @@ namespace ArktoonShaders
             ReflectionShadeMix = FindProperty("_ReflectionShadeMix", props);
             ReflectionCubemap = FindProperty("_ReflectionCubemap", props);
             ReflectionSuppressBaseColorValue = FindProperty("_ReflectionSuppressBaseColorValue", props);
+            if(isRefracted) RefractionFresnelExp = FindProperty("_RefractionFresnelExp", props);
+            if(isRefracted) RefractionStrength = FindProperty("_RefractionStrength", props);
             UseRim = FindProperty("_UseRim", props);
             RimBlend = FindProperty("_RimBlend", props);
             RimBlendMask = FindProperty("_RimBlendMask", props);
@@ -261,6 +266,15 @@ namespace ArktoonShaders
                     }
                     if(isFade) materialEditor.ShaderProperty(ZWrite, "ZWrite");
                     EditorGUI.indentLevel --;
+                }
+                if(isRefracted){
+                    UIHelper.ShurikenHeader("Refraction");
+                    {
+                        EditorGUI.indentLevel ++;
+                        materialEditor.ShaderProperty(RefractionFresnelExp, "Fresnel Exp");
+                        materialEditor.ShaderProperty(RefractionStrength, "Strength");
+                        EditorGUI.indentLevel --;
+                    }
                 }
 
                 if(isCutout){
@@ -356,30 +370,32 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel --;
                 }
 
-                UIHelper.ShurikenHeader("Outline");
-                {
-                    EditorGUI.indentLevel++;
-                    materialEditor.ShaderProperty(UseOutline, "Use");
-                    var useOutline = UseOutline.floatValue;
-                    if(useOutline > 0)
+                if(!isRefracted) {
+                    UIHelper.ShurikenHeader("Outline");
                     {
-                        materialEditor.ShaderProperty(OutlineWidth,"Width");
-                        if(!isOpaque) {
-                            materialEditor.ShaderProperty(OutlineMask,"Cutoff Mask");
-                            materialEditor.ShaderProperty(OutlineCutoffRange,"Cutoff Range");
-                        }else{
-                            EditorGUILayout.LabelField("Cutoff Mask","Available in", EditorStyles.centeredGreyMiniLabel);
-                            EditorGUILayout.LabelField("Cutoff Range","AlphaCutout/Fade Shader", EditorStyles.centeredGreyMiniLabel);
-                        }
-                        materialEditor.ShaderProperty(UseOutlineWidthMask,"Use Width Mask");
-                        var useOutlineWidthMask = UseOutlineWidthMask.floatValue;
-                        if (useOutlineWidthMask > 0) materialEditor.ShaderProperty(OutlineWidthMask,"Width Mask");
+                        EditorGUI.indentLevel++;
+                        materialEditor.ShaderProperty(UseOutline, "Use");
+                        var useOutline = UseOutline.floatValue;
+                        if(useOutline > 0)
+                        {
+                            materialEditor.ShaderProperty(OutlineWidth,"Width");
+                            if(!isOpaque) {
+                                materialEditor.ShaderProperty(OutlineMask,"Cutoff Mask");
+                                materialEditor.ShaderProperty(OutlineCutoffRange,"Cutoff Range");
+                            }else{
+                                EditorGUILayout.LabelField("Cutoff Mask","Available in", EditorStyles.centeredGreyMiniLabel);
+                                EditorGUILayout.LabelField("Cutoff Range","AlphaCutout/Fade Shader", EditorStyles.centeredGreyMiniLabel);
+                            }
+                            materialEditor.ShaderProperty(UseOutlineWidthMask,"Use Width Mask");
+                            var useOutlineWidthMask = UseOutlineWidthMask.floatValue;
+                            if (useOutlineWidthMask > 0) materialEditor.ShaderProperty(OutlineWidthMask,"Width Mask");
 
-                        materialEditor.ShaderProperty(OutlineColor,"Color");
-                        materialEditor.ShaderProperty(OutlineShadeMix,"Shadow mix");
-                        materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
+                            materialEditor.ShaderProperty(OutlineColor,"Color");
+                            materialEditor.ShaderProperty(OutlineShadeMix,"Shadow mix");
+                            materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
+                        }
+                        EditorGUI.indentLevel--;
                     }
-                    EditorGUI.indentLevel--;
                 }
 
                 UIHelper.ShurikenHeader("MatCap");
