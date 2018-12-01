@@ -19,6 +19,11 @@ Shader "arktoon/FadeRefracted" {
         _BumpScale ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMap ("[Common] Emission map", 2D) = "white" {}
         _EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
+        // Emission Parallax
+        [Toggle]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
+        _EmissionMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
+        _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
         // refraction
         _RefractionFresnelExp ("[Refraction] Fresnel Exp",  Range(0, 10)) = 0
         _RefractionStrength ("[Refraction] Strength",  Range(-2, 2)) = 0

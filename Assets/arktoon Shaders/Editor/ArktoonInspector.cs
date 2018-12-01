@@ -23,6 +23,10 @@ namespace ArktoonShaders
         MaterialProperty BumpScale;
         MaterialProperty EmissionMap;
         MaterialProperty EmissionColor;
+        MaterialProperty UseEmissionParallax;
+        MaterialProperty EmissionMask;
+        MaterialProperty EmissionParallaxDepth;
+        MaterialProperty EmissionParallaxDepthMask;
         MaterialProperty Shadowborder;
         MaterialProperty ShadowborderBlur;
         MaterialProperty ShadowStrength;
@@ -144,6 +148,10 @@ namespace ArktoonShaders
             BumpScale = FindProperty("_BumpScale", props);
             EmissionMap = FindProperty("_EmissionMap", props);
             EmissionColor = FindProperty("_EmissionColor", props);
+            UseEmissionParallax = FindProperty("_UseEmissionParallax", props);
+            EmissionMask = FindProperty("_EmissionMask", props);
+            EmissionParallaxDepth = FindProperty("_EmissionParallaxDepth", props);
+            EmissionParallaxDepthMask = FindProperty("_EmissionParallaxDepthMask", props);
             if(isCutout) CutoutCutoutAdjust = FindProperty("_CutoutCutoutAdjust", props);
             Shadowborder = FindProperty("_Shadowborder", props);
             ShadowborderBlur = FindProperty("_ShadowborderBlur", props);
@@ -252,6 +260,16 @@ namespace ArktoonShaders
                     materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Base Color Texture (RGB)"), BaseTexture, BaseColor);
                     materialEditor.TexturePropertySingleLine(new GUIContent("Normal Map", "Normal Map (RGB)"), Normalmap, BumpScale);
                     materialEditor.TexturePropertySingleLine(new GUIContent("Emission", "Emission (RGB)"), EmissionMap, EmissionColor);
+
+                    materialEditor.ShaderProperty(UseEmissionParallax, "Use Parallaxed Emission");
+                    var useEmissionPara = UseEmissionParallax.floatValue;
+                    if(useEmissionPara > 0){
+                        EditorGUI.indentLevel ++;
+                        materialEditor.ShaderProperty(EmissionMask, "Emission Mask");
+                        materialEditor.ShaderProperty(EmissionParallaxDepth, "Parallax Depth");
+                        materialEditor.ShaderProperty(EmissionParallaxDepthMask, "Parallax Depth Mask");
+                        EditorGUI.indentLevel --;
+                    }
                     // materialEditor.ShaderProperty(Cull, "Cull");
                     materialEditor.ShaderProperty(UseDoubleSided, "Is Double Sided");
                     var doublesided = UseDoubleSided.floatValue;

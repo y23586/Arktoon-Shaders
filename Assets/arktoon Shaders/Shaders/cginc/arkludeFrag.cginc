@@ -322,9 +322,15 @@ float4 frag(VertexOutput i) : COLOR {
         float4 sceneColor = tex2D(_GrabTexture, sceneUVs);
     #endif
 
+
+    // Emission Parallax
+    float _EmissionParallaxDepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxDepthMask, _MainTex, TRANSFORM_TEX(i.uv0, _EmissionParallaxDepthMask)).r;
+    float2 emissionParallaxTransform = _EmissionParallaxDepth * _EmissionParallaxDepthMask_var * mul(tangentTransform, viewDirection).xy + i.uv0;
+    float _EmissionMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMask, _MainTex, TRANSFORM_TEX(i.uv0, _EmissionMask)).r;
+
     // Emissive合成・FinalColor計算
-    float3 _Emission = tex2D(_EmissionMap,TRANSFORM_TEX(i.uv0, _EmissionMap)).rgb *_EmissionColor.rgb;
-    float3 emissive = max(lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive), RimLight) * !i.isOutline;
+    float3 _Emission = tex2D(_EmissionMap,TRANSFORM_TEX(lerp(i.uv0, emissionParallaxTransform.rg, _UseEmissionParallax), _EmissionMap)).rgb *_EmissionColor.rgb;
+    float3 emissive = max( lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive) * lerp(1,_EmissionMask_var, _UseEmissionParallax) , RimLight) * !i.isOutline;
     float3 finalColor = emissive + finalcolor2;
 
     #ifdef ARKTOON_FADE

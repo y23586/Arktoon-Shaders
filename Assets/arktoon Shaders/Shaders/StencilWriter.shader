@@ -18,6 +18,11 @@ Shader "arktoon/Stencil/Writer/Cutout" {
         _BumpScale ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMap ("[Common] Emission map", 2D) = "white" {}
         _EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
+        // Emission Parallax
+        [Toggle]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
+        _EmissionMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
+        _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
         // Cutout
         _CutoutCutoutAdjust ("Cutout Border Adjust", Range(0, 1)) = 0.5
         // Shadow (received from DirectionalLight, other Indirect(baked) Lights, including SH)
