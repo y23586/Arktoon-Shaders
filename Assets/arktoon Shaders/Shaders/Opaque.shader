@@ -60,7 +60,6 @@ Shader "arktoon/Opaque" {
         _ShadowPlanB2ValueFromBase ("[Plan B-2] Value From Base", Range(0, 2)) = 1
         _ShadowPlanB2CustomShadowTexture ("[Plan B-2] Custom Shadow Texture", 2D) = "black" {}
         _ShadowPlanB2CustomShadowTextureRGB ("[Plan B-2] Custom Shadow Texture RGB", Color) = (1,1,1,1)
-
         // Gloss
         [Toggle(USE_GLOSS)]_UseGloss ("[Gloss] Enabled", Float) = 0
         _GlossBlend ("[Gloss] Smoothness", Range(0, 1)) = 0.5
@@ -120,8 +119,6 @@ Shader "arktoon/Opaque" {
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
         // Legacy MatCap/ShadeCap Calculation
         [Toggle(USE_POSITION_RELATED_CALC)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Float) = 0
-        // Backface Color Multiply
-        // _BackfaceColorMultiply ("[Advancced] Backface Color Multiply", Color) = (1,1,1,1)
     }
     SubShader {
         Tags {

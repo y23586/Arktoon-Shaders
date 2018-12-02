@@ -178,9 +178,7 @@ namespace ArktoonShaders
             ShadowPlanBValueFromBase = FindProperty("_ShadowPlanBValueFromBase", props);
             ShadowPlanBCustomShadowTexture = FindProperty("_ShadowPlanBCustomShadowTexture", props);
             ShadowPlanBCustomShadowTextureRGB = FindProperty("_ShadowPlanBCustomShadowTextureRGB", props);
-
             CustomShadow2nd = FindProperty("_CustomShadow2nd", props);
-
             ShadowPlanB2border = FindProperty("_ShadowPlanB2border", props);
             ShadowPlanB2borderBlur = FindProperty("_ShadowPlanB2borderBlur", props);
             ShadowPlanB2HueShiftFromBase = FindProperty("_ShadowPlanB2HueShiftFromBase", props);
@@ -189,7 +187,6 @@ namespace ArktoonShaders
             ShadowPlanB2UseCustomShadowTexture = FindProperty("_ShadowPlanB2UseCustomShadowTexture", props);
             ShadowPlanB2CustomShadowTexture = FindProperty("_ShadowPlanB2CustomShadowTexture", props);
             ShadowPlanB2CustomShadowTextureRGB = FindProperty("_ShadowPlanB2CustomShadowTextureRGB", props);
-
             UseGloss = FindProperty("_UseGloss", props);
             GlossBlend = FindProperty("_GlossBlend", props);
             GlossBlendMask = FindProperty("_GlossBlendMask", props);
@@ -239,7 +236,6 @@ namespace ArktoonShaders
             if(isStencilWriterMask) StencilMaskTex = FindProperty("_StencilMaskTex", props);
             if(isStencilWriterMask) StencilMaskAdjust = FindProperty("_StencilMaskAdjust", props);
             if(isStencilReader) StencilCompareAction = FindProperty("_StencilCompareAction", props);
-            // Cull = FindProperty("_Cull", props);
             UseDoubleSided = FindProperty("_UseDoubleSided", props);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props);
             DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props);
@@ -252,12 +248,12 @@ namespace ArktoonShaders
             LightSampling = FindProperty("_LightSampling", props);
             UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props);
             if(isFade) ZWrite = FindProperty("_ZWrite", props);
-            // BackfaceColorMultiply = FindProperty("_BackfaceColorMultiply", props);
 
             EditorGUIUtility.labelWidth = 0f;
 
             EditorGUI.BeginChangeCheck();
             {
+                // Common
                 UIHelper.ShurikenHeader("Common");
                 {
                     EditorGUI.indentLevel ++;
@@ -280,6 +276,8 @@ namespace ArktoonShaders
                     if(isFade) materialEditor.ShaderProperty(ZWrite, "ZWrite");
                     EditorGUI.indentLevel --;
                 }
+
+                // Refraction
                 if(isRefracted){
                     UIHelper.ShurikenHeader("Refraction");
                     {
@@ -290,6 +288,7 @@ namespace ArktoonShaders
                     }
                 }
 
+                // Alpha Cutout
                 if(isCutout){
                     UIHelper.ShurikenHeader("Alpha Cutout");
                     {
@@ -299,6 +298,7 @@ namespace ArktoonShaders
                     }
                 }
 
+                // Shadow
                 UIHelper.ShurikenHeader("Shadow");
                 {
                     EditorGUI.indentLevel ++;
@@ -368,6 +368,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel --;
                 }
 
+                // Gloss
                 UIHelper.ShurikenHeader("Gloss");
                 {
                     EditorGUI.indentLevel ++;
@@ -383,6 +384,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel --;
                 }
 
+                // Outline
                 if(!isRefracted) {
                     UIHelper.ShurikenHeader("Outline");
                     {
@@ -411,6 +413,7 @@ namespace ArktoonShaders
                     }
                 }
 
+                // MatCap
                 UIHelper.ShurikenHeader("MatCap");
                 {
                     EditorGUI.indentLevel++;
@@ -428,6 +431,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
+                // Reflection
                 UIHelper.ShurikenHeader("Reflection");
                 {
                     EditorGUI.indentLevel++;
@@ -451,6 +455,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
+                // Rim Light
                 UIHelper.ShurikenHeader("Rim");
                 {
                     EditorGUI.indentLevel++;
@@ -470,6 +475,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
+                // Shade Cap
                 UIHelper.ShurikenHeader("Shade Cap");
                 {
                     EditorGUI.indentLevel++;
@@ -485,6 +491,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel--;
                 }
 
+                // Stencil Writer
                 if(isStencilWriter)
                 {
                     UIHelper.ShurikenHeader("Stencil Writer");
@@ -497,6 +504,7 @@ namespace ArktoonShaders
                     }
                 }
 
+                // Stencil Reader
                 if(isStencilReader)
                 {
                     UIHelper.ShurikenHeader("Stencil Reader");
@@ -508,21 +516,23 @@ namespace ArktoonShaders
                     }
                 }
 
+                // Parallax Emission
                 UIHelper.ShurikenHeader("Parallaxed Emission");
                 {
+                    EditorGUI.indentLevel ++;
                     materialEditor.ShaderProperty(UseEmissionParallax, "Use");
                     var useEmissionPara = UseEmissionParallax.floatValue;
                     if(useEmissionPara > 0){
-                        EditorGUI.indentLevel ++;
                         materialEditor.ShaderProperty(EmissionParallaxTex, "Texture");
                         materialEditor.ShaderProperty(EmissionParallaxColor, "Color");
                         materialEditor.ShaderProperty(EmissionParallaxMask, "Mask");
                         materialEditor.ShaderProperty(EmissionParallaxDepth, "Parallax Depth");
                         materialEditor.ShaderProperty(EmissionParallaxDepthMask, "Parallax Depth Mask");
-                        EditorGUI.indentLevel --;
                     }
+                    EditorGUI.indentLevel --;
                 }
 
+                // Advanced / Experimental
                 IsShowAdvanced = UIHelper.ShurikenFoldout("Advanced / Experimental (Click to Open)", IsShowAdvanced);
                 if (IsShowAdvanced) {
                     EditorGUI.indentLevel++;
@@ -656,7 +666,8 @@ namespace ArktoonShaders
     }
 
     class UIHelper
-    {        private static Rect DrawShuriken(string title, Vector2 contentOffset) {
+    {
+        private static Rect DrawShuriken(string title, Vector2 contentOffset) {
             var style = new GUIStyle("ShurikenModuleTitle");
             style.margin = new RectOffset(0, 0, 10, 0);
             style.font = new GUIStyle(EditorStyles.boldLabel).font;
@@ -674,14 +685,11 @@ namespace ArktoonShaders
         public static bool ShurikenFoldout(string title, bool display)
         {
             var rect = DrawShuriken(title,new Vector2(20f, -2f));
-
             var e = Event.current;
-
             var toggleRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
             if (e.type == EventType.Repaint) {
                 EditorStyles.foldout.Draw(toggleRect, false, false, display, false);
             }
-
             if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition)) {
                 display = !display;
                 e.Use();

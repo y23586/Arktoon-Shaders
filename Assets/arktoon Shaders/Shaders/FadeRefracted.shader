@@ -125,8 +125,6 @@ Shader "arktoon/FadeRefracted" {
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
         // Legacy MatCap/ShadeCap Calculation
         [Toggle(USE_POSITION_RELATED_CALC)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Float) = 0
-        // Backface Color Multiply
-        // _BackfaceColorMultiply ("[Advancced] Backface Color Multiply", Color) = (1,1,1,1)
     }
     SubShader {
         Tags {
