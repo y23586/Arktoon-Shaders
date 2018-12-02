@@ -19,6 +19,13 @@ Shader "arktoon/FadeRefracted" {
         _BumpScale ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMap ("[Common] Emission map", 2D) = "white" {}
         _EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
+        // Emission Parallax
+        [Toggle(USE_EMISSION_PARALLLAX)]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
+        _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
+        _EmissionParallaxColor ("[Emission Parallax] Color", Color ) = (1,1,1,1)
+        _EmissionParallaxMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
+        _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
         // refraction
         _RefractionFresnelExp ("[Refraction] Fresnel Exp",  Range(0, 10)) = 0
         _RefractionStrength ("[Refraction] Strength",  Range(-2, 2)) = 0
@@ -118,8 +125,6 @@ Shader "arktoon/FadeRefracted" {
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
         // Legacy MatCap/ShadeCap Calculation
         [Toggle(USE_POSITION_RELATED_CALC)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Float) = 0
-        // Backface Color Multiply
-        // _BackfaceColorMultiply ("[Advancced] Backface Color Multiply", Color) = (1,1,1,1)
     }
     SubShader {
         Tags {
@@ -150,6 +155,7 @@ Shader "arktoon/FadeRefracted" {
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
+            #pragma shader_feature USE_EMISSION_PARALLLAX
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER

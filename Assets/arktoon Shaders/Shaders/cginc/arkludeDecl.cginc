@@ -10,6 +10,14 @@ uniform float _BumpScale;
 uniform sampler2D _EmissionMap; uniform float4 _EmissionMap_ST;
 uniform float4 _EmissionColor;
 
+// Emission Parallax
+uniform float _UseEmissionParallax;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxTex); uniform float4 _EmissionParallaxTex_ST;
+uniform float4 _EmissionParallaxColor;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxMask); uniform float4 _EmissionParallaxMask_ST;
+uniform float _EmissionParallaxDepth;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxDepthMask); uniform float4 _EmissionParallaxDepthMask_ST;
+
 // Double Side
 uniform float _DoubleSidedBackfaceLightIntensity;
 uniform float _DoubleSidedFlipBackfaceNormal;
