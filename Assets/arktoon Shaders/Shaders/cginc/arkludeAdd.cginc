@@ -31,10 +31,11 @@ float4 frag(VertexOutput i) : COLOR {
         }
     #endif
 
-    float ShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur/2);
-    float ShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur/2);
+    fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, _MainTex, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
+    float ShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur_var/2);
+    float ShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur_var/2);
 
-    float lightContribution = dot(normalize(_WorldSpaceLightPos0.xyz - i.posWorld.xyz),normalDirection)*attenuation;
+    float lightContribution = dot(lightDirection, normalDirection)*attenuation;
     float directContribution = 1.0 - ((1.0 - saturate(( (saturate(lightContribution) - ShadowborderMin)) / (ShadowborderMax - ShadowborderMin))));
     // #ifdef USE_POINT_SHADOW_STEPS
         directContribution = lerp(directContribution, min(1,floor(directContribution * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);

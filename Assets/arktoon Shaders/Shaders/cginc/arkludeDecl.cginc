@@ -17,6 +17,7 @@ uniform float4 _EmissionParallaxColor;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxMask); uniform float4 _EmissionParallaxMask_ST;
 uniform float _EmissionParallaxDepth;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxDepthMask); uniform float4 _EmissionParallaxDepthMask_ST;
+uniform float _EmissionParallaxDepthMaskInvert;
 
 // Double Side
 uniform float _DoubleSidedBackfaceLightIntensity;
@@ -25,6 +26,7 @@ uniform float _DoubleSidedFlipBackfaceNormal;
 // Shadow
 uniform float _Shadowborder;
 uniform float _ShadowborderBlur;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowborderBlurMask); uniform float4 _ShadowborderBlurMask_ST;
 uniform float _ShadowStrength;
 uniform float _ShadowIndirectIntensity;
 uniform float _ShadowUseStep;
@@ -69,6 +71,7 @@ uniform float _PointAddIntensity;
 uniform float _PointShadowStrength;
 uniform float _PointShadowborder;
 uniform float _PointShadowborderBlur;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_PointShadowborderBlurMask); uniform float4 _PointShadowborderBlurMask_ST;
 uniform float _PointShadowUseStep;
 uniform int _PointShadowSteps;
 

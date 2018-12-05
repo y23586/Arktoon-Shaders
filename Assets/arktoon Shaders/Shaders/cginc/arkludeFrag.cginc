@@ -58,8 +58,9 @@ float4 frag(VertexOutput i) : COLOR {
     float remappedLight = ((grayscaleDirectLighting-bottomIndirectLighting)/lightDifference);
     float _ShadowStrengthMask_var = tex2D(_ShadowStrengthMask, TRANSFORM_TEX(i.uv0, _ShadowStrengthMask));
 
-    float ShadowborderMin = max(0, _Shadowborder - _ShadowborderBlur/2);
-    float ShadowborderMax = min(1, _Shadowborder + _ShadowborderBlur/2);
+    fixed _ShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowborderBlurMask, _MainTex, TRANSFORM_TEX(i.uv0, _ShadowborderBlurMask)).r * _ShadowborderBlur;
+    float ShadowborderMin = max(0, _Shadowborder - _ShadowborderBlur_var/2);
+    float ShadowborderMax = min(1, _Shadowborder + _ShadowborderBlur_var/2);
     float grayscaleDirectLighting2 = (((dot(lightDirection,normalDirection)*0.5+0.5)*grayscalelightcolor) + dot(ShadeSH9Normal( normalDirection ),grayscale_vector));
     float remappedLight2 = ((grayscaleDirectLighting2-bottomIndirectLighting)/lightDifference);
     float directContribution = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin)) / (ShadowborderMax - ShadowborderMin))));
@@ -105,8 +106,9 @@ float4 frag(VertexOutput i) : COLOR {
 
     // 頂点ライティング：PixelLightから溢れた4光源をそれぞれ計算
     #ifdef USE_VERTEX_LIGHT
-        float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur/2.0);
-        float VertexShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur/2.0);
+        fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, _MainTex, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
+        float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur_var/2.0);
+        float VertexShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur_var/2.0);
         float4 directContributionVertex = 1.0 - ((1.0 - saturate(( (saturate(i.ambientAttenuation) - VertexShadowborderMin)) / (VertexShadowborderMax - VertexShadowborderMin))));
         // #ifdef USE_POINT_SHADOW_STEPS
             directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
@@ -327,7 +329,7 @@ float4 frag(VertexOutput i) : COLOR {
     float3 emissionParallax = float3(0,0,0);
     #ifdef USE_EMISSION_PARALLLAX
         float _EmissionParallaxDepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxDepthMask, _MainTex, TRANSFORM_TEX(i.uv0, _EmissionParallaxDepthMask)).r;
-        float2 emissionParallaxTransform = _EmissionParallaxDepth * _EmissionParallaxDepthMask_var * mul(tangentTransform, viewDirection).xy + i.uv0;
+        float2 emissionParallaxTransform = _EmissionParallaxDepth * (_EmissionParallaxDepthMask_var - _EmissionParallaxDepthMaskInvert) * mul(tangentTransform, viewDirection).xy + i.uv0;
         float _EmissionMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxMask, _MainTex, TRANSFORM_TEX(i.uv0, _EmissionParallaxMask)).r;
         float3 _EmissionParallaxTex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxTex, _MainTex, TRANSFORM_TEX(emissionParallaxTransform, _EmissionParallaxTex)).rgb * _EmissionParallaxColor.rgb;
         emissionParallax = lerp(0, _EmissionParallaxTex_var * _EmissionMask_var, _UseEmissionParallax);

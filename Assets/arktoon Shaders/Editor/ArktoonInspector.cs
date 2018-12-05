@@ -29,8 +29,10 @@ namespace ArktoonShaders
         MaterialProperty EmissionParallaxMask;
         MaterialProperty EmissionParallaxDepth;
         MaterialProperty EmissionParallaxDepthMask;
+        MaterialProperty EmissionParallaxDepthMaskInvert;
         MaterialProperty Shadowborder;
         MaterialProperty ShadowborderBlur;
+        MaterialProperty ShadowborderBlurMask;
         MaterialProperty ShadowStrength;
         MaterialProperty ShadowStrengthMask;
         MaterialProperty ShadowIndirectIntensity;
@@ -40,6 +42,7 @@ namespace ArktoonShaders
         MaterialProperty PointShadowStrength;
         MaterialProperty PointShadowborder;
         MaterialProperty PointShadowborderBlur;
+        MaterialProperty PointShadowborderBlurMask;
         MaterialProperty PointShadowUseStep;
         MaterialProperty PointShadowSteps;
         MaterialProperty CutoutCutoutAdjust;
@@ -156,9 +159,11 @@ namespace ArktoonShaders
             EmissionParallaxMask = FindProperty("_EmissionParallaxMask", props);
             EmissionParallaxDepth = FindProperty("_EmissionParallaxDepth", props);
             EmissionParallaxDepthMask = FindProperty("_EmissionParallaxDepthMask", props);
+            EmissionParallaxDepthMaskInvert = FindProperty("_EmissionParallaxDepthMaskInvert", props);
             if(isCutout) CutoutCutoutAdjust = FindProperty("_CutoutCutoutAdjust", props);
             Shadowborder = FindProperty("_Shadowborder", props);
             ShadowborderBlur = FindProperty("_ShadowborderBlur", props);
+            ShadowborderBlurMask = FindProperty("_ShadowborderBlurMask", props);
             ShadowStrength = FindProperty("_ShadowStrength", props);
             ShadowStrengthMask = FindProperty("_ShadowStrengthMask", props);
             ShadowIndirectIntensity = FindProperty("_ShadowIndirectIntensity", props);
@@ -167,7 +172,8 @@ namespace ArktoonShaders
             PointAddIntensity = FindProperty("_PointAddIntensity", props);
             PointShadowStrength = FindProperty("_PointShadowStrength", props);
             PointShadowborder = FindProperty("_PointShadowborder", props);
-            PointShadowborderBlur= FindProperty("_PointShadowborderBlur", props);
+            PointShadowborderBlur = FindProperty("_PointShadowborderBlur", props);
+            PointShadowborderBlurMask= FindProperty("_PointShadowborderBlurMask", props);
             PointShadowUseStep = FindProperty("_PointShadowUseStep", props);
             PointShadowSteps = FindProperty("_PointShadowSteps", props);
             ShadowPlanBUsePlanB = FindProperty("_ShadowPlanBUsePlanB", props);
@@ -304,6 +310,7 @@ namespace ArktoonShaders
                     EditorGUI.indentLevel ++;
                     materialEditor.ShaderProperty(Shadowborder, "Border pos");
                     materialEditor.ShaderProperty(ShadowborderBlur, "Border blur");
+                    materialEditor.ShaderProperty(ShadowborderBlurMask, "Border blur Mask");
                     if(ShadowPlanBUsePlanB.floatValue > 0)
                     {
                         EditorGUILayout.LabelField("Strength"," (disabled)", EditorStyles.centeredGreyMiniLabel);
@@ -528,6 +535,7 @@ namespace ArktoonShaders
                         materialEditor.ShaderProperty(EmissionParallaxMask, "Mask");
                         materialEditor.ShaderProperty(EmissionParallaxDepth, "Parallax Depth");
                         materialEditor.ShaderProperty(EmissionParallaxDepthMask, "Parallax Depth Mask");
+                        materialEditor.ShaderProperty(EmissionParallaxDepthMaskInvert, "Invert Depth Mask");
                     }
                     EditorGUI.indentLevel --;
                 }
@@ -542,6 +550,7 @@ namespace ArktoonShaders
                         PointShadowStrength.floatValue = 0.5f;
                         PointShadowborder.floatValue = 0.5f;
                         PointShadowborderBlur.floatValue = 0.01f;
+                        PointShadowborderBlurMask.textureValue = null;
                         OtherShadowAdjust.floatValue = -0.1f;
                         OtherShadowBorderSharpness.floatValue = 3;
                         PointShadowUseStep.floatValue = 0;
@@ -585,6 +594,7 @@ namespace ArktoonShaders
                             materialEditor.ShaderProperty(PointShadowStrength, "Shadow Strength (def:0.5)");
                             materialEditor.ShaderProperty(PointShadowborder, "Shadow Border (def:0.5)");
                             materialEditor.ShaderProperty(PointShadowborderBlur, "Shadow Border blur (def:0.01)");
+                            materialEditor.ShaderProperty(PointShadowborderBlurMask, "Shadow Border blur Mask(def:none)");
                             materialEditor.ShaderProperty(PointShadowUseStep, "Use Shadow Steps");
                             var usePointStep = PointShadowUseStep.floatValue;
                             if(usePointStep > 0)

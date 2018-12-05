@@ -25,11 +25,13 @@ Shader "arktoon/Stencil/Reader/Cutout" {
         _EmissionParallaxMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
         _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
         _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
+        [Toggle]_EmissionParallaxDepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
         // Cutout
         _CutoutCutoutAdjust ("Cutout Border Adjust", Range(0, 1)) = 0.5
         // Shadow (received from DirectionalLight, other Indirect(baked) Lights, including SH)
         _Shadowborder ("[Shadow] border ", Range(0, 1)) = 0.6
         _ShadowborderBlur ("[Shadow] border Blur", Range(0, 1)) = 0.05
+        _ShadowborderBlurMask ("[Shadow] border Blur Mask", 2D) = "white" {}
         _ShadowStrength ("[Shadow] Strength", Range(0, 1)) = 0.5
         _ShadowStrengthMask ("[Shadow] Strength Mask", 2D) = "white" {}
         _ShadowIndirectIntensity ("[Shadow] Indirect face Intensity", Range(0,0.5)) = 0.25
@@ -41,6 +43,7 @@ Shader "arktoon/Stencil/Reader/Cutout" {
         _PointShadowStrength ("[PointShadow] Strength", Range(0, 1)) = 0.5
         _PointShadowborder ("[PointShadow] border ", Range(0, 1)) = 0.5
         _PointShadowborderBlur ("[PointShadow] border Blur", Range(0, 1)) = 0.01
+        _PointShadowborderBlurMask ("[PointShadow] border Blur Mask", 2D) = "white" {}
         [Toggle]_PointShadowUseStep ("[PointShadow] use step", Float ) = 0
         _PointShadowSteps("[PointShadow] steps between borders", Range(2, 10)) = 2
         // Plan B
