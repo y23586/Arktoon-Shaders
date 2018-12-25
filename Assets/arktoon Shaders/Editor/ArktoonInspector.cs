@@ -120,6 +120,7 @@ namespace ArktoonShaders
         MaterialProperty StencilCompareActionSecondary;
         MaterialProperty StencilMaskTex;
         MaterialProperty StencilMaskAdjust;
+        MaterialProperty StencilMaskAlphaDither;
         MaterialProperty UseDoubleSided;
         MaterialProperty DoubleSidedFlipBackfaceNormal;
         MaterialProperty DoubleSidedBackfaceLightIntensity;
@@ -256,6 +257,7 @@ namespace ArktoonShaders
             if(isStencilWriter || isStencilReader) StencilNumber = FindProperty("_StencilNumber", props);
             if(isStencilWriterMask) StencilMaskTex = FindProperty("_StencilMaskTex", props);
             if(isStencilWriterMask) StencilMaskAdjust = FindProperty("_StencilMaskAdjust", props);
+            if(isStencilWriterMask) StencilMaskAlphaDither = FindProperty("_StencilMaskAlphaDither", props);
             if(isStencilReader) StencilCompareAction = FindProperty("_StencilCompareAction", props);
             if(isStencilReaderDouble) StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props);
             if(isStencilReaderDouble) StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props);
@@ -535,6 +537,7 @@ namespace ArktoonShaders
                         materialEditor.ShaderProperty(StencilNumber,"Number");
                         if(isStencilWriterMask) materialEditor.ShaderProperty(StencilMaskTex, "Mask Texture");
                         if(isStencilWriterMask) materialEditor.ShaderProperty(StencilMaskAdjust, "Mask Adjust");
+                        if(isStencilWriterMask) materialEditor.ShaderProperty(StencilMaskAlphaDither, "Alpha(Dither)");
                         EditorGUI.indentLevel--;
                     }
                 }
