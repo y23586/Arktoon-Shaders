@@ -23,6 +23,12 @@ namespace ArktoonShaders
         MaterialProperty BumpScale;
         MaterialProperty EmissionMap;
         MaterialProperty EmissionColor;
+        MaterialProperty BaseTextureSecondary;
+        MaterialProperty BaseColorSecondary;
+        MaterialProperty NormalmapSecondary;
+        MaterialProperty BumpScaleSecondary;
+        MaterialProperty EmissionMapSecondary;
+        MaterialProperty EmissionColorSecondary;
         MaterialProperty UseEmissionParallax;
         MaterialProperty EmissionParallaxColor;
         MaterialProperty EmissionParallaxTex;
@@ -110,6 +116,8 @@ namespace ArktoonShaders
         MaterialProperty ShadowCapTexture;
         MaterialProperty StencilNumber;
         MaterialProperty StencilCompareAction;
+        MaterialProperty StencilNumberSecondary;
+        MaterialProperty StencilCompareActionSecondary;
         MaterialProperty StencilMaskTex;
         MaterialProperty StencilMaskAdjust;
         MaterialProperty UseDoubleSided;
@@ -143,6 +151,7 @@ namespace ArktoonShaders
             bool isCutout = shader.name.Contains("Cutout");
             bool isStencilWriter = shader.name.Contains("Stencil/Writer");
             bool isStencilReader = shader.name.Contains("Stencil/Reader");
+            bool isStencilReaderDouble = shader.name.Contains("Stencil/Reader/Double");
             bool isStencilWriterMask = shader.name.Contains("Stencil/WriterMask");
             bool isRefracted = shader.name.Contains("Refracted");
 
@@ -153,6 +162,12 @@ namespace ArktoonShaders
             BumpScale = FindProperty("_BumpScale", props);
             EmissionMap = FindProperty("_EmissionMap", props);
             EmissionColor = FindProperty("_EmissionColor", props);
+            if(isStencilReaderDouble) BaseTextureSecondary = FindProperty("_MainTexSecondary", props);
+            if(isStencilReaderDouble) BaseColorSecondary = FindProperty("_ColorSecondary", props);
+            if(isStencilReaderDouble) NormalmapSecondary = FindProperty("_BumpMapSecondary", props);
+            if(isStencilReaderDouble) BumpScaleSecondary = FindProperty("_BumpScaleSecondary", props);
+            if(isStencilReaderDouble) EmissionMapSecondary = FindProperty("_EmissionMapSecondary", props);
+            if(isStencilReaderDouble) EmissionColorSecondary = FindProperty("_EmissionColorSecondary", props);
             UseEmissionParallax = FindProperty("_UseEmissionParallax", props);
             EmissionParallaxColor = FindProperty("_EmissionParallaxColor", props);
             EmissionParallaxTex = FindProperty("_EmissionParallaxTex", props);
@@ -242,6 +257,8 @@ namespace ArktoonShaders
             if(isStencilWriterMask) StencilMaskTex = FindProperty("_StencilMaskTex", props);
             if(isStencilWriterMask) StencilMaskAdjust = FindProperty("_StencilMaskAdjust", props);
             if(isStencilReader) StencilCompareAction = FindProperty("_StencilCompareAction", props);
+            if(isStencilReaderDouble) StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props);
+            if(isStencilReaderDouble) StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props);
             UseDoubleSided = FindProperty("_UseDoubleSided", props);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props);
             DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props);
@@ -281,6 +298,17 @@ namespace ArktoonShaders
                     }
                     if(isFade) materialEditor.ShaderProperty(ZWrite, "ZWrite");
                     EditorGUI.indentLevel --;
+                }
+                // Secondary Common
+                if(isStencilReaderDouble) {
+                    UIHelper.ShurikenHeader("Secondary Common");
+                    {
+                        EditorGUI.indentLevel ++;
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Base Color Texture (RGB)"), BaseTextureSecondary, BaseColorSecondary);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Normal Map", "Normal Map (RGB)"), NormalmapSecondary, BumpScaleSecondary);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Emission", "Emission (RGB)"), EmissionMapSecondary, EmissionColorSecondary);
+                        EditorGUI.indentLevel --;
+                    }
                 }
 
                 // Refraction
@@ -517,8 +545,21 @@ namespace ArktoonShaders
                     UIHelper.ShurikenHeader("Stencil Reader");
                     {
                         EditorGUI.indentLevel++;
-                        materialEditor.ShaderProperty(StencilNumber,"Number");
-                        materialEditor.ShaderProperty(StencilCompareAction,"Compare Action");
+                        if(isStencilReaderDouble) {
+                            EditorGUILayout.LabelField("Primary", EditorStyles.boldLabel);
+                            EditorGUI.indentLevel++;
+                            materialEditor.ShaderProperty(StencilNumber,"Number");
+                            materialEditor.ShaderProperty(StencilCompareAction,"Compare Action");
+                            EditorGUI.indentLevel--;
+                            EditorGUILayout.LabelField("Secondary", EditorStyles.boldLabel);
+                            EditorGUI.indentLevel++;
+                            materialEditor.ShaderProperty(StencilNumberSecondary,"Number");
+                            materialEditor.ShaderProperty(StencilCompareActionSecondary,"Compare Action");
+                            EditorGUI.indentLevel--;
+                        } else {
+                            materialEditor.ShaderProperty(StencilNumber,"Number");
+                            materialEditor.ShaderProperty(StencilCompareAction,"Compare Action");
+                        }
                         EditorGUI.indentLevel--;
                     }
                 }
