@@ -4,13 +4,14 @@
 //
 // 本コードおよびリポジトリ（https://github.com/synqark/Arktoon-Shader) は MIT License を使用して公開しています。
 // 詳細はLICENSEか、https://opensource.org/licenses/mit-license.php を参照してください。
-Shader "arktoon/Stencil/WriterMask/Cutout" {
+Shader "arktoon/Stencil/Reader/Double/FadeFade" {
     Properties {
         // Double Sided
         [Toggle(DOUBLE_SIDED)]_UseDoubleSided ("Double Sided", Float ) = 0
         [Toggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
+        [Enum(Off, 0, On, 1)]_ZWrite("ZWrite", Float) = 0
         // Common
         _MainTex ("[Common] Base Texture", 2D) = "white" {}
         _Color ("[Common] Base Color", Color) = (1,1,1,1)
@@ -18,6 +19,13 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _BumpScale ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMap ("[Common] Emission map", 2D) = "white" {}
         _EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
+        // Secondary Common
+        _MainTexSecondary ("[CommonSecondary] Base Texture", 2D) = "white" {}
+        _ColorSecondary ("[CommonSecondary] Base Color", Color) = (1,1,1,1)
+        _BumpMapSecondary ("[Common] Normal map", 2D) = "bump" {}
+        _BumpScaleSecondary ("[Common] Normal scale", Range(0,2)) = 1
+        _EmissionMapSecondary ("[Common] Emission map", 2D) = "white" {}
+        _EmissionColorSecondary ("[Common] Emission Color", Color) = (0,0,0,1)
         // Emission Parallax
         [Toggle(USE_EMISSION_PARALLLAX)]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
         _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
@@ -26,8 +34,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
         _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
         [Toggle]_EmissionParallaxDepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
-        // Cutout
-        _CutoutCutoutAdjust ("Cutout Border Adjust", Range(0, 1)) = 0.5
         // Shadow (received from DirectionalLight, other Indirect(baked) Lights, including SH)
         _Shadowborder ("[Shadow] border ", Range(0, 1)) = 0.6
         _ShadowborderBlur ("[Shadow] border Blur", Range(0, 1)) = 0.05
@@ -114,11 +120,11 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _ShadowCapBlendMask ("[ShadowCap] Blend Mask", 2D) = "white" {}
         _ShadowCapNormalMix ("[ShadowCap] Normal map mix", Range(0, 2)) = 1
         _ShadowCapTexture ("[ShadowCap] Texture", 2D) = "white" {}
-        // Stencil(Writer)
-        _StencilNumber ("[StencilWriter] Number", int) = 5
-        _StencilMaskTex ("[StencilWriter] Mask Texture", 2D) = "white" {}
-        _StencilMaskAdjust ("[StencilWriter] Mask Texture Adjust", Range(0, 1)) = 0.5
-        _StencilMaskAlphaDither ("[StencilWriter] StencilAlpha(Dither)", Range(0, 1)) = 1.0
+        // Stencil(Reader)
+        _StencilNumber ("[StencilReader] Number", int) = 5
+        [Enum(UnityEngine.Rendering.CompareFunction)] _StencilCompareAction ("[StencilReader] Compare Action", int) = 6
+        _StencilNumberSecondary ("[StencilReaderSecondary] Number", int) = 5
+        [Enum(UnityEngine.Rendering.CompareFunction)] _StencilCompareActionSecondary ("[StencilReaderSecondary] Compare Action", int) = 6
         // vertex color blend
         _VertexColorBlendDiffuse ("[VertexColor] Blend to diffuse", Range(0,1)) = 0
         _VertexColorBlendEmissive ("[VertexColor] Blend to emissive", Range(0,1)) = 0
@@ -134,44 +140,22 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
     }
     SubShader {
         Tags {
-            "Queue"="AlphaTest"
-            "RenderType" = "TransparentCutout"
+            "Queue"="Transparent"
+            "RenderType"="Transparent"
         }
         Pass {
-            Name "STENCIL_WRITER"
-            Tags {
-            }
-            Cull Back
-
-            Stencil {
-                Ref [_StencilNumber]
-                Comp Always
-                Pass Replace
-            }
-
-            CGPROGRAM
-            #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature DOUBLE_SIDED
-
-            #pragma vertex vert
-            #pragma geometry geom
-            #pragma fragment frag
-            #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 4.0
-            #define ARKTOON_CUTOUT
-
-            #include "cginc/arkludeDecl.cginc"
-            #include "cginc/arkludeOther.cginc"
-            #include "cginc/arkludeVertGeom.cginc"
-            #include "cginc/arkludeFragOnlyStencilWrite.cginc"
-            ENDCG
-        }
-        Pass {
-            Name "FORWARD"
+            Name "FORWARD_PRIMARY"
             Tags {
                 "LightMode"="ForwardBase"
             }
             Cull Back
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite [_ZWrite]
+
+            Stencil {
+                Ref [_StencilNumber]
+                Comp [_StencilCompareAction]
+            }
 
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
@@ -196,11 +180,11 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma vertex vert
             #pragma geometry geom
             #pragma fragment frag
-            #pragma multi_compile_fwdbase_fullshadows
+            #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
-            #define ARKTOON_CUTOUT
+            #define ARKTOON_FADE
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -209,12 +193,18 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             ENDCG
         }
         Pass {
-            Name "FORWARD_DELTA"
+            Name "FORWARD_DELTA_PRIMARY"
             Tags {
                 "LightMode"="ForwardAdd"
             }
             Cull Back
             Blend One One
+            ZWrite [_ZWrite]
+
+            Stencil {
+                Ref [_StencilNumber]
+                Comp [_StencilCompareAction]
+            }
 
             CGPROGRAM
             #pragma shader_feature USE_GLOSS
@@ -229,11 +219,11 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma vertex vert
             #pragma geometry geom
             #pragma fragment frag
-            #pragma multi_compile_fwdadd_fullshadows
+            #pragma multi_compile_fwdadd
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
-            #define ARKTOON_CUTOUT
+            #define ARKTOON_FADE
             #define ARKTOON_ADD
 
             #include "cginc/arkludeDecl.cginc"
@@ -243,46 +233,119 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             ENDCG
         }
         Pass {
-            Name "ShadowCaster"
+            Name "FORWARD_SECONDARY"
             Tags {
-                "LightMode"="ShadowCaster"
+                "LightMode"="ForwardBase"
             }
-            Offset 1, 1
-            Cull [_ShadowCasterCulling]
+            Cull Back
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite [_ZWrite]
+
+            Stencil {
+                Ref [_StencilNumberSecondary]
+                Comp [_StencilCompareActionSecondary]
+            }
 
             CGPROGRAM
+            #pragma shader_feature USE_SHADE_TEXTURE
+            #pragma shader_feature USE_GLOSS
+            #pragma shader_feature USE_REFLECTION
+            #pragma shader_feature USE_REFLECTION_PROBE
+            #pragma shader_feature USE_RIM
+            #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
+            #pragma shader_feature USE_CUSTOM_SHADOW_2ND
+            #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
+            #pragma shader_feature USE_VERTEX_LIGHT
+            #pragma shader_feature USE_OUTLINE
+            #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature DOUBLE_SIDED
+            #pragma shader_feature USE_POSITION_RELATED_CALC
+            #pragma shader_feature USE_EMISSION_PARALLLAX
+
+            #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
+            #pragma shader_feature _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
+
             #pragma vertex vert
+            #pragma geometry geom
             #pragma fragment frag
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #pragma fragmentoption ARB_precision_hint_fastest
-            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
-            uniform float _CutoutCutoutAdjust;
-            uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
-            uniform float4 _Color;
-            struct VertexInput {
-                float4 vertex : POSITION;
-                float2 texcoord0 : TEXCOORD0;
-            };
-            struct VertexOutput {
-                V2F_SHADOW_CASTER;
-                float2 uv0 : TEXCOORD1;
-            };
-            VertexOutput vert (VertexInput v) {
-                VertexOutput o = (VertexOutput)0;
-                o.uv0 = v.texcoord0;
-                o.pos = UnityObjectToClipPos( v.vertex );
-                TRANSFER_SHADOW_CASTER(o)
-                return o;
+            #define ARKTOON_FADE
+            #define ARKTOON_SECONDARY
+
+            #include "cginc/arkludeDecl.cginc"
+            #include "cginc/arkludeOther.cginc"
+            #include "cginc/arkludeVertGeom.cginc"
+            #include "cginc/arkludeFrag.cginc"
+            ENDCG
+        }
+        Pass {
+            Name "FORWARD_DELTA_SECONDARY"
+            Tags {
+                "LightMode"="ForwardAdd"
             }
-            float4 frag(VertexOutput i) : COLOR {
-                float4 _MainTex_var = tex2D(_MainTex,TRANSFORM_TEX(i.uv0, _MainTex));
-                clip((_MainTex_var.a * _Color.a) - _CutoutCutoutAdjust);
-                SHADOW_CASTER_FRAGMENT(i)
+            Cull Back
+            Blend One One
+            ZWrite [_ZWrite]
+
+            Stencil {
+                Ref [_StencilNumberSecondary]
+                Comp [_StencilCompareActionSecondary]
             }
+
+            CGPROGRAM
+            #pragma shader_feature USE_GLOSS
+            #pragma shader_feature USE_RIM
+            #pragma shader_feature USE_OUTLINE
+            #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature DOUBLE_SIDED
+            #pragma shader_feature USE_POSITION_RELATED_CALC
+            #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
+            #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
+
+            #pragma vertex vert
+            #pragma geometry geom
+            #pragma fragment frag
+            #pragma multi_compile_fwdadd
+            #pragma multi_compile_fog
+            #pragma only_renderers d3d9 d3d11 glcore gles
+            #pragma target 4.0
+            #define ARKTOON_FADE
+            #define ARKTOON_ADD
+            #define ARKTOON_SECONDARY
+
+            #include "cginc/arkludeDecl.cginc"
+            #include "cginc/arkludeOther.cginc"
+            #include "cginc/arkludeVertGeom.cginc"
+            #include "cginc/arkludeAdd.cginc"
+            ENDCG
+        }
+
+        // ------------------------------------------------------------------
+        //  Shadow rendering pass
+        Pass {
+            Name "SHADOWCASTER"
+            Tags { "LightMode" = "ShadowCaster" }
+
+            ZWrite On ZTest LEqual
+            Cull [_ShadowCasterCulling]
+
+            CGPROGRAM
+            #pragma target 3.0
+
+            // -------------------------------------
+
+            #pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma multi_compile_shadowcaster
+
+            #pragma vertex vertShadowCaster
+            #pragma fragment fragShadowCaster
+
+            #include "cginc/arkludeFadeShadowCaster.cginc"
+
             ENDCG
         }
     }

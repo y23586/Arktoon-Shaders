@@ -4,7 +4,7 @@ float4 frag(VertexOutput i) : COLOR {
 
     float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, i.faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
-    float3 _BumpMap_var = UnpackScaleNormal(tex2D(_BumpMap,TRANSFORM_TEX(i.uv0, _BumpMap)), _BumpScale);
+    float3 _BumpMap_var = UnpackScaleNormal(tex2D(REF_BUMPMAP,TRANSFORM_TEX(i.uv0, REF_BUMPMAP)), REF_BUMPSCALE);
     float3 normalLocal = _BumpMap_var.rgb;
     float3 normalDirection = normalize(mul( normalLocal, tangentTransform )); // Perturbed normals
 
@@ -13,25 +13,25 @@ float4 frag(VertexOutput i) : COLOR {
     float3 halfDirection = normalize(viewDirection+lightDirection);
 
     UNITY_LIGHT_ATTENUATION(attenuation,i, i.posWorld.xyz);
-    float4 _MainTex_var = UNITY_SAMPLE_TEX2D(_MainTex, TRANSFORM_TEX(i.uv0, _MainTex));
-    float3 Diffuse = (_MainTex_var.rgb*_Color.rgb);
+    float4 _MainTex_var = UNITY_SAMPLE_TEX2D(REF_MAINTEX, TRANSFORM_TEX(i.uv0, REF_MAINTEX));
+    float3 Diffuse = (_MainTex_var.rgb*REF_COLOR.rgb);
     Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse); // 頂点カラーを合成
 
     // アウトラインであればDiffuseとColorを混ぜる
     Diffuse = lerp(Diffuse, (Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), i.isOutline);
 
     #ifdef ARKTOON_CUTOUT
-        clip((_MainTex_var.a * _Color.a) - _CutoutCutoutAdjust);
+        clip((_MainTex_var.a * REF_COLOR.a) - _CutoutCutoutAdjust);
     #endif
 
     #if defined(ARKTOON_CUTOUT) || defined(ARKTOON_FADE)
         if (i.isOutline) {
-            float _OutlineMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineMask, _MainTex, TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
+            float _OutlineMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
             clip(_OutlineMask_var.r - _OutlineCutoffRange);
         }
     #endif
 
-    fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, _MainTex, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
+    fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
     float ShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur_var/2);
     float ShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur_var/2);
 
@@ -58,7 +58,7 @@ float4 frag(VertexOutput i) : COLOR {
             float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
         #endif
         float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
-        float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
+        float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
         additionalContributionMultiplier *= (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
     #endif
 
@@ -78,7 +78,7 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
         // オプション：Gloss
         #ifdef USE_GLOSS
-            float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
+            float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
 
             float gloss = _GlossBlend * _GlossBlendMask_var;
             float perceptualRoughness = 1.0 - gloss;
@@ -126,7 +126,7 @@ float4 frag(VertexOutput i) : COLOR {
                 float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
             #endif
             float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
-            float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
+            float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
         #endif
 
@@ -144,14 +144,14 @@ float4 frag(VertexOutput i) : COLOR {
                 float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
             #endif
             float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
-            float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
+            float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
             float3 matcapResult = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend);
             matcap = min(matcapResult, matcapResult * (coloredLight * _MatcapShadeMix));
         #endif
 
         // オプション：Rim
         #ifdef USE_RIM
-            float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, _MainTex, TRANSFORM_TEX(i.uv0, _RimBlendMask));
+            float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
             RimLight = (
                 lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
@@ -188,7 +188,7 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
 
     #ifdef ARKTOON_FADE
-        fixed4 finalRGBA = fixed4(finalColor * (_MainTex_var.a * _Color.a),0);
+        fixed4 finalRGBA = fixed4(finalColor * (_MainTex_var.a * REF_COLOR.a),0);
     #else
         fixed4 finalRGBA = fixed4(finalColor * 1,0);
     #endif
