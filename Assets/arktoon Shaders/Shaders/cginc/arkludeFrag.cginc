@@ -342,10 +342,11 @@ float4 frag(VertexOutput i) : COLOR {
     float3 finalColor = emissive + finalcolor2;
 
     #ifdef ARKTOON_FADE
+        fixed _AlphaMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_AlphaMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _AlphaMask)).r;
         #ifdef ARKTOON_REFRACTED
-            fixed4 finalRGBA = fixed4(lerp(sceneColor, finalColor, (_MainTex_var.a*REF_COLOR.a)),1);
+            fixed4 finalRGBA = fixed4(lerp(sceneColor, finalColor, (_MainTex_var.a*REF_COLOR.a*_AlphaMask_var)),1);
         #else
-            fixed4 finalRGBA = fixed4(finalColor,(_MainTex_var.a*REF_COLOR.a));
+            fixed4 finalRGBA = fixed4(finalColor,(_MainTex_var.a*REF_COLOR.a*_AlphaMask_var));
         #endif
     #else
         fixed4 finalRGBA = fixed4(finalColor,1);

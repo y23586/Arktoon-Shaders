@@ -23,6 +23,7 @@ namespace ArktoonShaders
         MaterialProperty BumpScale;
         MaterialProperty EmissionMap;
         MaterialProperty EmissionColor;
+        MaterialProperty AlphaMask;
         MaterialProperty BaseTextureSecondary;
         MaterialProperty BaseColorSecondary;
         MaterialProperty NormalmapSecondary;
@@ -138,6 +139,7 @@ namespace ArktoonShaders
         #endregion
 
         static bool IsShowAdvanced = false;
+        static bool IsShowAlphaMask = false;
         GUIStyle style = new GUIStyle();
 
 
@@ -163,6 +165,7 @@ namespace ArktoonShaders
             BumpScale = FindProperty("_BumpScale", props);
             EmissionMap = FindProperty("_EmissionMap", props);
             EmissionColor = FindProperty("_EmissionColor", props);
+            if(isFade) AlphaMask = FindProperty("_AlphaMask", props);
             if(isStencilReaderDouble) BaseTextureSecondary = FindProperty("_MainTexSecondary", props);
             if(isStencilReaderDouble) BaseColorSecondary = FindProperty("_ColorSecondary", props);
             if(isStencilReaderDouble) NormalmapSecondary = FindProperty("_BumpMapSecondary", props);
@@ -310,6 +313,16 @@ namespace ArktoonShaders
                         materialEditor.TexturePropertySingleLine(new GUIContent("Normal Map", "Normal Map (RGB)"), NormalmapSecondary, BumpScaleSecondary);
                         materialEditor.TexturePropertySingleLine(new GUIContent("Emission", "Emission (RGB)"), EmissionMapSecondary, EmissionColorSecondary);
                         EditorGUI.indentLevel --;
+                    }
+                }
+
+                // AlphaMask
+                if(isFade){
+                    IsShowAlphaMask = UIHelper.ShurikenFoldout("AlphaMask", IsShowAlphaMask);
+                    if (IsShowAlphaMask) {
+                            EditorGUI.indentLevel ++;
+                            materialEditor.ShaderProperty(AlphaMask, "Alpha Mask");
+                            EditorGUI.indentLevel --;
                     }
                 }
 

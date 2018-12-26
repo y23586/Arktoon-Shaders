@@ -33,6 +33,9 @@
 #   define REF_EMISSIONCOLOR _EmissionColor
 #endif
 
+// Alpha Mask
+UNITY_DECLARE_TEX2D_NOSAMPLER(_AlphaMask); uniform float4 _AlphaMask_ST;
+
 // Emission Parallax
 uniform float _UseEmissionParallax;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxTex); uniform float4 _EmissionParallaxTex_ST;

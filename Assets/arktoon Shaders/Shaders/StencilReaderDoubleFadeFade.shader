@@ -26,6 +26,8 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
         _BumpScaleSecondary ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMapSecondary ("[Common] Emission map", 2D) = "white" {}
         _EmissionColorSecondary ("[Common] Emission Color", Color) = (0,0,0,1)
+        // Alpha Mask
+        _AlphaMask ("[Alpha] AlphaMask", 2D ) = "white" {}
         // Emission Parallax
         [Toggle(USE_EMISSION_PARALLLAX)]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
         _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
