@@ -4,8 +4,10 @@
 #include "UnityCG.cginc"
 #include "UnityStandardUtils.cginc"
 
-uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
+UNITY_DECLARE_TEX2D(_MainTex); uniform float4 _MainTex_ST;
 uniform float4 _Color;
+// Alpha Mask
+UNITY_DECLARE_TEX2D_NOSAMPLER(_AlphaMask); uniform float4 _AlphaMask_ST;
 
 #define _ALPHABLEND_ON
 
@@ -74,8 +76,9 @@ half4 fragShadowCaster (
     ) : SV_Target
 {
     #if defined(UNITY_STANDARD_USE_SHADOW_UVS)
-        float4 _MainTex_var = tex2D(_MainTex, i.tex);
-        half alpha = _MainTex_var.a*_Color.a;
+        float4 _MainTex_var = UNITY_SAMPLE_TEX2D(_MainTex, TRANSFORM_TEX(i.tex, _MainTex));
+        fixed _AlphaMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_AlphaMask, _MainTex, TRANSFORM_TEX(i.tex, _AlphaMask)).r;
+        half alpha = _MainTex_var.a*_Color.a*_AlphaMask_var;
         #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
             #if defined(UNITY_STANDARD_USE_DITHER_MASK)
                 half alphaRef = tex3D(_DitherMaskLOD, float3(vpos.xy*0.25,alpha*0.9375)).a;
