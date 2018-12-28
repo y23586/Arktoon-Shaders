@@ -23,9 +23,11 @@ Here : https://github.com/synqark/Arktoon-Shaders/releases
    - Rim (additive color/texture)
    - Shade Cap ( Darker version of MatCap. can use for shading!)
    - Vertex Color (usually for MagicaVoxel, etc.)
+   - Simple Stencil feature. with translucent effect.
+   - Additional Parallaxed Emission Texture
    
 # Hot to use?  
- In Japanese. I'm sorry!  
+ Available only in Japanese. I'm sorry!  
  https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing
 
 # Inspector Window
