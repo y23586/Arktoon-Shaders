@@ -721,9 +721,10 @@ namespace ArktoonShaders
                     {
                         System.Diagnostics.Process.Start("https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing");
                     }
-                    EditorGUI.BeginDisabledGroup(true);
-                    GUILayout.Button("(english - wip)");
-                    EditorGUI.EndDisabledGroup();
+                    if(GUILayout.Button("README.md (English)"))
+                    {
+                        System.Diagnostics.Process.Start("https://github.com/synqark/Arktoon-Shaders/blob/master/README.md");
+                    }
 
                     GUILayout.EndHorizontal();
                 }
