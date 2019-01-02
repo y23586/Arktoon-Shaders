@@ -18,13 +18,13 @@ Shader "arktoon/Fade" {
         _BumpMap ("[Common] Normal map", 2D) = "bump" {}
         _BumpScale ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMap ("[Common] Emission map", 2D) = "white" {}
-        _EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
+        [HDR]_EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
         // Alpha Mask
         _AlphaMask ("[Alpha] AlphaMask", 2D ) = "white" {}
         // Emission Parallax
         [Toggle(USE_EMISSION_PARALLLAX)]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
         _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
-        _EmissionParallaxColor ("[Emission Parallax] Color", Color ) = (1,1,1,1)
+        [HDR]_EmissionParallaxColor ("[Emission Parallax] Color", Color ) = (1,1,1,1)
         _EmissionParallaxMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
         _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
         _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
@@ -106,7 +106,7 @@ Shader "arktoon/Fade" {
         _RimShadeMix("[Rim] Shade Mix", Range(0, 1)) = 0
         [PowerSlider(3.0)]_RimFresnelPower ("[Rim] Fresnel Power", Range(0, 200)) = 1
         _RimUpperSideWidth("[Rim] Upper width", Range(0, 1)) = 0
-        _RimColor ("[Rim] Color", Color) = (1,1,1,1)
+        [HDR]_RimColor ("[Rim] Color", Color) = (1,1,1,1)
         _RimTexture ("[Rim] Texture", 2D) = "white" {}
         [MaterialToggle] _RimUseBaseTexture ("[Rim] Use Base Texture", Float ) = 0
         // ShadowCap
