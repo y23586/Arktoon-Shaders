@@ -84,6 +84,10 @@ Shader "arktoon/Fade" {
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
         // MatCap
         [KeywordEnum(Add, Lighten, Screen, Unused)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 3
+        [Toggle(USE_OUTLINE_COLOR_SHIFT)]_OutlineUseColorShift("[Outline] Use Outline Color Shift", Float) = 0
+        [PowerSlider(2.0)]_OutlineHueShiftFromBase("[Outline] Hue Shift From Base", Range(-0.5, 0.5)) = 0
+        _OutlineSaturationFromBase("[Outline] Saturation From Base", Range(0, 2)) = 1
+        _OutlineValueFromBase("[Outline] Value From Base", Range(0, 2)) = 1
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
         _MatcapBlendMask ("[MatCap] Blend Mask", 2D) = "white" {}
         _MatcapNormalMix ("[MatCap] Normal map mix", Range(0, 2)) = 1
@@ -154,6 +158,7 @@ Shader "arktoon/Fade" {
             #pragma shader_feature USE_VERTEX_LIGHT
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature USE_EMISSION_PARALLLAX
@@ -193,6 +198,7 @@ Shader "arktoon/Fade" {
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
 

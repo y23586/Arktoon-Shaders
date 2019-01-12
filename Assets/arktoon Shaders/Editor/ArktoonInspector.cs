@@ -84,6 +84,10 @@ namespace ArktoonShaders
         MaterialProperty OutlineTextureColorRate;
         MaterialProperty UseOutlineWidthMask;
         MaterialProperty OutlineWidthMask;
+        MaterialProperty OutlineUseColorShift;
+        MaterialProperty OutlineHueShiftFromBase;
+        MaterialProperty OutlineSaturationFromBase;
+        MaterialProperty OutlineValueFromBase;
         MaterialProperty MatcapBlendMode;
         MaterialProperty MatcapBlend;
         MaterialProperty MatcapTexture;
@@ -226,6 +230,10 @@ namespace ArktoonShaders
             OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
             UseOutlineWidthMask = FindProperty("_UseOutlineWidthMask", props);
             OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
+            OutlineUseColorShift = FindProperty("_OutlineUseColorShift", props);
+            OutlineHueShiftFromBase = FindProperty("_OutlineHueShiftFromBase", props);
+            OutlineSaturationFromBase = FindProperty("_OutlineSaturationFromBase", props);
+            OutlineValueFromBase = FindProperty("_OutlineValueFromBase", props);
             MatcapBlendMode = FindProperty("_MatcapBlendMode", props);
             MatcapBlend = FindProperty("_MatcapBlend", props);
             MatcapTexture = FindProperty("_MatcapTexture", props);
@@ -458,6 +466,13 @@ namespace ArktoonShaders
                             materialEditor.ShaderProperty(OutlineColor,"Color");
                             materialEditor.ShaderProperty(OutlineShadeMix,"Shadow mix");
                             materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
+                            materialEditor.ShaderProperty(OutlineUseColorShift, "Use Color Shift");
+                            var useOutlineColorShift = OutlineUseColorShift.floatValue;
+                            if(useOutlineColorShift > 0) {
+                                materialEditor.ShaderProperty(OutlineHueShiftFromBase, "Hue Shift");
+                                materialEditor.ShaderProperty(OutlineSaturationFromBase, "Saturation");
+                                materialEditor.ShaderProperty(OutlineValueFromBase, "Value");
+                            }
                         }
                         EditorGUI.indentLevel--;
                     }
