@@ -82,7 +82,6 @@ namespace ArktoonShaders
         MaterialProperty OutlineColor;
         MaterialProperty OutlineShadeMix;
         MaterialProperty OutlineTextureColorRate;
-        MaterialProperty UseOutlineWidthMask;
         MaterialProperty OutlineWidthMask;
         MaterialProperty OutlineUseColorShift;
         MaterialProperty OutlineHueShiftFromBase;
@@ -228,7 +227,6 @@ namespace ArktoonShaders
             OutlineColor = FindProperty("_OutlineColor", props);
             OutlineShadeMix = FindProperty("_OutlineShadeMix", props);
             OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
-            UseOutlineWidthMask = FindProperty("_UseOutlineWidthMask", props);
             OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
             OutlineUseColorShift = FindProperty("_OutlineUseColorShift", props);
             OutlineHueShiftFromBase = FindProperty("_OutlineHueShiftFromBase", props);
@@ -292,7 +290,6 @@ namespace ArktoonShaders
                 // Common
                 UIHelper.ShurikenHeader("Common");
                 {
-                    EditorGUI.indentLevel ++;
                     materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Base Color Texture (RGB)"), BaseTexture, BaseColor);
                     materialEditor.TexturePropertySingleLine(new GUIContent("Normal Map", "Normal Map (RGB)"), Normalmap, BumpScale);
                     materialEditor.TexturePropertySingleLine(new GUIContent("Emission", "Emission (RGB)"), EmissionMap, EmissionColor);
@@ -310,17 +307,14 @@ namespace ArktoonShaders
                         ShadowCasterCulling.floatValue = 2;
                     }
                     if(isFade) materialEditor.ShaderProperty(ZWrite, "ZWrite");
-                    EditorGUI.indentLevel --;
                 }
                 // Secondary Common
                 if(isStencilReaderDouble) {
                     UIHelper.ShurikenHeader("Secondary Common");
                     {
-                        EditorGUI.indentLevel ++;
                         materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Base Color Texture (RGB)"), BaseTextureSecondary, BaseColorSecondary);
                         materialEditor.TexturePropertySingleLine(new GUIContent("Normal Map", "Normal Map (RGB)"), NormalmapSecondary, BumpScaleSecondary);
                         materialEditor.TexturePropertySingleLine(new GUIContent("Emission", "Emission (RGB)"), EmissionMapSecondary, EmissionColorSecondary);
-                        EditorGUI.indentLevel --;
                     }
                 }
 
@@ -328,9 +322,7 @@ namespace ArktoonShaders
                 if(isFade){
                     IsShowAlphaMask = UIHelper.ShurikenFoldout("AlphaMask", IsShowAlphaMask);
                     if (IsShowAlphaMask) {
-                            EditorGUI.indentLevel ++;
-                            materialEditor.ShaderProperty(AlphaMask, "Alpha Mask");
-                            EditorGUI.indentLevel --;
+                        materialEditor.ShaderProperty(AlphaMask, "Alpha Mask");
                     }
                 }
 
@@ -338,10 +330,8 @@ namespace ArktoonShaders
                 if(isRefracted){
                     UIHelper.ShurikenHeader("Refraction");
                     {
-                        EditorGUI.indentLevel ++;
                         materialEditor.ShaderProperty(RefractionFresnelExp, "Fresnel Exp");
                         materialEditor.ShaderProperty(RefractionStrength, "Strength");
-                        EditorGUI.indentLevel --;
                     }
                 }
 
@@ -349,38 +339,38 @@ namespace ArktoonShaders
                 if(isCutout){
                     UIHelper.ShurikenHeader("Alpha Cutout");
                     {
-                        EditorGUI.indentLevel ++;
                         materialEditor.ShaderProperty(CutoutCutoutAdjust, "Cutoff Adjust");
-                        EditorGUI.indentLevel --;
                     }
                 }
 
                 // Shadow
                 UIHelper.ShurikenHeader("Shadow");
                 {
-                    EditorGUI.indentLevel ++;
-                    materialEditor.ShaderProperty(Shadowborder, "Border pos");
-                    materialEditor.ShaderProperty(ShadowborderBlur, "Border blur");
-                    materialEditor.ShaderProperty(ShadowborderBlurMask, "Border blur Mask");
-                    if(ShadowPlanBUsePlanB.floatValue > 0)
-                    {
-                        EditorGUILayout.LabelField("Strength"," (disabled)", EditorStyles.centeredGreyMiniLabel);
-                    } else {
-                        materialEditor.ShaderProperty(ShadowStrength, "Strength");
-                    }
-                    materialEditor.ShaderProperty(ShadowStrengthMask, "Strength Mask");
+                    materialEditor.ShaderProperty(Shadowborder, "Border");
+                    materialEditor.TexturePropertySingleLine(new GUIContent("Strength & Mask", "Strength and Mask Texture"), ShadowStrengthMask, ShadowStrength);
+                    materialEditor.TextureScaleOffsetPropertyIndent(ShadowStrengthMask);
+                    materialEditor.TexturePropertySingleLine(new GUIContent("Blur & Mask", "Blur and Mask Texture"), ShadowborderBlurMask, ShadowborderBlur);
+                    materialEditor.TextureScaleOffsetPropertyIndent(ShadowborderBlurMask);
                     materialEditor.ShaderProperty(ShadowUseStep, "Use Steps");
                     var useStep = ShadowUseStep.floatValue;
                     if(useStep > 0)
                     {
-                        materialEditor.ShaderProperty(ShadowSteps, " ");
+                        EditorGUI.indentLevel ++;
+                        ShadowSteps.floatValue = EditorGUILayout.IntSlider(
+                            new GUIContent("Steps"),
+                            (int)ShadowSteps.floatValue,
+                            (int)ShadowSteps.rangeLimits.x,
+                            (int)ShadowSteps.rangeLimits.y)
+                        ;
+                        EditorGUI.indentLevel --;
                     }
 
                     materialEditor.ShaderProperty(ShadowPlanBUsePlanB, "Use Custom Shade");
                     var usePlanB = ShadowPlanBUsePlanB.floatValue;
                     if(usePlanB > 0)
                     {
-
+                        EditorGUILayout.HelpBox(
+                            "[Strength] max is recommended for using custom shade." + Environment.NewLine + "Custom Shadeの使用時は[Strength]を最大値に設定することを推奨", MessageType.Info);
                         EditorGUI.indentLevel ++;
                         materialEditor.ShaderProperty(ShadowPlanBDefaultShadowMix, "Mix Default Shade");
                         EditorGUILayout.LabelField("1st shade", EditorStyles.boldLabel);
@@ -405,8 +395,8 @@ namespace ArktoonShaders
                         var customshadow2nd = CustomShadow2nd.floatValue;
                         if(customshadow2nd > 0)
                         {
-                            materialEditor.ShaderProperty(ShadowPlanB2border, "Border pos");
-                            materialEditor.ShaderProperty(ShadowPlanB2borderBlur, "Border blur");
+                            materialEditor.ShaderProperty(ShadowPlanB2border, "Border");
+                            materialEditor.ShaderProperty(ShadowPlanB2borderBlur, "Blur");
                             materialEditor.ShaderProperty(ShadowPlanB2UseCustomShadowTexture, "Use Shade Texture");
                             var useShadeTexture2 = ShadowPlanB2UseCustomShadowTexture.floatValue;
                             if(useShadeTexture2 > 0)
@@ -423,137 +413,149 @@ namespace ArktoonShaders
                         EditorGUI.indentLevel --;
                         EditorGUI.indentLevel --;
                     }
-                    EditorGUI.indentLevel --;
                 }
 
                 // Gloss
                 UIHelper.ShurikenHeader("Gloss");
                 {
-                    EditorGUI.indentLevel ++;
-                    materialEditor.ShaderProperty(UseGloss, "Use");
+
+                    Rect r = EditorGUILayout.GetControlRect(true,0,EditorStyles.layerMaskField);
+                    r.y -= 22;
+                    r.height = MaterialEditor.GetDefaultPropertyHeight(UseGloss);
+                    // Debug.Log(r.ToString());
+                    // (x:14.00, y:1247.00, width:503.00, height:0.00)
+                    // (x:14.00, y:1247.00, width:503.00, height:0.00)
+
+                    materialEditor.ShaderProperty(r, UseGloss, " ");
+
                     var useGloss = UseGloss.floatValue;
                     if(useGloss > 0)
                     {
-                        materialEditor.ShaderProperty(GlossBlend, "Smoothness");
-                        materialEditor.ShaderProperty(GlossBlendMask, "Smoothness Mask");
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Smoothness & Mask", "Smoothness and Mask Texture"), GlossBlendMask, GlossBlend);
+                        materialEditor.TextureScaleOffsetPropertyIndent(GlossBlendMask);
                         materialEditor.ShaderProperty(GlossPower, "Metallic");
                         materialEditor.ShaderProperty(GlossColor, "Color");
                     }
-                    EditorGUI.indentLevel --;
                 }
 
                 // Outline
                 if(!isRefracted) {
                     UIHelper.ShurikenHeader("Outline");
                     {
-                        EditorGUI.indentLevel++;
-                        materialEditor.ShaderProperty(UseOutline, "Use");
+                        Rect r = EditorGUILayout.GetControlRect(true,0,EditorStyles.layerMaskField);
+                        r.y -= 22;
+                        r.height = MaterialEditor.GetDefaultPropertyHeight(UseOutline);
+                        // Debug.Log(r.ToString());
+                        // (x:14.00, y:1247.00, width:503.00, height:0.00)
+                        // (x:14.00, y:1247.00, width:503.00, height:0.00)
+
+                        materialEditor.ShaderProperty(r, UseOutline, " ");
                         var useOutline = UseOutline.floatValue;
                         if(useOutline > 0)
                         {
-                            materialEditor.ShaderProperty(OutlineWidth,"Width");
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Width & Mask", "Width and Mask Texture"), OutlineWidthMask, OutlineWidth);
+                            materialEditor.TextureScaleOffsetPropertyIndent(OutlineWidthMask);
                             if(!isOpaque) {
-                                materialEditor.ShaderProperty(OutlineMask,"Cutoff Mask");
-                                materialEditor.ShaderProperty(OutlineCutoffRange,"Cutoff Range");
+                                materialEditor.TexturePropertySingleLine(new GUIContent("Cutoff Mask & Range", "Cutoff Mask Texture & Range"), OutlineMask, OutlineCutoffRange);
+                                materialEditor.TextureScaleOffsetPropertyIndent(OutlineMask);
                             }else{
-                                EditorGUILayout.LabelField("Cutoff Mask","Available in", EditorStyles.centeredGreyMiniLabel);
-                                EditorGUILayout.LabelField("Cutoff Range","AlphaCutout/Fade Shader", EditorStyles.centeredGreyMiniLabel);
+                                EditorGUILayout.LabelField("Cutoff Mask & Range","Unavailable in Opaque", EditorStyles.centeredGreyMiniLabel);
                             }
-                            materialEditor.ShaderProperty(UseOutlineWidthMask,"Use Width Mask");
-                            var useOutlineWidthMask = UseOutlineWidthMask.floatValue;
-                            if (useOutlineWidthMask > 0) materialEditor.ShaderProperty(OutlineWidthMask,"Width Mask");
-
-                            materialEditor.ShaderProperty(OutlineColor,"Color");
                             materialEditor.ShaderProperty(OutlineShadeMix,"Shadow mix");
+                            materialEditor.ShaderProperty(OutlineColor,"Color");
                             materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
                             materialEditor.ShaderProperty(OutlineUseColorShift, "Use Color Shift");
                             var useOutlineColorShift = OutlineUseColorShift.floatValue;
                             if(useOutlineColorShift > 0) {
+                                EditorGUI.indentLevel ++;
                                 materialEditor.ShaderProperty(OutlineHueShiftFromBase, "Hue Shift");
                                 materialEditor.ShaderProperty(OutlineSaturationFromBase, "Saturation");
                                 materialEditor.ShaderProperty(OutlineValueFromBase, "Value");
+                                EditorGUI.indentLevel --;
                             }
                         }
-                        EditorGUI.indentLevel--;
                     }
                 }
 
                 // MatCap
                 UIHelper.ShurikenHeader("MatCap");
                 {
-                    EditorGUI.indentLevel++;
-                    materialEditor.ShaderProperty(MatcapBlendMode,"MatCap Mode");
+
+                    Rect r = EditorGUILayout.GetControlRect(true,0,EditorStyles.layerMaskField);
+                    r.y -= 22;
+                    r.height = MaterialEditor.GetDefaultPropertyHeight(MatcapBlendMode);
+                    // Debug.Log(r.ToString());
+                    // (x:14.00, y:1247.00, width:503.00, height:0.00)
+                    // (x:14.00, y:1247.00, width:503.00, height:0.00)
+
+                    materialEditor.ShaderProperty(r, MatcapBlendMode," ");
+
                     var useMatcap = MatcapBlendMode.floatValue;
                     if(useMatcap != 3) // Not 'Unused'
                     {
-                        materialEditor.ShaderProperty(MatcapBlend,"Blend");
-                        materialEditor.ShaderProperty(MatcapBlendMask,"Blend Mask");
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Blend & Mask", "Blend and Mask Texture"), MatcapBlendMask, MatcapBlend);
+                        materialEditor.TextureScaleOffsetPropertyIndent(MatcapBlendMask);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Color and Texture"), MatcapTexture, MatcapColor);
+                        materialEditor.TextureScaleOffsetPropertyIndent(MatcapTexture);
                         materialEditor.ShaderProperty(MatcapNormalMix, "Normal Map mix");
                         materialEditor.ShaderProperty(MatcapShadeMix,"Shadow mix");
-                        materialEditor.ShaderProperty(MatcapTexture,"Texture");
-                        materialEditor.ShaderProperty(MatcapColor,"Color");
                     }
-                    EditorGUI.indentLevel--;
                 }
 
                 // Reflection
                 UIHelper.ShurikenHeader("Reflection");
                 {
-                    EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(UseReflection, "Use");
                     var useReflection = UseReflection.floatValue;
                     if(useReflection > 0)
                     {
                         materialEditor.ShaderProperty(UseReflectionProbe,"Use Reflection Probe");
                         var useProbe = UseReflectionProbe.floatValue;
-                        materialEditor.ShaderProperty(ReflectionReflectionPower,"Smoothness");
-                        materialEditor.ShaderProperty(ReflectionReflectionMask,"Smoothness Mask");
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Smoothness & Mask", "Smoothness and Mask Texture"), ReflectionReflectionMask, ReflectionReflectionPower);
+                        materialEditor.TextureScaleOffsetPropertyIndent(ReflectionReflectionMask);
                         materialEditor.ShaderProperty(ReflectionNormalMix,"Normal Map mix");
                         materialEditor.ShaderProperty(ReflectionShadeMix, "Shadow mix");
                         materialEditor.ShaderProperty(ReflectionSuppressBaseColorValue,"Suppress Base Color");
-                        if(useProbe <= 0) {
-                            materialEditor.ShaderProperty(ReflectionCubemap,"Cubemap");
-                        } else {
-                            materialEditor.ShaderProperty(ReflectionCubemap,"Cubemap(falllback)");
+                        var cubemapLabel = "Cubemap";
+                        if(useProbe > 0) {
+                            cubemapLabel += "(fallback)";
                         }
+                        materialEditor.TexturePropertySingleLine(new GUIContent(cubemapLabel, cubemapLabel), ReflectionCubemap);
+                        materialEditor.TextureScaleOffsetPropertyIndent(ReflectionCubemap);
                     }
-                    EditorGUI.indentLevel--;
                 }
 
                 // Rim Light
                 UIHelper.ShurikenHeader("Rim");
                 {
-                    EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(UseRim, "Use");
                     var useRim = UseRim.floatValue;
                     if(useRim > 0)
                     {
-                        materialEditor.ShaderProperty(RimBlend,"Blend");
-                        materialEditor.ShaderProperty(RimBlendMask,"Blend Mask");
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Blend & Mask", "Blend and Mask Texture"), RimBlendMask, RimBlend);
+                        materialEditor.TextureScaleOffsetPropertyIndent(RimBlendMask);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Texture and Color"), RimTexture, RimColor);
+                        materialEditor.TextureScaleOffsetPropertyIndent(RimTexture);
                         materialEditor.ShaderProperty(RimShadeMix,"Shadow mix");
                         materialEditor.ShaderProperty(RimFresnelPower,"Fresnel Power");
                         materialEditor.ShaderProperty(RimUpperSideWidth,"Upper side width");
                         materialEditor.ShaderProperty(RimUseBaseTexture,"Use Base Color");
-                        materialEditor.ShaderProperty(RimColor,"Color");
-                        materialEditor.ShaderProperty(RimTexture,"Texture");
                     }
-                    EditorGUI.indentLevel--;
                 }
 
                 // Shade Cap
                 UIHelper.ShurikenHeader("Shade Cap");
                 {
-                    EditorGUI.indentLevel++;
                     materialEditor.ShaderProperty(ShadowCapBlendMode,"Shade Cap Mode");
                     var useShadowCap = ShadowCapBlendMode.floatValue;
                     if(useShadowCap != 3) // Not 'Unused'
                     {
-                        materialEditor.ShaderProperty(ShadowCapBlend,"Blend");
-                        materialEditor.ShaderProperty(ShadowCapBlendMask,"Blend Mask");
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Blend & Mask", "Blend and Mask Texture"), ShadowCapBlendMask, ShadowCapBlend);
+                        materialEditor.TextureScaleOffsetPropertyIndent(ShadowCapBlendMask);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Texture", "Texture"), ShadowCapTexture);
+                        materialEditor.TextureScaleOffsetPropertyIndent(ShadowCapTexture);
                         materialEditor.ShaderProperty(ShadowCapNormalMix,"Normal Map mix");
-                        materialEditor.ShaderProperty(ShadowCapTexture,"Texture");
                     }
-                    EditorGUI.indentLevel--;
                 }
 
                 // Stencil Writer
@@ -561,12 +563,12 @@ namespace ArktoonShaders
                 {
                     UIHelper.ShurikenHeader("Stencil Writer");
                     {
-                        EditorGUI.indentLevel++;
-                        materialEditor.ShaderProperty(StencilNumber,"Number");
-                        if(isStencilWriterMask) materialEditor.ShaderProperty(StencilMaskTex, "Mask Texture");
-                        if(isStencilWriterMask) materialEditor.ShaderProperty(StencilMaskAdjust, "Mask Adjust");
+                        materialEditor.ShaderProperty(StencilNumber,"Stencil Number");
+                        if(isStencilWriterMask) {
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Stencil Mask & Range", "Stencil Mask and Range"), StencilMaskTex, StencilMaskAdjust);
+                            materialEditor.TextureScaleOffsetPropertyIndent(StencilMaskTex);
+                        }
                         if(isStencilWriterMask) materialEditor.ShaderProperty(StencilMaskAlphaDither, "Alpha(Dither)");
-                        EditorGUI.indentLevel--;
                     }
                 }
 
@@ -575,7 +577,6 @@ namespace ArktoonShaders
                 {
                     UIHelper.ShurikenHeader("Stencil Reader");
                     {
-                        EditorGUI.indentLevel++;
                         if(isStencilReaderDouble) {
                             EditorGUILayout.LabelField("Primary", EditorStyles.boldLabel);
                             EditorGUI.indentLevel++;
@@ -591,31 +592,28 @@ namespace ArktoonShaders
                             materialEditor.ShaderProperty(StencilNumber,"Number");
                             materialEditor.ShaderProperty(StencilCompareAction,"Compare Action");
                         }
-                        EditorGUI.indentLevel--;
                     }
                 }
 
                 // Parallax Emission
                 UIHelper.ShurikenHeader("Parallaxed Emission");
                 {
-                    EditorGUI.indentLevel ++;
                     materialEditor.ShaderProperty(UseEmissionParallax, "Use");
                     var useEmissionPara = UseEmissionParallax.floatValue;
                     if(useEmissionPara > 0){
-                        materialEditor.ShaderProperty(EmissionParallaxTex, "Texture");
-                        materialEditor.ShaderProperty(EmissionParallaxColor, "Color");
-                        materialEditor.ShaderProperty(EmissionParallaxMask, "Mask");
-                        materialEditor.ShaderProperty(EmissionParallaxDepth, "Parallax Depth");
-                        materialEditor.ShaderProperty(EmissionParallaxDepthMask, "Parallax Depth Mask");
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Texture and Color"), EmissionParallaxTex, EmissionParallaxColor);
+                        materialEditor.TextureScaleOffsetPropertyIndent(EmissionParallaxTex);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("TexCol Mask", "Texture and Color Mask"), EmissionParallaxMask);
+                        materialEditor.TextureScaleOffsetPropertyIndent(EmissionParallaxMask);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Depth & Mask", "Depth and Mask Texture"), EmissionParallaxDepthMask, EmissionParallaxDepth);
+                        materialEditor.TextureScaleOffsetPropertyIndent(EmissionParallaxDepthMask);
                         materialEditor.ShaderProperty(EmissionParallaxDepthMaskInvert, "Invert Depth Mask");
                     }
-                    EditorGUI.indentLevel --;
                 }
 
                 // Advanced / Experimental
                 IsShowAdvanced = UIHelper.ShurikenFoldout("Advanced / Experimental (Click to Open)", IsShowAdvanced);
                 if (IsShowAdvanced) {
-                    EditorGUI.indentLevel++;
                     EditorGUILayout.HelpBox("These are some shade tweaking. no need to change usually." + Environment.NewLine + "ほとんどのケースで触る必要のないやつら。",MessageType.Info);
                     if (GUILayout.Button("Revert advanced params.")){
                         PointAddIntensity.floatValue = 1f;
@@ -639,7 +637,6 @@ namespace ArktoonShaders
                         material.DisableKeyword("USE_POSITION_RELATED_CALC");
                     }
                     {
-                        EditorGUI.indentLevel ++;
                         EditorGUILayout.LabelField("Lights", EditorStyles.boldLabel);
                         {
                             EditorGUI.indentLevel ++;
@@ -689,10 +686,8 @@ namespace ArktoonShaders
                             materialEditor.ShaderProperty(UsePositionRelatedCalc, "Use Position Related Calc(def: no)");
                             EditorGUI.indentLevel --;
                         }
-                        EditorGUI.indentLevel --;
                         // materialEditor.ShaderProperty(BackfaceColorMultiply, "Backface Color Multiply (def:white)");
                     }
-                    EditorGUI.indentLevel--;
                 }
 
                 // Arktoon version info
@@ -748,17 +743,27 @@ namespace ArktoonShaders
         }
     }
 
-    class UIHelper
+    static class UIHelper
     {
         private static Rect DrawShuriken(string title, Vector2 contentOffset) {
             var style = new GUIStyle("ShurikenModuleTitle");
-            style.margin = new RectOffset(0, 0, 10, 0);
+            style.margin = new RectOffset(0, 0, 8, 0);
             style.font = new GUIStyle(EditorStyles.boldLabel).font;
             style.border = new RectOffset(15, 7, 4, 4);
             style.fixedHeight = 22;
             style.contentOffset = contentOffset;
             var rect = GUILayoutUtility.GetRect(16f, 22f, style);
             GUI.Box(rect, title, style);
+
+
+
+            // Rect toggleRect = new Rect(rect.x + 4f, rect.y + 4f, 13f, 13f);
+            // if (Event.current.type == EventType.Repaint){
+
+            //     var style2 = new GUIStyle("ShurikenModuleTitle");
+            //     new GUIStyle("ShurikenCheckMark").Draw(toggleRect, false, false, true, false);
+            // }
+
             return rect;
         }
         public static void ShurikenHeader(string title)
@@ -778,6 +783,33 @@ namespace ArktoonShaders
                 e.Use();
             }
             return display;
+        }
+        public static void Vector2Property(MaterialProperty property, string name)
+        {
+            EditorGUI.BeginChangeCheck();
+            Vector2 vector2 = EditorGUILayout.Vector2Field(name,new Vector2(property.vectorValue.x, property.vectorValue.y),null);
+            if (EditorGUI.EndChangeCheck())
+                property.vectorValue = new Vector4(vector2.x, vector2.y);
+        }
+        public static void Vector4Property(MaterialProperty property, string name)
+        {
+            EditorGUI.BeginChangeCheck();
+            Vector4 vector4 = EditorGUILayout.Vector2Field(name,property.vectorValue,null);
+            if (EditorGUI.EndChangeCheck())
+                property.vectorValue = vector4;
+        }
+        public static void Vector2PropertyZW(MaterialProperty property, string name)
+        {
+            EditorGUI.BeginChangeCheck();
+            Vector2 vector2 = EditorGUILayout.Vector2Field(name,new Vector2(property.vectorValue.x, property.vectorValue.y),null);
+            if (EditorGUI.EndChangeCheck())
+                property.vectorValue = new Vector4(vector2.x, vector2.y);
+        }
+        public static void TextureScaleOffsetPropertyIndent(this MaterialEditor editor, MaterialProperty property)
+        {
+            EditorGUI.indentLevel ++;
+            editor.TextureScaleOffsetProperty(property);
+            EditorGUI.indentLevel --;
         }
     }
 }

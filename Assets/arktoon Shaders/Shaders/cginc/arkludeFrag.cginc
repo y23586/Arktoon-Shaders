@@ -78,11 +78,7 @@ float4 frag(VertexOutput i) : COLOR {
         directContribution = lerp(directContribution, min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1)), _ShadowUseStep);
     // #endif
 
-    #ifdef USE_SHADE_TEXTURE
-        directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * 1;
-    #else
-        directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * _ShadowStrength;
-    #endif
+    directContribution = 1.0 - (1.0 - directContribution) * _ShadowStrengthMask_var * _ShadowStrength;
 
     // 光の受光に関する更なる補正
     // ・LightIntensityIfBackface(裏面を描画中に変動する受光倍率)
