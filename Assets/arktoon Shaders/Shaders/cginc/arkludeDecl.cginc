@@ -84,6 +84,10 @@ uniform float _OutlineShadeMix;
 uniform float _OutlineWidth;
 uniform float4 _OutlineColor;
 uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST; // FIXME:tex2dLodはUNITY_SAMPLE_TEX2D_SAMPLERの代用が判らないためいったん保留
+uniform float _OutlineUseColorShift;
+uniform float _OutlineHueShiftFromBase;
+uniform float _OutlineSaturationFromBase;
+uniform float _OutlineValueFromBase;
 
 // Gloss
 uniform float _GlossBlend;

@@ -83,12 +83,15 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
         [Toggle(USE_OUTLINE)]_UseOutline ("[Outline] Enabled", Float) = 0
         _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
         _OutlineMask ("[Outline] Outline Mask", 2D) = "white" {}
-        _OutlineCutoffRange ("[Outline] Cutoff Range", Range(0, 1)) = 0
+        _OutlineCutoffRange ("[Outline] Cutoff Range", Range(0, 1)) = 0.5
         _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
         _OutlineShadeMix ("[Outline] Shade Mix", Range(0, 1)) = 0
         _OutlineTextureColorRate ("[Outline] Texture Color Rate", Range(0, 1)) = 0.05
-        [Toggle(USE_OUTLINE_WIDTH_MASK)]_UseOutlineWidthMask ("[Outline] Use Width Mask", Float) = 0
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
+        [Toggle(USE_OUTLINE_COLOR_SHIFT)]_OutlineUseColorShift("[Outline] Use Outline Color Shift", Float) = 0
+        [PowerSlider(2.0)]_OutlineHueShiftFromBase("[Outline] Hue Shift From Base", Range(-0.5, 0.5)) = 0
+        _OutlineSaturationFromBase("[Outline] Saturation From Base", Range(0, 2)) = 1
+        _OutlineValueFromBase("[Outline] Value From Base", Range(0, 2)) = 1
         // MatCap
         [KeywordEnum(Add, Lighten, Screen, Unused)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 3
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
@@ -170,7 +173,7 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
             #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature USE_EMISSION_PARALLLAX
@@ -212,7 +215,7 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
@@ -259,7 +262,7 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
             #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature USE_EMISSION_PARALLLAX
@@ -302,7 +305,7 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature USE_OUTLINE_WIDTH_MASK
+            #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN

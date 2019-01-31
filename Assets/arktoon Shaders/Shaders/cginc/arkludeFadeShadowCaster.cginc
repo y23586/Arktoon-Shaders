@@ -1,6 +1,3 @@
-#ifndef TYPEA_SHADOW_INCLUDED
-#define TYPEA_SHADOW_INCLUDED
-
 #include "UnityCG.cginc"
 #include "UnityStandardUtils.cginc"
 
@@ -90,5 +87,3 @@ half4 fragShadowCaster (
     #endif
     SHADOW_CASTER_FRAGMENT(i)
 }
-
-#endif

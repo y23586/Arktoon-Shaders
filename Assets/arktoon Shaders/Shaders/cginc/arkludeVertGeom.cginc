@@ -128,12 +128,8 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
     #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
     for (int i = 2; i >= 0; i--)
     {
-        #ifdef USE_OUTLINE_WIDTH_MASK
-            float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
-            float width = _OutlineWidth * _OutlineWidthMask_var;
-        #else
-            float width = _OutlineWidth;
-        #endif
+        float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
+        float width = _OutlineWidth * _OutlineWidthMask_var;
 
         o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
         o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
