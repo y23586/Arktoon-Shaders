@@ -28,7 +28,8 @@ Here : https://github.com/synqark/Arktoon-Shaders/releases
    
 # How to use?  
  Available only in Japanese. I'm sorry!  
- https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing
+ Newest : https://synqark.github.io/Arktoon-Shaders-Doc/  
+ Unser 1.0.0: https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing
 
 # Inspector Window
 
