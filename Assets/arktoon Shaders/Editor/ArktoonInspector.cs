@@ -754,7 +754,7 @@ namespace ArktoonShaders
                 UIHelper.DrawWithGroupHorizontal(() => {
                     if(GUILayout.Button("How to use (Japanese)"))
                     {
-                        System.Diagnostics.Process.Start("https://docs.google.com/document/d/15qR1ixw7YO1vKqaJXp5ul3Yvsgvv2cWa3YlXM07iQlo/edit?usp=sharing");
+                        System.Diagnostics.Process.Start("https://synqark.github.io/Arktoon-Shaders-Doc/");
                     }
                     if(GUILayout.Button("README.md (English)"))
                     {
