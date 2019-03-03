@@ -80,6 +80,7 @@ namespace ArktoonShaders
         MaterialProperty OutlineMask;
         MaterialProperty OutlineCutoffRange;
         MaterialProperty OutlineColor;
+        MaterialProperty OutlineTexture;
         MaterialProperty OutlineShadeMix;
         MaterialProperty OutlineTextureColorRate;
         MaterialProperty OutlineWidthMask;
@@ -225,6 +226,7 @@ namespace ArktoonShaders
             if(!isOpaque) OutlineMask = FindProperty("_OutlineMask", props);
             if(!isOpaque) OutlineCutoffRange = FindProperty("_OutlineCutoffRange", props);
             OutlineColor = FindProperty("_OutlineColor", props);
+            OutlineTexture = FindProperty("_OutlineTexture", props);
             OutlineShadeMix = FindProperty("_OutlineShadeMix", props);
             OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
             OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
@@ -470,7 +472,8 @@ namespace ArktoonShaders
                                 }
                             });
                             UIHelper.DrawWithGroup(() => {
-                                materialEditor.ShaderProperty(OutlineColor,"Color");
+                                materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Texture and Color"), OutlineTexture, OutlineColor);
+                                materialEditor.TextureScaleOffsetPropertyIndent(OutlineTexture);
                                 materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
                                 materialEditor.ShaderProperty(OutlineUseColorShift, "Use Color Shift");
                                 var useOutlineColorShift = OutlineUseColorShift.floatValue;

@@ -73,6 +73,7 @@ Shader "arktoon/Opaque" {
         [Toggle(USE_OUTLINE)]_UseOutline ("[Outline] Enabled", Float) = 0
         _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
         _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
+        _OutlineTexture ("[Outline] Texture", 2D) = "white" {}
         _OutlineShadeMix ("[Outline] Shade Mix", Range(0, 1)) = 0
         _OutlineTextureColorRate ("[Outline] Texture Color Rate", Range(0, 1)) = 0.05
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
