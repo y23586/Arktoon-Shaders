@@ -175,7 +175,7 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
 
         // オプション：Reflection
-        #ifdef USE_REFLECTION
+        if (_UseReflection) {
             float3 normalDirectionReflection = normalize(mul( float3(normalLocal.r*_ReflectionNormalMix,normalLocal.g*_ReflectionNormalMix,normalLocal.b), tangentTransform ));
             float reflNdotV = abs(dot( normalDirectionReflection, viewDirection ));
             float _ReflectionSmoothnessMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectionReflectionMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ReflectionReflectionMask));
@@ -207,7 +207,7 @@ float4 frag(VertexOutput i) : COLOR {
             float reflSuppress = _ReflectionSuppressBaseColorValue * reflectionSmoothness;
             ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
-        #endif
+        }
 
         // オプション：Gloss
         if(_UseGloss) {

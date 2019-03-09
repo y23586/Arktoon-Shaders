@@ -94,7 +94,7 @@ Shader "arktoon/AlphaCutout" {
         _MatcapTexture ("[MatCap] Texture", 2D) = "black" {}
         _MatcapColor ("[MatCap] Color", Color) = (1,1,1,1)
         // Reflection
-        [Toggle(USE_REFLECTION)]_UseReflection ("[Reflection] Enabled", Float) = 0
+        [Toggle]_UseReflection ("[Reflection] Enabled", Int) = 0
         [Toggle(USE_REFLECTION_PROBE)]_UseReflectionProbe ("[Reflection] Use Reflection Probe", Float) = 1
         _ReflectionReflectionPower ("[Reflection] Reflection Power", Range(0, 1)) = 1
         _ReflectionReflectionMask ("[Reflection] Reflection Mask", 2D) = "white" {}
@@ -146,7 +146,6 @@ Shader "arktoon/AlphaCutout" {
 
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
-            #pragma shader_feature USE_REFLECTION
             #pragma shader_feature USE_REFLECTION_PROBE
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
