@@ -30,7 +30,7 @@ namespace ArktoonShaders
         MaterialProperty BumpScaleSecondary;
         MaterialProperty EmissionMapSecondary;
         MaterialProperty EmissionColorSecondary;
-        MaterialProperty IsEnabledEmissionParallax;
+        MaterialProperty UseEmissionParallax;
         MaterialProperty EmissionParallaxColor;
         MaterialProperty EmissionParallaxTex;
         MaterialProperty EmissionParallaxMask;
@@ -70,7 +70,7 @@ namespace ArktoonShaders
         MaterialProperty ShadowPlanB2UseCustomShadowTexture;
         MaterialProperty ShadowPlanB2CustomShadowTexture;
         MaterialProperty ShadowPlanB2CustomShadowTextureRGB;
-        MaterialProperty IsEnabledGloss;
+        MaterialProperty UseGloss;
         MaterialProperty GlossBlend;
         MaterialProperty GlossBlendMask;
         MaterialProperty GlossPower;
@@ -84,7 +84,7 @@ namespace ArktoonShaders
         MaterialProperty OutlineShadeMix;
         MaterialProperty OutlineTextureColorRate;
         MaterialProperty OutlineWidthMask;
-        MaterialProperty IsEnabledOutlineColorShift;
+        MaterialProperty OutlineUseColorShift;
         MaterialProperty OutlineHueShiftFromBase;
         MaterialProperty OutlineSaturationFromBase;
         MaterialProperty OutlineValueFromBase;
@@ -126,7 +126,7 @@ namespace ArktoonShaders
         MaterialProperty StencilMaskTex;
         MaterialProperty StencilMaskAdjust;
         MaterialProperty StencilMaskAlphaDither;
-        MaterialProperty IsEnabledDoubleSide;
+        MaterialProperty UseDoubleSided;
         MaterialProperty DoubleSidedFlipBackfaceNormal;
         MaterialProperty DoubleSidedBackfaceLightIntensity;
         MaterialProperty ShadowCasterCulling;
@@ -176,7 +176,7 @@ namespace ArktoonShaders
             if(isStencilReaderDouble) BumpScaleSecondary = FindProperty("_BumpScaleSecondary", props);
             if(isStencilReaderDouble) EmissionMapSecondary = FindProperty("_EmissionMapSecondary", props);
             if(isStencilReaderDouble) EmissionColorSecondary = FindProperty("_EmissionColorSecondary", props);
-            IsEnabledEmissionParallax = FindProperty("_IsEnabledEmissionParallax", props);
+            UseEmissionParallax = FindProperty("_UseEmissionParallax", props);
             EmissionParallaxColor = FindProperty("_EmissionParallaxColor", props);
             EmissionParallaxTex = FindProperty("_EmissionParallaxTex", props);
             EmissionParallaxMask = FindProperty("_EmissionParallaxMask", props);
@@ -216,7 +216,7 @@ namespace ArktoonShaders
             ShadowPlanB2UseCustomShadowTexture = FindProperty("_ShadowPlanB2UseCustomShadowTexture", props);
             ShadowPlanB2CustomShadowTexture = FindProperty("_ShadowPlanB2CustomShadowTexture", props);
             ShadowPlanB2CustomShadowTextureRGB = FindProperty("_ShadowPlanB2CustomShadowTextureRGB", props);
-            IsEnabledGloss = FindProperty("_IsEnabledGloss", props);
+            UseGloss = FindProperty("_UseGloss", props);
             GlossBlend = FindProperty("_GlossBlend", props);
             GlossBlendMask = FindProperty("_GlossBlendMask", props);
             GlossPower = FindProperty("_GlossPower", props);
@@ -230,7 +230,7 @@ namespace ArktoonShaders
             OutlineShadeMix = FindProperty("_OutlineShadeMix", props);
             OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
             OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
-            IsEnabledOutlineColorShift = FindProperty("_IsEnabledOutlineColorShift", props);
+            OutlineUseColorShift = FindProperty("_OutlineUseColorShift", props);
             OutlineHueShiftFromBase = FindProperty("_OutlineHueShiftFromBase", props);
             OutlineSaturationFromBase = FindProperty("_OutlineSaturationFromBase", props);
             OutlineValueFromBase = FindProperty("_OutlineValueFromBase", props);
@@ -272,7 +272,7 @@ namespace ArktoonShaders
             if(isStencilReader) StencilCompareAction = FindProperty("_StencilCompareAction", props);
             if(isStencilReaderDouble) StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props);
             if(isStencilReaderDouble) StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props);
-            IsEnabledDoubleSide = FindProperty("_IsEnabledDoubleSide", props);
+            UseDoubleSided = FindProperty("_UseDoubleSided", props);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props);
             DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props);
             ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props);
@@ -298,8 +298,8 @@ namespace ArktoonShaders
 
                     // materialEditor.ShaderProperty(Cull, "Cull");
                     UIHelper.DrawWithGroup(() => {
-                        materialEditor.ShaderProperty(IsEnabledDoubleSide, "Is Double Sided");
-                        var doublesided = IsEnabledDoubleSide.floatValue;
+                        materialEditor.ShaderProperty(UseDoubleSided, "Is Double Sided");
+                        var doublesided = UseDoubleSided.floatValue;
                         if(doublesided > 0){
                             ShadowCasterCulling.floatValue = 0;
                             EditorGUI.indentLevel ++;
@@ -437,8 +437,8 @@ namespace ArktoonShaders
 
                 // Gloss
                 UIHelper.ShurikenHeader("Gloss");
-                materialEditor.DrawShaderPropertySameLIne(IsEnabledGloss);
-                var isEnabledGloss = IsEnabledGloss.floatValue;
+                materialEditor.DrawShaderPropertySameLIne(UseGloss);
+                var isEnabledGloss = UseGloss.floatValue;
                 if(isEnabledGloss > 0)
                 {
                     UIHelper.DrawWithGroup(() => {
@@ -475,8 +475,8 @@ namespace ArktoonShaders
                                 materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Texture and Color"), OutlineTexture, OutlineColor);
                                 materialEditor.TextureScaleOffsetPropertyIndent(OutlineTexture);
                                 materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
-                                materialEditor.ShaderProperty(IsEnabledOutlineColorShift, "Use Color Shift");
-                                var isEnabledOutlineColorShift = IsEnabledOutlineColorShift.floatValue;
+                                materialEditor.ShaderProperty(OutlineUseColorShift, "Use Color Shift");
+                                var isEnabledOutlineColorShift = OutlineUseColorShift.floatValue;
                                 if(isEnabledOutlineColorShift > 0) {
                                     EditorGUI.indentLevel ++;
                                     materialEditor.ShaderProperty(OutlineHueShiftFromBase, "Hue Shift");
@@ -623,8 +623,8 @@ namespace ArktoonShaders
 
                 // Parallax Emission
                 UIHelper.ShurikenHeader("Parallaxed Emission");
-                materialEditor.DrawShaderPropertySameLIne(IsEnabledEmissionParallax);
-                var useEmissionPara = IsEnabledEmissionParallax.floatValue;
+                materialEditor.DrawShaderPropertySameLIne(UseEmissionParallax);
+                var useEmissionPara = UseEmissionParallax.floatValue;
                 if(useEmissionPara > 0){
                     UIHelper.DrawWithGroup(() => {
                         UIHelper.DrawWithGroup(() => {

@@ -7,7 +7,7 @@
 Shader "arktoon/Fade" {
     Properties {
         // Double Sided
-        [MaterialToggle]_IsEnabledDoubleSide ("Double Sided", Int ) = 0
+        [MaterialToggle]_UseDoubleSided ("Double Sided", Int ) = 0
         [Toggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
@@ -22,7 +22,7 @@ Shader "arktoon/Fade" {
         // Alpha Mask
         _AlphaMask ("[Alpha] AlphaMask", 2D ) = "white" {}
         // Emission Parallax
-        [MaterialToggle]_IsEnabledEmissionParallax ("[Emission Parallax] Use Emission Parallax", Int ) = 0
+        [MaterialToggle]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Int ) = 0
         _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
         [HDR]_EmissionParallaxColor ("[Emission Parallax] Color", Color ) = (1,1,1,1)
         _EmissionParallaxMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
@@ -67,7 +67,7 @@ Shader "arktoon/Fade" {
         _ShadowPlanB2CustomShadowTexture ("[Plan B-2] Custom Shadow Texture", 2D) = "black" {}
         _ShadowPlanB2CustomShadowTextureRGB ("[Plan B-2] Custom Shadow Texture RGB", Color) = (1,1,1,1)
         // Gloss
-        [Toggle]_IsEnabledGloss ("[Gloss] Enabled", Int) = 0
+        [Toggle]_UseGloss ("[Gloss] Enabled", Int) = 0
         _GlossBlend ("[Gloss] Smoothness", Range(0, 1)) = 0.5
         _GlossBlendMask ("[Gloss] Smoothness Mask", 2D) = "white" {}
         _GlossPower ("[Gloss] Metallic", Range(0, 1)) = 0.5
@@ -84,7 +84,7 @@ Shader "arktoon/Fade" {
         _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
         // MatCap
         [KeywordEnum(Add, Lighten, Screen, Unused)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 3
-        [Toggle]_IsEnabledOutlineColorShift("[Outline] Use Outline Color Shift", Int) = 0
+        [Toggle]_OutlineUseColorShift("[Outline] Use Outline Color Shift", Int) = 0
         [PowerSlider(2.0)]_OutlineHueShiftFromBase("[Outline] Hue Shift From Base", Range(-0.5, 0.5)) = 0
         _OutlineSaturationFromBase("[Outline] Saturation From Base", Range(0, 2)) = 1
         _OutlineValueFromBase("[Outline] Value From Base", Range(0, 2)) = 1

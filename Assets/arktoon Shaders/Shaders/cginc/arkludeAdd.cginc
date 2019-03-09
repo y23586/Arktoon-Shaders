@@ -18,7 +18,7 @@ float4 frag(VertexOutput i) : COLOR {
     Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse); // 頂点カラーを合成
 
     // アウトラインであればDiffuseとColorを混ぜる
-    if (_IsEnabledOutlineColorShift) {
+    if (_OutlineUseColorShift) {
         float3 Outline_Diff_HSV = CalculateHSV((Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
         Diffuse = lerp(Diffuse, Outline_Diff_HSV, i.isOutline);
     } else {
@@ -82,7 +82,7 @@ float4 frag(VertexOutput i) : COLOR {
     if (!i.isOutline) {
     #endif
         // オプション：Gloss
-        if(_IsEnabledGloss) {
+        if(_UseGloss) {
             float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
 
             float gloss = _GlossBlend * _GlossBlendMask_var;

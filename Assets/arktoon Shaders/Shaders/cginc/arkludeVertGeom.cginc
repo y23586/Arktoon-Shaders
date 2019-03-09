@@ -176,7 +176,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
     tristream.RestartStrip();
     #endif
 
-    if (_IsEnabledDoubleSide) {
+    if (_UseDoubleSided) {
         for (int iii = 2; iii >= 0; iii--)
         {
             o.pos = UnityObjectToClipPos(IN[iii].vertex);

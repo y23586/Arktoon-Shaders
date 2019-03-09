@@ -37,7 +37,7 @@
 UNITY_DECLARE_TEX2D_NOSAMPLER(_AlphaMask); uniform float4 _AlphaMask_ST;
 
 // Emission Parallax
-uniform float _IsEnabledEmissionParallax;
+uniform float _UseEmissionParallax;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxTex); uniform float4 _EmissionParallaxTex_ST;
 uniform float4 _EmissionParallaxColor;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxMask); uniform float4 _EmissionParallaxMask_ST;
@@ -46,7 +46,7 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxDepthMask); uniform float4 _Emiss
 uniform float _EmissionParallaxDepthMaskInvert;
 
 // Double Side
-uniform int _IsEnabledDoubleSide;
+uniform int _UseDoubleSided;
 uniform float _DoubleSidedBackfaceLightIntensity;
 uniform float _DoubleSidedFlipBackfaceNormal;
 
@@ -86,13 +86,13 @@ uniform float _OutlineWidth;
 uniform float4 _OutlineColor;
 uniform sampler2D _OutlineTexture; uniform float4 _OutlineTexture_ST;
 uniform sampler2D _OutlineWidthMask; uniform float4 _OutlineWidthMask_ST; // FIXME:tex2dLodはUNITY_SAMPLE_TEX2D_SAMPLERの代用が判らないためいったん保留
-uniform float _IsEnabledOutlineColorShift;
+uniform float _OutlineUseColorShift;
 uniform float _OutlineHueShiftFromBase;
 uniform float _OutlineSaturationFromBase;
 uniform float _OutlineValueFromBase;
 
 // Gloss
-uniform int _IsEnabledGloss;
+uniform int _UseGloss;
 uniform float _GlossBlend;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_GlossBlendMask); uniform float4 _GlossBlendMask_ST;
 uniform float _GlossPower;

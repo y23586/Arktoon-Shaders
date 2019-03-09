@@ -20,7 +20,7 @@ float4 frag(VertexOutput i) : COLOR {
     Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse);
 
     // アウトラインであればDiffuseとColorを混ぜる
-    if (_IsEnabledOutlineColorShift) {
+    if (_OutlineUseColorShift) {
         float3 Outline_Diff_HSV = CalculateHSV((Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
         Diffuse = lerp(Diffuse, Outline_Diff_HSV, i.isOutline);
     } else {
@@ -210,7 +210,7 @@ float4 frag(VertexOutput i) : COLOR {
         #endif
 
         // オプション：Gloss
-        if(_IsEnabledGloss) {
+        if(_UseGloss) {
             float glossNdotV = abs(dot( normalDirection, viewDirection ));
             float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
             float gloss = _GlossBlend * _GlossBlendMask_var;
@@ -328,7 +328,7 @@ float4 frag(VertexOutput i) : COLOR {
 
     // Emission Parallax
     float3 emissionParallax = float3(0,0,0);
-    if(_IsEnabledEmissionParallax) {
+    if(_UseEmissionParallax) {
         float _EmissionParallaxDepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxDepthMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionParallaxDepthMask)).r;
         float2 emissionParallaxTransform = _EmissionParallaxDepth * (_EmissionParallaxDepthMask_var - _EmissionParallaxDepthMaskInvert) * mul(tangentTransform, viewDirection).xy + i.uv0;
         float _EmissionMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionParallaxMask)).r;
