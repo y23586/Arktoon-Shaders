@@ -328,13 +328,13 @@ float4 frag(VertexOutput i) : COLOR {
 
     // Emission Parallax
     float3 emissionParallax = float3(0,0,0);
-    #ifdef USE_EMISSION_PARALLLAX
+    if(_IsEnabledEmissionParallax) {
         float _EmissionParallaxDepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxDepthMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionParallaxDepthMask)).r;
         float2 emissionParallaxTransform = _EmissionParallaxDepth * (_EmissionParallaxDepthMask_var - _EmissionParallaxDepthMaskInvert) * mul(tangentTransform, viewDirection).xy + i.uv0;
         float _EmissionMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionParallaxMask)).r;
         float3 _EmissionParallaxTex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxTex, REF_MAINTEX, TRANSFORM_TEX(emissionParallaxTransform, _EmissionParallaxTex)).rgb * _EmissionParallaxColor.rgb;
-        emissionParallax = lerp(0, _EmissionParallaxTex_var * _EmissionMask_var, _UseEmissionParallax);
-    #endif
+        emissionParallax = _EmissionParallaxTex_var * _EmissionMask_var;
+    }
 
     // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(REF_EMISSIONMAP,TRANSFORM_TEX(i.uv0, REF_EMISSIONMAP)).rgb *REF_EMISSIONCOLOR.rgb;

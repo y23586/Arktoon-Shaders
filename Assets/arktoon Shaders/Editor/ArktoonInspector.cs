@@ -30,7 +30,7 @@ namespace ArktoonShaders
         MaterialProperty BumpScaleSecondary;
         MaterialProperty EmissionMapSecondary;
         MaterialProperty EmissionColorSecondary;
-        MaterialProperty UseEmissionParallax;
+        MaterialProperty IsEnabledEmissionParallax;
         MaterialProperty EmissionParallaxColor;
         MaterialProperty EmissionParallaxTex;
         MaterialProperty EmissionParallaxMask;
@@ -176,7 +176,7 @@ namespace ArktoonShaders
             if(isStencilReaderDouble) BumpScaleSecondary = FindProperty("_BumpScaleSecondary", props);
             if(isStencilReaderDouble) EmissionMapSecondary = FindProperty("_EmissionMapSecondary", props);
             if(isStencilReaderDouble) EmissionColorSecondary = FindProperty("_EmissionColorSecondary", props);
-            UseEmissionParallax = FindProperty("_UseEmissionParallax", props);
+            IsEnabledEmissionParallax = FindProperty("_IsEnabledEmissionParallax", props);
             EmissionParallaxColor = FindProperty("_EmissionParallaxColor", props);
             EmissionParallaxTex = FindProperty("_EmissionParallaxTex", props);
             EmissionParallaxMask = FindProperty("_EmissionParallaxMask", props);
@@ -623,8 +623,8 @@ namespace ArktoonShaders
 
                 // Parallax Emission
                 UIHelper.ShurikenHeader("Parallaxed Emission");
-                materialEditor.DrawShaderPropertySameLIne(UseEmissionParallax);
-                var useEmissionPara = UseEmissionParallax.floatValue;
+                materialEditor.DrawShaderPropertySameLIne(IsEnabledEmissionParallax);
+                var useEmissionPara = IsEnabledEmissionParallax.floatValue;
                 if(useEmissionPara > 0){
                     UIHelper.DrawWithGroup(() => {
                         UIHelper.DrawWithGroup(() => {

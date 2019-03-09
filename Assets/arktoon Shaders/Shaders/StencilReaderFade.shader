@@ -22,7 +22,7 @@ Shader "arktoon/Stencil/Reader/Fade" {
         // Alpha Mask
         _AlphaMask ("[Alpha] AlphaMask", 2D ) = "white" {}
         // Emission Parallax
-        [Toggle(USE_EMISSION_PARALLLAX)]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Float ) = 0
+        [MaterialToggle]_IsEnabledEmissionParallax ("[Emission Parallax] Use Emission Parallax", Int ) = 0
         _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
         [HDR]_EmissionParallaxColor ("[Emission Parallax] Color", Color ) = (1,1,1,1)
         _EmissionParallaxMask ("[Emission Parallax] Emission Mask", 2D ) = "white" {}
@@ -167,7 +167,6 @@ Shader "arktoon/Stencil/Reader/Fade" {
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
             #pragma shader_feature USE_POSITION_RELATED_CALC
-            #pragma shader_feature USE_EMISSION_PARALLLAX
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
