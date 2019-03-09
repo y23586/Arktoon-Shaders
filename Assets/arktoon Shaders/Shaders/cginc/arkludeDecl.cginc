@@ -46,6 +46,7 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxDepthMask); uniform float4 _Emiss
 uniform float _EmissionParallaxDepthMaskInvert;
 
 // Double Side
+uniform int _IsEnabledDoubleSide;
 uniform float _DoubleSidedBackfaceLightIntensity;
 uniform float _DoubleSidedFlipBackfaceNormal;
 

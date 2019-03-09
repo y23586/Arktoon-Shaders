@@ -126,7 +126,7 @@ namespace ArktoonShaders
         MaterialProperty StencilMaskTex;
         MaterialProperty StencilMaskAdjust;
         MaterialProperty StencilMaskAlphaDither;
-        MaterialProperty UseDoubleSided;
+        MaterialProperty IsEnabledDoubleSide;
         MaterialProperty DoubleSidedFlipBackfaceNormal;
         MaterialProperty DoubleSidedBackfaceLightIntensity;
         MaterialProperty ShadowCasterCulling;
@@ -272,7 +272,7 @@ namespace ArktoonShaders
             if(isStencilReader) StencilCompareAction = FindProperty("_StencilCompareAction", props);
             if(isStencilReaderDouble) StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props);
             if(isStencilReaderDouble) StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props);
-            UseDoubleSided = FindProperty("_UseDoubleSided", props);
+            IsEnabledDoubleSide = FindProperty("_IsEnabledDoubleSide", props);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props);
             DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props);
             ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props);
@@ -298,8 +298,8 @@ namespace ArktoonShaders
 
                     // materialEditor.ShaderProperty(Cull, "Cull");
                     UIHelper.DrawWithGroup(() => {
-                        materialEditor.ShaderProperty(UseDoubleSided, "Is Double Sided");
-                        var doublesided = UseDoubleSided.floatValue;
+                        materialEditor.ShaderProperty(IsEnabledDoubleSide, "Is Double Sided");
+                        var doublesided = IsEnabledDoubleSide.floatValue;
                         if(doublesided > 0){
                             ShadowCasterCulling.floatValue = 0;
                             EditorGUI.indentLevel ++;

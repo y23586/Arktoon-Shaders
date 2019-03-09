@@ -7,7 +7,7 @@
 Shader "arktoon/Fade" {
     Properties {
         // Double Sided
-        [Toggle(DOUBLE_SIDED)]_UseDoubleSided ("Double Sided", Float ) = 0
+        [Toggle]_IsEnabledDoubleSide ("Double Sided", Int ) = 0
         [Toggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
@@ -158,7 +158,6 @@ Shader "arktoon/Fade" {
             #pragma shader_feature USE_VERTEX_LIGHT
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
-            #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature USE_EMISSION_PARALLLAX
 
@@ -197,7 +196,6 @@ Shader "arktoon/Fade" {
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
-            #pragma shader_feature DOUBLE_SIDED
             #pragma shader_feature USE_POSITION_RELATED_CALC
 
             #pragma vertex vert

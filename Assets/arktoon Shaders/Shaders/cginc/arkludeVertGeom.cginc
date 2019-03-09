@@ -176,52 +176,52 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
     tristream.RestartStrip();
     #endif
 
-    #ifdef DOUBLE_SIDED
-    for (int iii = 2; iii >= 0; iii--)
-    {
-        o.pos = UnityObjectToClipPos(IN[iii].vertex);
-        o.uv0 = IN[iii].uv0;
-        o.col = fixed4(1., 1., 1., 0.);
-        o.color = IN[iii].color;
-        o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
-        o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
-        o.tangentDir = IN[iii].tangentDir;
-        o.bitangentDir = IN[iii].bitangentDir;
-        o.isOutline = false;
-        o.faceSign = -1;
-        o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
+    if (_IsEnabledDoubleSide) {
+        for (int iii = 2; iii >= 0; iii--)
+        {
+            o.pos = UnityObjectToClipPos(IN[iii].vertex);
+            o.uv0 = IN[iii].uv0;
+            o.col = fixed4(1., 1., 1., 0.);
+            o.color = IN[iii].color;
+            o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
+            o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
+            o.tangentDir = IN[iii].tangentDir;
+            o.bitangentDir = IN[iii].bitangentDir;
+            o.isOutline = false;
+            o.faceSign = -1;
+            o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
 
-        // Pass-through the shadow coordinates if this pass has shadows.
-        #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-        o._ShadowCoord = IN[iii]._ShadowCoord;
-        #endif
-
-        // Pass-through the fog coordinates if this pass has shadows.
-        #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-        o.fogCoord = IN[iii].fogCoord;
-        #endif
-
-        #ifdef ARKTOON_REFRACTED
-            o.projPos = IN[iii].projPos;
-        #endif
-
-        #ifndef ARKTOON_ADD
-            o.lightColor0          = IN[iii].lightColor0;
-            o.lightColor1          = IN[iii].lightColor1;
-            o.lightColor2          = IN[iii].lightColor2;
-            o.lightColor3          = IN[iii].lightColor3;
-            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
-            #else
-                o.ambientAttenuation = o.ambientIndirect = 0;
+            // Pass-through the shadow coordinates if this pass has shadows.
+            #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
+            o._ShadowCoord = IN[iii]._ShadowCoord;
             #endif
-        #endif
 
-        tristream.Append(o);
+            // Pass-through the fog coordinates if this pass has shadows.
+            #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+            o.fogCoord = IN[iii].fogCoord;
+            #endif
+
+            #ifdef ARKTOON_REFRACTED
+                o.projPos = IN[iii].projPos;
+            #endif
+
+            #ifndef ARKTOON_ADD
+                o.lightColor0          = IN[iii].lightColor0;
+                o.lightColor1          = IN[iii].lightColor1;
+                o.lightColor2          = IN[iii].lightColor2;
+                o.lightColor3          = IN[iii].lightColor3;
+                #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
+                    calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
+                #else
+                    o.ambientAttenuation = o.ambientIndirect = 0;
+                #endif
+            #endif
+
+            tristream.Append(o);
+        }
+
+        tristream.RestartStrip();
     }
-
-    tristream.RestartStrip();
-    #endif
 
     for (int ii = 0; ii < 3; ii++)
     {

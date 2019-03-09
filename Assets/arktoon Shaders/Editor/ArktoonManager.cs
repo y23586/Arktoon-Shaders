@@ -54,14 +54,14 @@ namespace ArktoonShaders
                 if (www.isNetworkError || www.isHttpError) {
                     Debug.Log(www.error);
                 } else {
-                    updateHandler(www.downloadHandler.text);
+                    UpdateHandler(www.downloadHandler.text);
                 }
             #else
                 #pragma warning disable 0618
                 if (www.isError) {
                     Debug.Log(www.error);
                 } else {
-                    updateHandler(www.downloadHandler.text);
+                    UpdateHandler(www.downloadHandler.text);
                 }
                 #pragma warning restore 0618
             #endif
@@ -69,7 +69,17 @@ namespace ArktoonShaders
             EditorApplication.update -= EditorUpdate;
         }
 
-        static void updateHandler(string apiResult)
+        static void Migrate()
+        {
+            /*
+            any → 1.0.2
+                remove keyword:
+                DOUBLE_SIDED
+
+            */
+        }
+
+        static void UpdateHandler(string apiResult)
         {
             gitJson git = JsonUtility.FromJson<gitJson>(apiResult);
             string version = git.tag_name;
