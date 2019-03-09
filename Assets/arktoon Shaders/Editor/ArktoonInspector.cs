@@ -667,7 +667,6 @@ namespace ArktoonShaders
                             material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
                             material.DisableKeyword("_LIGHTSAMPLING_CUBED");
                             UsePositionRelatedCalc.floatValue = 0f;
-                            material.DisableKeyword("USE_POSITION_RELATED_CALC");
                         }
                         UIHelper.DrawWithGroup(() => {
                             EditorGUILayout.LabelField("Lights", EditorStyles.boldLabel);

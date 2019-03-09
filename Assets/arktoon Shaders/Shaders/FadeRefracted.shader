@@ -133,7 +133,7 @@ Shader "arktoon/FadeRefracted" {
         // Light Sampling
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
         // Legacy MatCap/ShadeCap Calculation
-        [Toggle(USE_POSITION_RELATED_CALC)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Float) = 0
+        [Toggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
     }
     SubShader {
         Tags {
@@ -157,7 +157,6 @@ Shader "arktoon/FadeRefracted" {
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
             #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature USE_POSITION_RELATED_CALC
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
@@ -192,7 +191,6 @@ Shader "arktoon/FadeRefracted" {
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
             #pragma shader_feature USE_OUTLINE
-            #pragma shader_feature USE_POSITION_RELATED_CALC
 
             #pragma vertex vert
             #pragma geometry geom

@@ -81,6 +81,7 @@ namespace ArktoonShaders
                 USE_REFLECTION
                 USE_REFLECTION_PROBE
                 USE_RIM
+                USE_POSITION_RELATED_CALC
             */
         }
 
