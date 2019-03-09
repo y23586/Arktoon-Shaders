@@ -79,6 +79,7 @@ namespace ArktoonShaders
                 USE_GLOSS
                 USE_OUTLINE_COLOR_SHIFT
                 USE_REFLECTION
+                USE_REFLECTION_PROBE
             */
         }
 

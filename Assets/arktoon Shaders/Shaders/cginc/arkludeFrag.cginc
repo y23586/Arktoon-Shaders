@@ -183,14 +183,14 @@ float4 frag(VertexOutput i) : COLOR {
             float perceptualRoughnessRefl = 1.0 - reflectionSmoothness;
             float3 reflDir = reflect(-viewDirection, normalDirectionReflection);
             float roughnessRefl = SmoothnessToRoughness(reflectionSmoothness);
-            #ifdef USE_REFLECTION_PROBE
+            if (_UseReflectionProbe) {
                 float3 indirectSpecular = GetIndirectSpecular(lightColor, lightDirection,
                     normalDirectionReflection, viewDirection, reflDir, attenuation, roughnessRefl, i.posWorld.xyz
                 );
                 if (any(indirectSpecular.xyz) == 0) indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
-            #else
+            } else {
                 float3 indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
-            #endif
+            }
             float3 specularColorRefl = reflectionSmoothness;
             float specularMonochromeRefl;
             float3 diffuseColorRefl = Diffuse;

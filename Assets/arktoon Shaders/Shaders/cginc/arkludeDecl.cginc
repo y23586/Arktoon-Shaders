@@ -118,6 +118,7 @@ uniform float _MatcapShadeMix;
 
 // Reflection
 uniform int _UseReflection;
+uniform int _UseReflectionProbe;
 uniform float _ReflectionReflectionPower;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ReflectionReflectionMask); uniform float4 _ReflectionReflectionMask_ST;
 uniform float _ReflectionNormalMix;

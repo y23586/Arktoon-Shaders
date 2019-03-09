@@ -96,7 +96,7 @@ Shader "arktoon/Fade" {
         _MatcapColor ("[MatCap] Color", Color) = (1,1,1,1)
         // Reflection
         [Toggle]_UseReflection ("[Reflection] Enabled", Int) = 0
-        [Toggle(USE_REFLECTION_PROBE)]_UseReflectionProbe ("[Reflection] Use Reflection Probe", Float) = 1
+        [Toggle]_UseReflectionProbe ("[Reflection] Use Reflection Probe", Int) = 1
         _ReflectionReflectionPower ("[Reflection] Reflection Power", Range(0, 1)) = 1
         _ReflectionReflectionMask ("[Reflection] Reflection Mask", 2D) = "white" {}
         _ReflectionNormalMix ("[Reflection] Normal Map Mix", Range(0,2)) = 1
@@ -148,7 +148,6 @@ Shader "arktoon/Fade" {
 
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
-            #pragma shader_feature USE_REFLECTION_PROBE
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
