@@ -77,7 +77,7 @@ float4 frag(VertexOutput i) : COLOR {
     if (!i.isOutline) {
     #endif
         // オプション：Gloss
-        #ifdef USE_GLOSS
+        if(_IsEnabledGloss) {
             float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
 
             float gloss = _GlossBlend * _GlossBlendMask_var;
@@ -110,7 +110,7 @@ float4 frag(VertexOutput i) : COLOR {
             float3 directSpecular = attenColor*specularPBL*FresnelTerm(specularColor, LdotH);
             half grazingTerm = saturate( gloss + specularMonochrome );
             specular = attenuation * directSpecular * _GlossColor.rgb;
-        #endif
+        }
 
         // オプション:ShadeCap
         #if defined(_SHADOWCAPBLENDMODE_DARKEN) || defined(_SHADOWCAPBLENDMODE_MULTIPLY)

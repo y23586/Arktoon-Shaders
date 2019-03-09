@@ -70,7 +70,7 @@ namespace ArktoonShaders
         MaterialProperty ShadowPlanB2UseCustomShadowTexture;
         MaterialProperty ShadowPlanB2CustomShadowTexture;
         MaterialProperty ShadowPlanB2CustomShadowTextureRGB;
-        MaterialProperty UseGloss;
+        MaterialProperty IsEnabledGloss;
         MaterialProperty GlossBlend;
         MaterialProperty GlossBlendMask;
         MaterialProperty GlossPower;
@@ -216,7 +216,7 @@ namespace ArktoonShaders
             ShadowPlanB2UseCustomShadowTexture = FindProperty("_ShadowPlanB2UseCustomShadowTexture", props);
             ShadowPlanB2CustomShadowTexture = FindProperty("_ShadowPlanB2CustomShadowTexture", props);
             ShadowPlanB2CustomShadowTextureRGB = FindProperty("_ShadowPlanB2CustomShadowTextureRGB", props);
-            UseGloss = FindProperty("_UseGloss", props);
+            IsEnabledGloss = FindProperty("_IsEnabledGloss", props);
             GlossBlend = FindProperty("_GlossBlend", props);
             GlossBlendMask = FindProperty("_GlossBlendMask", props);
             GlossPower = FindProperty("_GlossPower", props);
@@ -437,9 +437,9 @@ namespace ArktoonShaders
 
                 // Gloss
                 UIHelper.ShurikenHeader("Gloss");
-                materialEditor.DrawShaderPropertySameLIne(UseGloss);
-                var useGloss = UseGloss.floatValue;
-                if(useGloss > 0)
+                materialEditor.DrawShaderPropertySameLIne(IsEnabledGloss);
+                var isEnabledGloss = IsEnabledGloss.floatValue;
+                if(isEnabledGloss > 0)
                 {
                     UIHelper.DrawWithGroup(() => {
                         UIHelper.DrawWithGroup(() => {

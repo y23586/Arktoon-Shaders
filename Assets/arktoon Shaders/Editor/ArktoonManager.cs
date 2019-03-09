@@ -75,7 +75,8 @@ namespace ArktoonShaders
             any → 1.0.2
                 remove keyword:
                 DOUBLE_SIDED
-
+                USE_EMISSION_PARALLLAX
+                USE_GLOSS
             */
         }
 

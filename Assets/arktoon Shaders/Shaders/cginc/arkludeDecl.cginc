@@ -92,6 +92,7 @@ uniform float _OutlineSaturationFromBase;
 uniform float _OutlineValueFromBase;
 
 // Gloss
+uniform int _IsEnabledGloss;
 uniform float _GlossBlend;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_GlossBlendMask); uniform float4 _GlossBlendMask_ST;
 uniform float _GlossPower;

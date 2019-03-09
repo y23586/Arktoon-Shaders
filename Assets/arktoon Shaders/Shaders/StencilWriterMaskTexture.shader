@@ -66,7 +66,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _ShadowPlanB2CustomShadowTexture ("[Plan B-2] Custom Shadow Texture", 2D) = "black" {}
         _ShadowPlanB2CustomShadowTextureRGB ("[Plan B-2] Custom Shadow Texture RGB", Color) = (1,1,1,1)
         // Gloss
-        [Toggle(USE_GLOSS)]_UseGloss ("[Gloss] Enabled", Float) = 0
+        [Toggle]_IsEnabledGloss ("[Gloss] Enabled", Int) = 0
         _GlossBlend ("[Gloss] Smoothness", Range(0, 1)) = 0.5
         _GlossBlendMask ("[Gloss] Smoothness Mask", 2D) = "white" {}
         _GlossPower ("[Gloss] Metallic", Range(0, 1)) = 0.5
@@ -178,7 +178,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
 
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
-            #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_REFLECTION
             #pragma shader_feature USE_REFLECTION_PROBE
             #pragma shader_feature USE_RIM
@@ -218,7 +217,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             Blend One One
 
             CGPROGRAM
-            #pragma shader_feature USE_GLOSS
             #pragma shader_feature USE_RIM
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_OUTLINE_COLOR_SHIFT
