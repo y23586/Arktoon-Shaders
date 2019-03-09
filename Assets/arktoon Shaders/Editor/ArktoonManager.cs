@@ -80,6 +80,7 @@ namespace ArktoonShaders
                 USE_OUTLINE_COLOR_SHIFT
                 USE_REFLECTION
                 USE_REFLECTION_PROBE
+                USE_RIM
             */
         }
 

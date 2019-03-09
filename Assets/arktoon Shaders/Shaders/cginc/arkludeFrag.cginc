@@ -183,6 +183,7 @@ float4 frag(VertexOutput i) : COLOR {
             float perceptualRoughnessRefl = 1.0 - reflectionSmoothness;
             float3 reflDir = reflect(-viewDirection, normalDirectionReflection);
             float roughnessRefl = SmoothnessToRoughness(reflectionSmoothness);
+            float3 indirectSpecular = float3(0,0,0);
             if (_UseReflectionProbe) {
                 float3 indirectSpecular = GetIndirectSpecular(lightColor, lightDirection,
                     normalDirectionReflection, viewDirection, reflDir, attenuation, roughnessRefl, i.posWorld.xyz
@@ -262,7 +263,7 @@ float4 frag(VertexOutput i) : COLOR {
         #endif
 
         // オプション：Rim
-        #ifdef USE_RIM
+        if (_UseRim) {
             float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
             RimLight = (
@@ -276,7 +277,7 @@ float4 frag(VertexOutput i) : COLOR {
                             * _RimBlendMask_var
                             * lerp(float3(1,1,1), finalLight,_RimShadeMix)
                         );
-        #endif
+        }
 
         // オプション:ShadeCap
         #if defined(_SHADOWCAPBLENDMODE_DARKEN) || defined(_SHADOWCAPBLENDMODE_MULTIPLY)

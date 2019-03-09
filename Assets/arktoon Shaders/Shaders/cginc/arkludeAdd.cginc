@@ -155,7 +155,7 @@ float4 frag(VertexOutput i) : COLOR {
         #endif
 
         // オプション：Rim
-        #ifdef USE_RIM
+        if (_UseRim) {
             float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
             RimLight = (
@@ -169,7 +169,7 @@ float4 frag(VertexOutput i) : COLOR {
                 * _RimBlendMask_var
             );
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
-        #endif
+        }
     #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
     }
     #endif

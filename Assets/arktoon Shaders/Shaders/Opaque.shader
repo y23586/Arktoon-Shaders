@@ -99,7 +99,7 @@ Shader "arktoon/Opaque" {
         _ReflectionSuppressBaseColorValue ("[Reflection] Suppress Base Color", Range(0, 1)) = 1
         _ReflectionCubemap ("[Reflection] Cubemap", Cube) = "" {}
         // Rim
-        [Toggle(USE_RIM)]_UseRim ("[Rim] Enabled", Float) = 0
+        [Toggle]_UseRim ("[Rim] Enabled", Int) = 0
         _RimBlend ("[Rim] Blend", Range(0, 3)) = 1
         _RimBlendMask ("[Rim] Blend Mask", 2D) = "white" {}
         _RimShadeMix("[Rim] Shade Mix", Range(0, 1)) = 0
@@ -141,7 +141,6 @@ Shader "arktoon/Opaque" {
 
             CGPROGRAM
             #pragma shader_feature USE_SHADE_TEXTURE
-            #pragma shader_feature USE_RIM
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
@@ -176,7 +175,6 @@ Shader "arktoon/Opaque" {
             Blend One One
 
             CGPROGRAM
-            #pragma shader_feature USE_RIM
             #pragma shader_feature USE_OUTLINE
             #pragma shader_feature USE_POSITION_RELATED_CALC
             #pragma shader_feature _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_SCREEN
