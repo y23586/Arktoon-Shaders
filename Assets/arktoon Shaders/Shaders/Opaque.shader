@@ -7,7 +7,7 @@
 Shader "arktoon/Opaque" {
     Properties {
         // Double Sided
-        [Toggle]_IsEnabledDoubleSide ("Double Sided", Int ) = 0
+        [MaterialToggle]_IsEnabledDoubleSide ("Double Sided", Int ) = 0
         [Toggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         [KeywordEnum(None, Front, Back)]_ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // Default Back
