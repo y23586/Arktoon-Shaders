@@ -20,12 +20,12 @@ float4 frag(VertexOutput i) : COLOR {
     Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse);
 
     // アウトラインであればDiffuseとColorを混ぜる
-    #ifdef USE_OUTLINE_COLOR_SHIFT
+    if (_IsEnabledOutlineColorShift) {
         float3 Outline_Diff_HSV = CalculateHSV((Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
         Diffuse = lerp(Diffuse, Outline_Diff_HSV, i.isOutline);
-    #else
+    } else {
         Diffuse = lerp(Diffuse, (Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), i.isOutline);
-    #endif
+    }
 
     #ifdef ARKTOON_CUTOUT
         clip((_MainTex_var.a * REF_COLOR.a) - _CutoutCutoutAdjust);

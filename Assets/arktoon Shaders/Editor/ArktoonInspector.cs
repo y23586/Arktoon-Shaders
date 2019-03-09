@@ -84,7 +84,7 @@ namespace ArktoonShaders
         MaterialProperty OutlineShadeMix;
         MaterialProperty OutlineTextureColorRate;
         MaterialProperty OutlineWidthMask;
-        MaterialProperty OutlineUseColorShift;
+        MaterialProperty IsEnabledOutlineColorShift;
         MaterialProperty OutlineHueShiftFromBase;
         MaterialProperty OutlineSaturationFromBase;
         MaterialProperty OutlineValueFromBase;
@@ -230,7 +230,7 @@ namespace ArktoonShaders
             OutlineShadeMix = FindProperty("_OutlineShadeMix", props);
             OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
             OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
-            OutlineUseColorShift = FindProperty("_OutlineUseColorShift", props);
+            IsEnabledOutlineColorShift = FindProperty("_IsEnabledOutlineColorShift", props);
             OutlineHueShiftFromBase = FindProperty("_OutlineHueShiftFromBase", props);
             OutlineSaturationFromBase = FindProperty("_OutlineSaturationFromBase", props);
             OutlineValueFromBase = FindProperty("_OutlineValueFromBase", props);
@@ -475,9 +475,9 @@ namespace ArktoonShaders
                                 materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Texture and Color"), OutlineTexture, OutlineColor);
                                 materialEditor.TextureScaleOffsetPropertyIndent(OutlineTexture);
                                 materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
-                                materialEditor.ShaderProperty(OutlineUseColorShift, "Use Color Shift");
-                                var useOutlineColorShift = OutlineUseColorShift.floatValue;
-                                if(useOutlineColorShift > 0) {
+                                materialEditor.ShaderProperty(IsEnabledOutlineColorShift, "Use Color Shift");
+                                var isEnabledOutlineColorShift = IsEnabledOutlineColorShift.floatValue;
+                                if(isEnabledOutlineColorShift > 0) {
                                     EditorGUI.indentLevel ++;
                                     materialEditor.ShaderProperty(OutlineHueShiftFromBase, "Hue Shift");
                                     materialEditor.ShaderProperty(OutlineSaturationFromBase, "Saturation");

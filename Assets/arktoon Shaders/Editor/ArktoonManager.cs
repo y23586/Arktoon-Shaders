@@ -77,6 +77,7 @@ namespace ArktoonShaders
                 DOUBLE_SIDED
                 USE_EMISSION_PARALLLAX
                 USE_GLOSS
+                USE_OUTLINE_COLOR_SHIFT
             */
         }
 
