@@ -48,7 +48,7 @@ Shader "arktoon/Fade" {
         [Toggle]_PointShadowUseStep ("[PointShadow] use step", Float ) = 0
         _PointShadowSteps("[PointShadow] steps between borders", Range(2, 10)) = 2
         // Plan B
-        [Toggle(USE_SHADE_TEXTURE)]_ShadowPlanBUsePlanB ("[Plan B] Use Plan B", Float ) = 0
+        [Toggle]_ShadowPlanBUsePlanB ("[Plan B] Use Plan B", Int ) = 0
         _ShadowPlanBDefaultShadowMix ("[Plan B] Shadow mix", Range(0, 1)) = 1
         [Toggle(USE_CUSTOM_SHADOW_TEXTURE)] _ShadowPlanBUseCustomShadowTexture ("[Plan B] Use Custom Shadow Texture", Float ) = 0
         [PowerSlider(2.0)]_ShadowPlanBHueShiftFromBase ("[Plan B] Hue Shift From Base", Range(-0.5, 0.5)) = 0
@@ -147,7 +147,6 @@ Shader "arktoon/Fade" {
             ZWrite [_ZWrite]
 
             CGPROGRAM
-            #pragma shader_feature USE_SHADE_TEXTURE
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND

@@ -72,7 +72,7 @@ float4 frag(VertexOutput i) : COLOR {
     float _ShadowStrengthMask_var = tex2D(_ShadowStrengthMask, TRANSFORM_TEX(i.uv0, _ShadowStrengthMask));
     float3 finalLight = saturate(directContribution + ((1 - (_PointShadowStrength * _ShadowStrengthMask_var)) * attenuation));
     float3 coloredLight = saturate(lightColor*finalLight*_PointAddIntensity);
-    float3 ToonedMap = Diffuse * coloredLight;
+    float3 toonedMap = Diffuse * coloredLight;
 
     float3 specular = float3(0,0,0);
     float3 shadowcap = float3(1000,1000,1000);
@@ -177,7 +177,7 @@ float4 frag(VertexOutput i) : COLOR {
     }
     #endif
 
-    float3 finalColor = max(ToonedMap, RimLight) + specular;
+    float3 finalColor = max(toonedMap, RimLight) + specular;
 
     // ShadeCapのブレンドモード
     #ifdef _SHADOWCAPBLENDMODE_DARKEN

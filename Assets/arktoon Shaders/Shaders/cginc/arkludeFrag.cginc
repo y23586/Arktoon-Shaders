@@ -128,7 +128,8 @@ float4 frag(VertexOutput i) : COLOR {
     float3 finalLight = lerp(indirectLighting,directLighting,directContribution)+coloredLight_sum;
 
     // カスタム陰を使っている場合、directContributionや直前のfinalLightを使い、finalLightを上書きする
-    #ifdef USE_SHADE_TEXTURE
+    float3 toonedMap = float3(0,0,0);
+    if (_ShadowPlanBUsePlanB) {
         float3 shadeMixValue = lerp(directLighting, finalLight, _ShadowPlanBDefaultShadowMix);
         #ifdef USE_CUSTOM_SHADOW_TEXTURE
             float4 _ShadowPlanBCustomShadowTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowPlanBCustomShadowTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowPlanBCustomShadowTexture));
@@ -157,13 +158,13 @@ float4 frag(VertexOutput i) : COLOR {
         #endif
 
         finalLight = lerp(ShadeMap,directLighting,directContribution)+coloredLight_sum;
-        float3 ToonedMap = lerp(ShadeMap,Diffuse*finalLight,finalLight);
-    #else
-        float3 ToonedMap = Diffuse*finalLight;
-    #endif
+        toonedMap = lerp(ShadeMap,Diffuse*finalLight,finalLight);
+    } else {
+        toonedMap = Diffuse*finalLight;
+    }
 
     // アウトラインであればShadeMixを反映
-    ToonedMap = lerp(ToonedMap, (ToonedMap * _OutlineShadeMix + (Diffuse+(Diffuse*coloredLight_sum)) * (1 - _OutlineShadeMix)), i.isOutline);
+    toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + (Diffuse+(Diffuse*coloredLight_sum)) * (1 - _OutlineShadeMix)), i.isOutline);
 
     float3 ReflectionMap = float3(0,0,0);
     float3 specular = float3(0,0,0);
@@ -207,7 +208,7 @@ float4 frag(VertexOutput i) : COLOR {
             indirectSpecular *= FresnelLerp (specularColorRefl, grazingTermRefl, reflNdotV);
             indirectSpecular *= surfaceReduction *lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
             float reflSuppress = _ReflectionSuppressBaseColorValue * reflectionSmoothness;
-            ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
+            toonedMap = lerp(toonedMap,toonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
         }
 
@@ -304,7 +305,7 @@ float4 frag(VertexOutput i) : COLOR {
     }
     #endif
 
-    float3 finalcolor2 = ToonedMap+ReflectionMap + specular;
+    float3 finalcolor2 = toonedMap+ReflectionMap + specular;
 
     // ShadeCapのブレンドモード
     #ifdef _SHADOWCAPBLENDMODE_DARKEN

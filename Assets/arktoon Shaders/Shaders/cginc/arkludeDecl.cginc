@@ -61,6 +61,7 @@ uniform int _ShadowSteps;
 uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
 
 // Custom shade1
+uniform int _ShadowPlanBUsePlanB;
 uniform float _ShadowPlanBDefaultShadowMix;
 uniform float _ShadowPlanBHueShiftFromBase;
 uniform float _ShadowPlanBSaturationFromBase;
