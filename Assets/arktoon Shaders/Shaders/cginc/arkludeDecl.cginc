@@ -77,6 +77,7 @@ uniform float _ShadowPlanB2borderBlur;
 uniform float _ShadowPlanB2HueShiftFromBase;
 uniform float _ShadowPlanB2SaturationFromBase;
 uniform float _ShadowPlanB2ValueFromBase;
+uniform int _ShadowPlanB2UseCustomShadowTexture;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowPlanB2CustomShadowTexture); uniform float4 _ShadowPlanB2CustomShadowTexture_ST;
 uniform float4 _ShadowPlanB2CustomShadowTextureRGB;
 
@@ -147,6 +148,9 @@ uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowCapBlendMask); uniform float4 _ShadowCapBlendMask_ST;
 uniform float _ShadowCapBlend;
 uniform float _ShadowCapNormalMix;
+
+// Use vertexLight
+uniform int _UseVertexLight;
 
 // Vertex Color Blend
 uniform float _VertexColorBlendDiffuse;

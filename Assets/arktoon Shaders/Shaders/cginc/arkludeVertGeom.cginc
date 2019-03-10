@@ -40,11 +40,18 @@ v2g vert(appdata_full v) {
 
     #ifndef ARKTOON_ADD
         // 頂点ライティングが必要な場合に取得
-        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON) && defined(USE_VERTEX_LIGHT)
-            o.lightColor0 = unity_LightColor[0].rgb;
-            o.lightColor1 = unity_LightColor[1].rgb;
-            o.lightColor2 = unity_LightColor[2].rgb;
-            o.lightColor3 = unity_LightColor[3].rgb;
+        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON)
+            if (_UseVertexLight) {
+                o.lightColor0 = unity_LightColor[0].rgb;
+                o.lightColor1 = unity_LightColor[1].rgb;
+                o.lightColor2 = unity_LightColor[2].rgb;
+                o.lightColor3 = unity_LightColor[3].rgb;
+            } else {
+                o.lightColor0 = 0;
+                o.lightColor1 = 0;
+                o.lightColor2 = 0;
+                o.lightColor3 = 0;
+            }
         #else
             o.lightColor0 = 0;
             o.lightColor1 = 0;
@@ -164,8 +171,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
                 o.lightColor1          = IN[i].lightColor1;
                 o.lightColor2          = IN[i].lightColor2;
                 o.lightColor3          = IN[i].lightColor3;
-                #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                    calcAmbientByShade4PointLights(0, o);
+                #if UNITY_SHOULD_SAMPLE_SH
+                    if (_UseVertexLight) {
+                        calcAmbientByShade4PointLights(0, o);
+                    } else {
+                        o.ambientAttenuation = o.ambientIndirect = 0;
+                    }
                 #else
                     o.ambientAttenuation = o.ambientIndirect = 0;
                 #endif
@@ -212,8 +223,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
                 o.lightColor1          = IN[iii].lightColor1;
                 o.lightColor2          = IN[iii].lightColor2;
                 o.lightColor3          = IN[iii].lightColor3;
-                #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                    calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
+                #if UNITY_SHOULD_SAMPLE_SH
+                    if (_UseVertexLight) {
+                        calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
+                    } else {
+                        o.ambientAttenuation = o.ambientIndirect = 0;
+                    }
                 #else
                     o.ambientAttenuation = o.ambientIndirect = 0;
                 #endif
@@ -258,8 +273,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor1          = IN[ii].lightColor1;
             o.lightColor2          = IN[ii].lightColor2;
             o.lightColor3          = IN[ii].lightColor3;
-            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                calcAmbientByShade4PointLights(0, o);
+            #if UNITY_SHOULD_SAMPLE_SH
+                if (_UseVertexLight) {
+                    calcAmbientByShade4PointLights(0, o);
+                } else {
+                    o.ambientAttenuation = o.ambientIndirect = 0;
+                }
             #else
                 o.ambientAttenuation = o.ambientIndirect = 0;
             #endif

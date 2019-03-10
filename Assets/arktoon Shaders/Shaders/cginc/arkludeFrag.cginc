@@ -107,7 +107,8 @@ float4 frag(VertexOutput i) : COLOR {
     directContribution *= additionalContributionMultiplier;
 
     // 頂点ライティング：PixelLightから溢れた4光源をそれぞれ計算
-    #ifdef USE_VERTEX_LIGHT
+    float3 coloredLight_sum = float3(0,0,0);
+    if (_UseVertexLight) {
         fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
         float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur_var/2.0);
         float VertexShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur_var/2.0);
@@ -121,9 +122,7 @@ float4 frag(VertexOutput i) : COLOR {
         float3 coloredLight_2 = max(directContributionVertex.b * i.lightColor2 * i.ambientAttenuation.b, i.lightColor2 * i.ambientIndirect.b * (1-_PointShadowStrength));
         float3 coloredLight_3 = max(directContributionVertex.a * i.lightColor3 * i.ambientAttenuation.a, i.lightColor3 * i.ambientIndirect.a * (1-_PointShadowStrength));
         float3 coloredLight_sum = (coloredLight_0 + coloredLight_1 + coloredLight_2 + coloredLight_3) * _PointAddIntensity;
-    #else
-        float3 coloredLight_sum = float3(0,0,0);
-    #endif
+    }
 
     float3 finalLight = lerp(indirectLighting,directLighting,directContribution)+coloredLight_sum;
 
@@ -146,15 +145,16 @@ float4 frag(VertexOutput i) : COLOR {
             float ShadowborderMax2 = min(1, (_ShadowPlanB2border * _Shadowborder) + _ShadowPlanB2borderBlur/2);
             float directContribution2 = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin2)) / (ShadowborderMax2 - ShadowborderMin2))));  // /2の部分をパラメーターにしたい
             directContribution2 *= additionalContributionMultiplier;
-            #ifdef USE_CUSTOM_SHADOW_TEXTURE_2ND
+            float3 ShadeMap2 = float3(0,0,0);
+            if (_ShadowPlanB2UseCustomShadowTexture) {
                 float4 _ShadowPlanB2CustomShadowTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowPlanB2CustomShadowTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowPlanB2CustomShadowTexture));
                 float3 shadowCustomTexture2 = _ShadowPlanB2CustomShadowTexture_var.rgb * _ShadowPlanB2CustomShadowTextureRGB.rgb;
                 shadowCustomTexture2 =  lerp(shadowCustomTexture2, shadowCustomTexture2 * i.color,_VertexColorBlendDiffuse); // 頂点カラーを合成
-                float3 ShadeMap2 = shadowCustomTexture2*shadeMixValue;
-            #else
+                ShadeMap2 = shadowCustomTexture2*shadeMixValue;
+            } else {
                 float3 Diff_HSV2 = CalculateHSV(Diffuse, _ShadowPlanB2HueShiftFromBase, _ShadowPlanB2SaturationFromBase, _ShadowPlanB2ValueFromBase);
-                float3 ShadeMap2 = Diff_HSV2*shadeMixValue;
-            #endif
+                ShadeMap2 = Diff_HSV2*shadeMixValue;
+            }
             ShadeMap = lerp(ShadeMap2,ShadeMap,directContribution2);
         }
 

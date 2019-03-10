@@ -662,7 +662,6 @@ namespace ArktoonShaders
                             VertexColorBlendDiffuse.floatValue = 0f;
                             VertexColorBlendEmissive.floatValue = 0f;
                             UseVertexLight.floatValue = 1f;
-                            material.EnableKeyword("USE_VERTEX_LIGHT");
                             LightSampling.floatValue = 0f;
                             material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
                             material.DisableKeyword("_LIGHTSAMPLING_CUBED");

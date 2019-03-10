@@ -59,7 +59,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
         [Toggle]_CustomShadow2nd ("[Plan B-2] CustomShadow2nd", Int ) = 0
         _ShadowPlanB2border ("[Plan B-2] border ", Range(0, 1)) = 0.55
         _ShadowPlanB2borderBlur ("[Plan B-2] border Blur", Range(0, 1)) = 0.55
-        [Toggle(USE_CUSTOM_SHADOW_TEXTURE_2ND)] _ShadowPlanB2UseCustomShadowTexture ("[Plan B-2] Use Custom Shadow Texture", Float ) = 0
+        [Toggle] _ShadowPlanB2UseCustomShadowTexture ("[Plan B-2] Use Custom Shadow Texture", Int ) = 0
         [PowerSlider(2.0)]_ShadowPlanB2HueShiftFromBase ("[Plan B-2] Hue Shift From Base", Range(-0.5, 0.5)) = 0
         _ShadowPlanB2SaturationFromBase ("[Plan B-2] Saturation From Base", Range(0, 2)) = 1
         _ShadowPlanB2ValueFromBase ("[Plan B-2] Value From Base", Range(0, 2)) = 1
@@ -127,7 +127,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
         _OtherShadowAdjust ("[Advanced] Other Mesh Shadow Adjust", Range(-0.2, 0.2)) = -0.1
         _OtherShadowBorderSharpness ("[Advanced] Other Mesh Shadow Border Sharpness", Range(1, 5)) = 3
         // Per-vertex light switching
-        [Toggle(USE_VERTEX_LIGHT)]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Float) = 1
+        [Toggle]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Int) = 1
         // Light Sampling
         [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
         // Legacy MatCap/ShadeCap Calculation
@@ -152,8 +152,6 @@ Shader "arktoon/Stencil/Writer/Cutout" {
             }
 
             CGPROGRAM
-            #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
-            #pragma shader_feature USE_VERTEX_LIGHT
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER

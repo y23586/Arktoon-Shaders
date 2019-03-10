@@ -86,6 +86,8 @@ namespace ArktoonShaders
                 USE_OUTLINE
                 USE_CUSTOM_SHADOW_TEXTURE
                 USE_CUSTOM_SHADOW_2ND
+                USE_CUSTOM_SHADOW_TEXTURE_2ND
+                USE_VERTEX_LIGHT
             */
         }
 
