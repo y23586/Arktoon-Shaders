@@ -90,6 +90,10 @@ namespace ArktoonShaders
                 USE_VERTEX_LIGHT
                 _LIGHTSAMPLING_ARKTOON
                 _LIGHTSAMPLING_CUBED
+                _MATCAPBLENDMODE_UNUSED
+                _MATCAPBLENDMODE_ADD
+                _MATCAPBLENDMODE_LIGHTEN
+                _MATCAPBLENDMODE_SCREEN
             */
         }
 

@@ -249,7 +249,7 @@ float4 frag(VertexOutput i) : COLOR {
         }
 
         // オプション：MatCap
-        #if defined(_MATCAPBLENDMODE_LIGHTEN) || defined(_MATCAPBLENDMODE_ADD) || defined(_MATCAPBLENDMODE_SCREEN)
+        if (_MatcapBlendMode < 3) {
             float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
             float2 transformMatcap = float2(0,0);
             if (_UsePositionRelatedCalc) {
@@ -265,7 +265,7 @@ float4 frag(VertexOutput i) : COLOR {
             float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
             float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
             matcap = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
-        #endif
+        }
 
         // オプション：Rim
         if (_UseRim) {
@@ -316,13 +316,13 @@ float4 frag(VertexOutput i) : COLOR {
     #endif
 
     // MatCapのブレンドモード
-    #ifdef _MATCAPBLENDMODE_LIGHTEN
-        finalcolor2 = max(finalcolor2, matcap);
-    #elif _MATCAPBLENDMODE_ADD
+    if (_MatcapBlendMode == 0) { // Add
         finalcolor2 = finalcolor2 + matcap;
-    #elif _MATCAPBLENDMODE_SCREEN
+    } else if (_MatcapBlendMode == 1) { // Lighten
+        finalcolor2 = max(finalcolor2, matcap);
+    } else if (_MatcapBlendMode == 2) { // Screen
         finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
-    #endif
+    }
 
     // 屈折
     #ifdef ARKTOON_REFRACTED

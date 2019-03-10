@@ -86,7 +86,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _OutlineSaturationFromBase("[Outline] Saturation From Base", Range(0, 2)) = 1
         _OutlineValueFromBase("[Outline] Value From Base", Range(0, 2)) = 1
         // MatCap
-        [KeywordEnum(Add, Lighten, Screen, Unused)] _MatcapBlendMode ("[MatCap] Blend Mode", Float) = 3
+        [Enum(Add,0, Lighten,1, Screen,2, Unused,3)] _MatcapBlendMode ("[MatCap] Blend Mode", Int) = 3
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1
         _MatcapBlendMask ("[MatCap] Blend Mask", 2D) = "white" {}
         _MatcapNormalMix ("[MatCap] Normal map mix", Range(0, 2)) = 1
@@ -177,7 +177,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
 
             CGPROGRAM
 
-            #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 
             #pragma vertex vert
@@ -204,7 +203,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             Blend One One
 
             CGPROGRAM
-            #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 
             #pragma vertex vert
