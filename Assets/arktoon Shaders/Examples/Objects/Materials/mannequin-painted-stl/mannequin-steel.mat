@@ -8,8 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: mannequin-steel
   m_Shader: {fileID: 4800000, guid: 9566a373fffe627408d31026ce69389d, type: 3}
-  m_ShaderKeywords: USE_GLOSS USE_REFLECTION USE_REFLECTION_PROBE USE_VERTEX_LIGHT
-    _LIGHTSAMPLING_ARKTOON _MATCAPBLENDMODE_ADD _SHADOWCAPBLENDMODE_UNUSED _SHADOWCASTERCULLING_BACK
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -39,6 +38,18 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _EmissionParallaxDepthMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionParallaxMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionParallaxTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _GlossBlendMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -63,11 +74,19 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _OutlineTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OutlineWidthMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PointShadowborderBlurMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -107,6 +126,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ShadowborderBlurMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
     - _CustomShadow2nd: 0
@@ -115,6 +138,8 @@ Material:
     - _DoubleSidedBackfaceLightIntensity: 0.5
     - _DoubleSidedFlipBackfaceNormal: 0
     - _DstBlend: 0
+    - _EmissionParallaxDepth: 0
+    - _EmissionParallaxDepthMaskInvert: 0
     - _GlossBlend: 0.736
     - _GlossMapScale: 1
     - _GlossPower: 0.766
@@ -130,8 +155,12 @@ Material:
     - _OcclusionStrength: 1
     - _OtherShadowAdjust: -0.1
     - _OtherShadowBorderSharpness: 3
+    - _OutlineHueShiftFromBase: 0
+    - _OutlineSaturationFromBase: 1
     - _OutlineShadeMix: 0
     - _OutlineTextureColorRate: 0.05
+    - _OutlineUseColorShift: 0
+    - _OutlineValueFromBase: 1
     - _OutlineWidth: 0.05
     - _Parallax: 0.02
     - _PointAddIntensity: 1
@@ -176,10 +205,12 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _UseDoubleSided: 0
+    - _UseEmissionParallax: 0
     - _UseGloss: 1
     - _UseLegacyCapCalc: 0
     - _UseOutline: 0
     - _UseOutlineWidthMask: 0
+    - _UsePositionRelatedCalc: 0
     - _UseReflection: 1
     - _UseReflectionProbe: 1
     - _UseRim: 0
@@ -190,6 +221,7 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionParallaxColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlossColor: {r: 1, g: 1, b: 1, a: 1}
     - _MatcapColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}

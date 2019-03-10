@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.IO;
 using UnityEditor.Callbacks;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ArktoonShaders
@@ -69,6 +70,53 @@ namespace ArktoonShaders
             EditorApplication.update -= EditorUpdate;
         }
 
+        // TODO: 落ち着いたらmigrationにする
+        [MenuItem("Arktoon/Clear Shader Keywords")]
+        private static void ClearArktoonKeywords()
+        {
+            var variation = new List<string>() {
+                "arktoon/Opaque",
+                "arktoon/Fade",
+                "arktoon/Cutout",
+                "arktoon/FadeRefracted",
+                "arktoon/Stencil/Reader/Cutout",
+                "arktoon/Stencil/Reader/Double/FadeFade",
+                "arktoon/Stencil/Reader/Fade",
+                "arktoon/Stencil/Writer/Cutout",
+                "arktoon/Stencil/WriterMask/Cutout"
+            };
+            variation.ForEach(s => ClearKeywordsByShader(s));
+        }
+
+        private static void ClearKeywordsByShader(string shaderName) {
+            int count = 0;
+            string stArea;
+            stArea = "Materials using shader " + shaderName+":\n\n";
+
+            List<Material> armat = new List<Material>();
+
+                Renderer[] arrend = (Renderer[])Resources.FindObjectsOfTypeAll(typeof(Renderer));
+            foreach (Renderer rend in arrend) {
+                foreach (Material mat in rend.sharedMaterials) {
+                    if (!armat.Contains (mat)) {
+                        armat.Add (mat);
+                    }
+                }
+            }
+
+            foreach (Material mat in armat) {
+                if (mat != null && mat.shader != null && mat.shader.name != null && mat.shader.name == shaderName) {
+                    stArea += ">"+mat.name + ":" + string.Join(" ", mat.shaderKeywords) + "\n";
+                    var keywords = new List<string>(mat.shaderKeywords);
+                    keywords.ForEach(keyword => mat.DisableKeyword(keyword));
+                    stArea += ">"+mat.name + ":" + string.Join(" ", mat.shaderKeywords) + "\n";
+                    count++;
+                }
+            }
+
+            stArea += "\n"+count + " materials using shader " + shaderName + " found.";
+            Debug.Log(stArea);
+        }
         static void Migrate()
         {
             /*
@@ -102,9 +150,7 @@ namespace ArktoonShaders
                 _ALPHABLEND_ON
                 _ALPHAPREMULTIPLY_ON
 
-                // 過去に使ってたキーワード
-                USE_SHADOWCAP
-                USE_MATCAP
+                その他Toggleで定義されていた奴とか、過去につかってたキーワード
             */
         }
 
