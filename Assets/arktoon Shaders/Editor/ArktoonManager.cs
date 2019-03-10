@@ -84,6 +84,7 @@ namespace ArktoonShaders
                 USE_POSITION_RELATED_CALC
                 USE_SHADE_TEXTURE
                 USE_OUTLINE
+                USE_CUSTOM_SHADOW_TEXTURE
             */
         }
 

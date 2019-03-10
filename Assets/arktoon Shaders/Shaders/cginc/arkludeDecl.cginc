@@ -66,6 +66,7 @@ uniform float _ShadowPlanBDefaultShadowMix;
 uniform float _ShadowPlanBHueShiftFromBase;
 uniform float _ShadowPlanBSaturationFromBase;
 uniform float _ShadowPlanBValueFromBase;
+uniform int _ShadowPlanBUseCustomShadowTexture;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowPlanBCustomShadowTexture); uniform float4 _ShadowPlanBCustomShadowTexture_ST;
 uniform float4 _ShadowPlanBCustomShadowTextureRGB;
 

@@ -131,14 +131,15 @@ float4 frag(VertexOutput i) : COLOR {
     float3 toonedMap = float3(0,0,0);
     if (_ShadowPlanBUsePlanB) {
         float3 shadeMixValue = lerp(directLighting, finalLight, _ShadowPlanBDefaultShadowMix);
-        #ifdef USE_CUSTOM_SHADOW_TEXTURE
+        float3 ShadeMap = float3(0,0,0);
+        if (_ShadowPlanBUseCustomShadowTexture) {
             float4 _ShadowPlanBCustomShadowTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowPlanBCustomShadowTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowPlanBCustomShadowTexture));
             float3 shadowCustomTexture = _ShadowPlanBCustomShadowTexture_var.rgb * _ShadowPlanBCustomShadowTextureRGB.rgb;
-            float3 ShadeMap = shadowCustomTexture*shadeMixValue;
-        #else
+            ShadeMap = shadowCustomTexture*shadeMixValue;
+        } else {
             float3 Diff_HSV = CalculateHSV(Diffuse, _ShadowPlanBHueShiftFromBase, _ShadowPlanBSaturationFromBase, _ShadowPlanBValueFromBase);
-            float3 ShadeMap = Diff_HSV*shadeMixValue;
-        #endif
+            ShadeMap = Diff_HSV*shadeMixValue;
+        }
 
         #ifdef USE_CUSTOM_SHADOW_2ND
             float ShadowborderMin2 = max(0, (_ShadowPlanB2border * _Shadowborder) - _ShadowPlanB2borderBlur/2);
