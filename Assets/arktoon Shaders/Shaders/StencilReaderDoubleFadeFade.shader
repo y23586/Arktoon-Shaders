@@ -80,7 +80,7 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
         _GlossPower ("[Gloss] Metallic", Range(0, 1)) = 0.5
         _GlossColor ("[Gloss] Color", Color) = (1,1,1,1)
         // Outline
-        [Toggle(USE_OUTLINE)]_UseOutline ("[Outline] Enabled", Float) = 0
+        [Toggle]_UseOutline ("[Outline] Enabled", Int) = 0
         _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
         _OutlineMask ("[Outline] Outline Mask", 2D) = "white" {}
         _OutlineCutoffRange ("[Outline] Cutoff Range", Range(0, 1)) = 0.5
@@ -168,7 +168,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
-            #pragma shader_feature USE_OUTLINE
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
@@ -204,7 +203,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             }
 
             CGPROGRAM
-            #pragma shader_feature USE_OUTLINE
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 
@@ -243,7 +241,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
-            #pragma shader_feature USE_OUTLINE
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
@@ -280,7 +277,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             }
 
             CGPROGRAM
-            #pragma shader_feature USE_OUTLINE
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 

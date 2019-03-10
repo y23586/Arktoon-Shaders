@@ -172,10 +172,9 @@ float4 frag(VertexOutput i) : COLOR {
     float3 RimLight = float3(0,0,0);
     float3 shadowcap = float3(1000,1000,1000);
 
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
-    if (!i.isOutline) {
+    #if !defined(ARKTOON_REFRACTED)
+    if (_UseOutline == 0 || !i.isOutline) {
     #endif
-
         // オプション：Reflection
         if (_UseReflection) {
             float3 normalDirectionReflection = normalize(mul( float3(normalLocal.r*_ReflectionNormalMix,normalLocal.g*_ReflectionNormalMix,normalLocal.b), tangentTransform ));
@@ -300,8 +299,7 @@ float4 frag(VertexOutput i) : COLOR {
             float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
         #endif
-
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
+    #if !defined(ARKTOON_REFRACTED)
     }
     #endif
 

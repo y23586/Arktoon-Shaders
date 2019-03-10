@@ -79,8 +79,8 @@ float4 frag(VertexOutput i) : COLOR {
     float3 matcap = float3(0,0,0);
     float3 RimLight = float3(0,0,0);
 
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
-    if (!i.isOutline) {
+    #if !defined(ARKTOON_REFRACTED)
+    if (_UseOutline == 0 || !i.isOutline) {
     #endif
         // オプション：Gloss
         if(_UseGloss) {
@@ -173,7 +173,7 @@ float4 frag(VertexOutput i) : COLOR {
             );
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
         }
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
+    #if !defined(ARKTOON_REFRACTED)
     }
     #endif
 

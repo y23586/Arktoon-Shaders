@@ -79,6 +79,7 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowPlanB2CustomShadowTexture); uniform float4 
 uniform float4 _ShadowPlanB2CustomShadowTextureRGB;
 
 // Outline
+uniform int _UseOutline;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_OutlineMask); uniform float4 _OutlineMask_ST;
 uniform float _OutlineCutoffRange;
 uniform float _OutlineTextureColorRate;

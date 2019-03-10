@@ -83,6 +83,7 @@ namespace ArktoonShaders
                 USE_RIM
                 USE_POSITION_RELATED_CALC
                 USE_SHADE_TEXTURE
+                USE_OUTLINE
             */
         }
 
