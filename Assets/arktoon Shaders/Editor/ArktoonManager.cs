@@ -94,6 +94,10 @@ namespace ArktoonShaders
                 _MATCAPBLENDMODE_ADD
                 _MATCAPBLENDMODE_LIGHTEN
                 _MATCAPBLENDMODE_SCREEN
+                _SHADOWCAPBLENDMODE_UNUSED
+                _SHADOWCAPBLENDMODE_DARKEN
+                _SHADOWCAPBLENDMODE_MULTIPLY
+                _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
             */
         }
 

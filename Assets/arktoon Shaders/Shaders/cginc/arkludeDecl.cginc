@@ -145,6 +145,7 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_RimBlendMask); uniform float4 _RimBlendMask_ST;
 uniform sampler2D _RimTexture; uniform float4 _RimTexture_ST;
 
 // Shade cap (Shadow cap)
+uniform int _ShadowCapBlendMode;
 uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowCapBlendMask); uniform float4 _ShadowCapBlendMask_ST;
 uniform float _ShadowCapBlend;

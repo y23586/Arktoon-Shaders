@@ -114,7 +114,7 @@ Shader "arktoon/Fade" {
         _RimTexture ("[Rim] Texture", 2D) = "white" {}
         [MaterialToggle] _RimUseBaseTexture ("[Rim] Use Base Texture", Float ) = 0
         // ShadowCap
-        [KeywordEnum(Darken, Multiply, Light Shutter, Unused)] _ShadowCapBlendMode ("[ShadowCap] Blend Mode", Float) = 3
+        [Enum(Darken,0, Multiply,1, Light Shutter,2, Unused,3)] _ShadowCapBlendMode ("[ShadowCap] Blend Mode", Int) = 3
         _ShadowCapBlend ("[ShadowCap] Blend", Range(0, 3)) = 1
         _ShadowCapBlendMask ("[ShadowCap] Blend Mask", 2D) = "white" {}
         _ShadowCapNormalMix ("[ShadowCap] Normal map mix", Range(0, 2)) = 1
@@ -148,7 +148,6 @@ Shader "arktoon/Fade" {
 
             CGPROGRAM
 
-            #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 
             #pragma vertex vert
             #pragma geometry geom
@@ -175,7 +174,6 @@ Shader "arktoon/Fade" {
             ZWrite [_ZWrite]
 
             CGPROGRAM
-            #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
 
             #pragma vertex vert
             #pragma geometry geom

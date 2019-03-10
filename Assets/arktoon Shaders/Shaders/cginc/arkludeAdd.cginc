@@ -52,7 +52,7 @@ float4 frag(VertexOutput i) : COLOR {
     float additionalContributionMultiplier = 1;
     additionalContributionMultiplier *= i.lightIntensityIfBackface;
 
-    #ifdef _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
+    if (_ShadowCapBlendMode == 2) { // Light Shutter
         float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
         float2 transformShadowCap = float2(0,0);
         if (_UsePositionRelatedCalc) {
@@ -66,7 +66,7 @@ float4 frag(VertexOutput i) : COLOR {
         float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
         float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
         additionalContributionMultiplier *= (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
-    #endif
+    }
 
     directContribution *= additionalContributionMultiplier;
     float _ShadowStrengthMask_var = tex2D(_ShadowStrengthMask, TRANSFORM_TEX(i.uv0, _ShadowStrengthMask));
@@ -119,7 +119,7 @@ float4 frag(VertexOutput i) : COLOR {
         }
 
         // オプション:ShadeCap
-        #if defined(_SHADOWCAPBLENDMODE_DARKEN) || defined(_SHADOWCAPBLENDMODE_MULTIPLY)
+        if (_ShadowCapBlendMode < 2) {
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
             float2 transformShadowCap = float2(0,0);
             if (_UsePositionRelatedCalc) {
@@ -135,7 +135,7 @@ float4 frag(VertexOutput i) : COLOR {
             float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
             float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
-        #endif
+        }
 
         // オプション：MatCap
         if (_MatcapBlendMode < 3) {
@@ -180,11 +180,11 @@ float4 frag(VertexOutput i) : COLOR {
     float3 finalColor = max(toonedMap, RimLight) + specular;
 
     // ShadeCapのブレンドモード
-    #ifdef _SHADOWCAPBLENDMODE_DARKEN
+    if (_ShadowCapBlendMode == 0) { // Darken
         finalColor = min(finalColor, shadowcap);
-    #elif _SHADOWCAPBLENDMODE_MULTIPLY
+    } else if  (_ShadowCapBlendMode == 1) { // Multiply
         finalColor = finalColor * shadowcap;
-    #endif
+    }
 
     // MatCapのブレンドモード
     if (_MatcapBlendMode == 0) { // Add
