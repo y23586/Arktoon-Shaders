@@ -98,6 +98,13 @@ namespace ArktoonShaders
                 _SHADOWCAPBLENDMODE_DARKEN
                 _SHADOWCAPBLENDMODE_MULTIPLY
                 _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
+                _ALPHATEST_ON
+                _ALPHABLEND_ON
+                _ALPHAPREMULTIPLY_ON
+
+                // 過去に使ってたキーワード
+                USE_SHADOWCAP
+                USE_MATCAP
             */
         }
 

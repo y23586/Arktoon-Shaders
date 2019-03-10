@@ -293,8 +293,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             #pragma target 3.0
 
             // -------------------------------------
-
-            #pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma multi_compile_shadowcaster
 
             #pragma vertex vertShadowCaster
