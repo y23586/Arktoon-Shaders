@@ -141,7 +141,7 @@ float4 frag(VertexOutput i) : COLOR {
             ShadeMap = Diff_HSV*shadeMixValue;
         }
 
-        #ifdef USE_CUSTOM_SHADOW_2ND
+        if (_CustomShadow2nd) {
             float ShadowborderMin2 = max(0, (_ShadowPlanB2border * _Shadowborder) - _ShadowPlanB2borderBlur/2);
             float ShadowborderMax2 = min(1, (_ShadowPlanB2border * _Shadowborder) + _ShadowPlanB2borderBlur/2);
             float directContribution2 = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin2)) / (ShadowborderMax2 - ShadowborderMin2))));  // /2の部分をパラメーターにしたい
@@ -156,7 +156,7 @@ float4 frag(VertexOutput i) : COLOR {
                 float3 ShadeMap2 = Diff_HSV2*shadeMixValue;
             #endif
             ShadeMap = lerp(ShadeMap2,ShadeMap,directContribution2);
-        #endif
+        }
 
         finalLight = lerp(ShadeMap,directLighting,directContribution)+coloredLight_sum;
         toonedMap = lerp(ShadeMap,Diffuse*finalLight,finalLight);

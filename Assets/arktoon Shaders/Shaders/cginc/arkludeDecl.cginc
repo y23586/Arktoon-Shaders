@@ -71,6 +71,7 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowPlanBCustomShadowTexture); uniform float4 _
 uniform float4 _ShadowPlanBCustomShadowTextureRGB;
 
 // Cutsom shade2
+uniform int _CustomShadow2nd;
 uniform float _ShadowPlanB2border;
 uniform float _ShadowPlanB2borderBlur;
 uniform float _ShadowPlanB2HueShiftFromBase;

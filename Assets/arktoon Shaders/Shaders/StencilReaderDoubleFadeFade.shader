@@ -64,7 +64,7 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
         _ShadowPlanBCustomShadowTexture ("[Plan B] Custom Shadow Texture", 2D) = "black" {}
         _ShadowPlanBCustomShadowTextureRGB ("[Plan B] Custom Shadow Texture RGB", Color) = (1,1,1,1)
         // ShadowPlanB-2
-        [Toggle(USE_CUSTOM_SHADOW_2ND)]_CustomShadow2nd ("[Plan B-2] CustomShadow2nd", Float ) = 0
+        [Toggle]_CustomShadow2nd ("[Plan B-2] CustomShadow2nd", Int ) = 0
         _ShadowPlanB2border ("[Plan B-2] border ", Range(0, 1)) = 0.55
         _ShadowPlanB2borderBlur ("[Plan B-2] border Blur", Range(0, 1)) = 0.55
         [Toggle(USE_CUSTOM_SHADOW_TEXTURE_2ND)] _ShadowPlanB2UseCustomShadowTexture ("[Plan B-2] Use Custom Shadow Texture", Float ) = 0
@@ -164,7 +164,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             }
 
             CGPROGRAM
-            #pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
 
@@ -236,7 +235,6 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
             }
 
             CGPROGRAM
-#pragma shader_feature USE_CUSTOM_SHADOW_2ND
             #pragma shader_feature USE_CUSTOM_SHADOW_TEXTURE_2ND
             #pragma shader_feature USE_VERTEX_LIGHT
 
