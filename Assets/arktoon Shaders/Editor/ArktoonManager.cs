@@ -88,6 +88,8 @@ namespace ArktoonShaders
                 USE_CUSTOM_SHADOW_2ND
                 USE_CUSTOM_SHADOW_TEXTURE_2ND
                 USE_VERTEX_LIGHT
+                _LIGHTSAMPLING_ARKTOON
+                _LIGHTSAMPLING_CUBED
             */
         }
 

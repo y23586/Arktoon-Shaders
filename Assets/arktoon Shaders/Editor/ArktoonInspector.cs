@@ -663,8 +663,6 @@ namespace ArktoonShaders
                             VertexColorBlendEmissive.floatValue = 0f;
                             UseVertexLight.floatValue = 1f;
                             LightSampling.floatValue = 0f;
-                            material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
-                            material.DisableKeyword("_LIGHTSAMPLING_CUBED");
                             UsePositionRelatedCalc.floatValue = 0f;
                         }
                         UIHelper.DrawWithGroup(() => {

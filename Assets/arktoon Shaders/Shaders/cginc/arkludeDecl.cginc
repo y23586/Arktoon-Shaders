@@ -163,6 +163,9 @@ uniform float _OtherShadowBorderSharpness;
 // Experimental Cap calculation
 uniform int _UsePositionRelatedCalc;
 
+// light sampling
+uniform int _LightSampling;
+
 // Refraction IF refracted
 #ifdef ARKTOON_REFRACTED
 uniform sampler2D _GrabTexture;

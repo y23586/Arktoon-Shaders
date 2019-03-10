@@ -129,7 +129,7 @@ Shader "arktoon/Stencil/Writer/Cutout" {
         // Per-vertex light switching
         [Toggle]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Int) = 1
         // Light Sampling
-        [KeywordEnum(Arktoon, Cubed)]_LightSampling("[Light] Sampling Style", Float) = 0
+        [Enum(Arktoon,0, Cubed,1)]_LightSampling("[Light] Sampling Style", Int) = 0
         // Legacy MatCap/ShadeCap Calculation
         [Toggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
     }
@@ -155,7 +155,6 @@ Shader "arktoon/Stencil/Writer/Cutout" {
 
             #pragma shader_feature _MATCAPBLENDMODE_UNUSED _MATCAPBLENDMODE_ADD _MATCAPBLENDMODE_LIGHTEN _MATCAPBLENDMODE_SCREEN
             #pragma shader_feature _SHADOWCAPBLENDMODE_UNUSED _SHADOWCAPBLENDMODE_DARKEN _SHADOWCAPBLENDMODE_MULTIPLY _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
-            #pragma shader_feature _LIGHTSAMPLING_ARKTOON _LIGHTSAMPLING_CUBED
 
             #pragma vertex vert
             #pragma geometry geom
