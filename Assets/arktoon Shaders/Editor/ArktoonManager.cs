@@ -19,17 +19,17 @@ namespace ArktoonShaders
         static void CheckVersion ()
         {
             if(EditorApplication.isPlayingOrWillChangePlaymode) return;
-            Debug.Log ("[Arktoon] Checking local version.");
-            string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
 
-            if (!localVersion.Equals(version)) {
-                // 直前のバージョンと異なるか新規インポートなので、とりあえずReimportを走らせる
-                Debug.Log ("[Arktoon] Version change detected : Force reimport.");
-                string guidArktoonManager   = AssetDatabase.FindAssets("ArktoonManager t:script")[0];
-                string pathToArktoonManager = AssetDatabase.GUIDToAssetPath(guidArktoonManager);
-                string pathToShaderDir      = Directory.GetParent(Path.GetDirectoryName(pathToArktoonManager)) + "/Shaders";
-                AssetDatabase.ImportAsset(pathToShaderDir, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
-            }
+            // Debug.Log ("[Arktoon] Checking local version.");
+            // string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
+            // if (!localVersion.Equals(version)) {
+            //     // 直前のバージョンと異なるか新規インポートなので、とりあえずReimportを走らせる
+            //     Debug.Log ("[Arktoon] Version change detected : Force reimport.");
+            //     string guidArktoonManager   = AssetDatabase.FindAssets("ArktoonManager t:script")[0];
+            //     string pathToArktoonManager = AssetDatabase.GUIDToAssetPath(guidArktoonManager);
+            //     string pathToShaderDir      = Directory.GetParent(Path.GetDirectoryName(pathToArktoonManager)) + "/Shaders";
+            //     AssetDatabase.ImportAsset(pathToShaderDir, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
+            // }
 
             // 更新後ローカルバージョンをセット
             EditorUserSettings.SetConfigValue("arktoon_version_local", version);
