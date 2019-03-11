@@ -727,7 +727,7 @@ namespace ArktoonShaders
 
                 UIHelper.ShurikenHeader("Arktoon-Shaders");
                 style.alignment = TextAnchor.MiddleRight;
-                style.normal.textColor = Color.black;
+                style.normal.textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
                 EditorGUILayout.LabelField("Your Version : " + localVersion, style);
 
                 if (!string.IsNullOrEmpty(remoteVersion))
@@ -736,7 +736,7 @@ namespace ArktoonShaders
                     Version remote_v = new Version(remoteVersion);
 
                     if(remote_v > local_v)  {
-                        style.normal.textColor = Color.blue;
+                        style.normal.textColor = EditorGUIUtility.isProSkin ? Color.cyan : Color.blue;
                         EditorGUILayout.LabelField("Remote Version : " + remoteVersion, style);
                         EditorGUILayout.BeginHorizontal( GUI.skin.box );
                         {
