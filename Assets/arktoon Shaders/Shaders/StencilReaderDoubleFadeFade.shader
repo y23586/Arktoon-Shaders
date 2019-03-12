@@ -143,6 +143,8 @@ Shader "arktoon/Stencil/Reader/Double/FadeFade" {
         [Enum(Arktoon,0, Cubed,1)]_LightSampling("[Light] Sampling Style", Int) = 0
         // Legacy MatCap/ShadeCap Calculation
         [ATSToggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
+        // Version
+        [HideInInspector]_Version("[hidden] Version", int) = 0
     }
     SubShader {
         Tags {

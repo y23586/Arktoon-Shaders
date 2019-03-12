@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using System.IO;
 using UnityEditor.Callbacks;
 using System.Linq;
+using System;
 using System.Text.RegularExpressions;
 
 namespace ArktoonShaders
@@ -13,29 +14,70 @@ namespace ArktoonShaders
     {
         static string url = "https://api.github.com/repos/synqark/Arktoon-Shaders/releases/latest";
         static UnityWebRequest www;
-        static string version = "1.0.2.0";
+        public static readonly string version = "1.0.2.2";
+
+        /// <summary>
+        /// アセットが示すバージョンをintで返却
+        /// マイグレーション時の移行先バージョンとして使われる
+        /// </summary>
+        /// <value></value>
+        public static int AssetVersionInt {
+            get
+            {
+                var new_version = ArktoonManager.version;
+                System.Version newVersion = new System.Version(new_version);
+                return newVersion.Major * 1000 + newVersion.Minor * 100 + newVersion.Build * 10 + newVersion.Revision;
+            }
+        }
+
+        /// <summary>
+        /// プロジェクトに記録されているArktoonのバージョンをintで返却
+        /// マイグレーション時にマテリアルにバージョン情報が記載されていない場合に、移行元バージョンとして使われる
+        /// そのため、存在しない場合はマイグレーション最小値である1.0.1.1固定となる。
+        /// </summary>
+        /// <value></value>
+        public static int LocalVersionInt {
+            get
+            {
+                string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
+                if(string.IsNullOrEmpty(localVersion)) localVersion = "1.0.1.1";
+                System.Version existVersion = new System.Version(localVersion);
+                return existVersion.Major * 1000 + existVersion.Minor * 100 + existVersion.Build * 10 + existVersion.Revision;
+            }
+        }
+
+        public static readonly List<string> variations = new List<string>(){
+                "arktoon/Opaque",
+                "arktoon/Fade",
+                "arktoon/AlphaCutout",
+                "arktoon/FadeRefracted",
+                "arktoon/Stencil/Reader/Cutout",
+                "arktoon/Stencil/Reader/Double/FadeFade",
+                "arktoon/Stencil/Reader/Fade",
+                "arktoon/Stencil/Writer/Cutout",
+                "arktoon/Stencil/WriterMask/Cutout"
+                // TODO:これ動的にならないかな？
+        };
 
         [DidReloadScripts(0)]
-        static void CheckVersion ()
+        private static void CheckVersion ()
         {
             if(EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-            // Debug.Log ("[Arktoon] Checking local version.");
-            // string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
-            // if (!localVersion.Equals(version)) {
-            //     // 直前のバージョンと異なるか新規インポートなので、とりあえずReimportを走らせる
-            //     Debug.Log ("[Arktoon] Version change detected : Force reimport.");
-            //     string guidArktoonManager   = AssetDatabase.FindAssets("ArktoonManager t:script")[0];
-            //     string pathToArktoonManager = AssetDatabase.GUIDToAssetPath(guidArktoonManager);
-            //     string pathToShaderDir      = Directory.GetParent(Path.GetDirectoryName(pathToArktoonManager)) + "/Shaders";
-            //     AssetDatabase.ImportAsset(pathToShaderDir, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
-            // }
+            // ローカルバージョンを確認
+            Debug.Log ("[Arktoon] Checking local version.");
+            string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
 
-            // 更新後ローカルバージョンをセット
+            if (!localVersion.Equals(version)) {
+                // Arktoonが更新または新規にインストールされているので、既存のマテリアルの更新を行う。
+                ArktoonMigrator.Migrate();
+            }
+            // ローカルバージョンをセット
             EditorUserSettings.SetConfigValue("arktoon_version_local", version);
+
+            // リモート(githubのpublic release)のバージョンを取得
             Debug.Log ("[Arktoon] Checking remote version.");
             www = UnityWebRequest.Get(url);
-
             #if UNITY_2017_OR_NEWER
             www.SendWebRequest();
             #else
@@ -47,7 +89,7 @@ namespace ArktoonShaders
             EditorApplication.update += EditorUpdate;
         }
 
-        static void EditorUpdate()
+        private static void EditorUpdate()
         {
             while (!www.isDone) return;
 
@@ -68,90 +110,6 @@ namespace ArktoonShaders
             #endif
 
             EditorApplication.update -= EditorUpdate;
-        }
-
-        // TODO: 落ち着いたらmigrationにする
-        [MenuItem("Arktoon/Clear Shader Keywords")]
-        private static void ClearArktoonKeywords()
-        {
-            var variation = new List<string>() {
-                "arktoon/Opaque",
-                "arktoon/Fade",
-                "arktoon/Cutout",
-                "arktoon/FadeRefracted",
-                "arktoon/Stencil/Reader/Cutout",
-                "arktoon/Stencil/Reader/Double/FadeFade",
-                "arktoon/Stencil/Reader/Fade",
-                "arktoon/Stencil/Writer/Cutout",
-                "arktoon/Stencil/WriterMask/Cutout"
-            };
-            variation.ForEach(s => ClearKeywordsByShader(s));
-        }
-
-        private static void ClearKeywordsByShader(string shaderName) {
-            int count = 0;
-            string stArea;
-            stArea = "Materials using shader " + shaderName+":\n\n";
-
-            List<Material> armat = new List<Material>();
-
-                Renderer[] arrend = (Renderer[])Resources.FindObjectsOfTypeAll(typeof(Renderer));
-            foreach (Renderer rend in arrend) {
-                foreach (Material mat in rend.sharedMaterials) {
-                    if (!armat.Contains (mat)) {
-                        armat.Add (mat);
-                    }
-                }
-            }
-
-            foreach (Material mat in armat) {
-                if (mat != null && mat.shader != null && mat.shader.name != null && mat.shader.name == shaderName) {
-                    stArea += ">"+mat.name + ":" + string.Join(" ", mat.shaderKeywords) + "\n";
-                    var keywords = new List<string>(mat.shaderKeywords);
-                    keywords.ForEach(keyword => mat.DisableKeyword(keyword));
-                    stArea += ">"+mat.name + ":" + string.Join(" ", mat.shaderKeywords) + "\n";
-                    count++;
-                }
-            }
-
-            stArea += "\n"+count + " materials using shader " + shaderName + " found.";
-            Debug.Log(stArea);
-        }
-        static void Migrate()
-        {
-            /*
-            any → 1.0.2
-                remove keyword:
-                DOUBLE_SIDED
-                USE_EMISSION_PARALLLAX
-                USE_GLOSS
-                USE_OUTLINE_COLOR_SHIFT
-                USE_REFLECTION
-                USE_REFLECTION_PROBE
-                USE_RIM
-                USE_POSITION_RELATED_CALC
-                USE_SHADE_TEXTURE
-                USE_OUTLINE
-                USE_CUSTOM_SHADOW_TEXTURE
-                USE_CUSTOM_SHADOW_2ND
-                USE_CUSTOM_SHADOW_TEXTURE_2ND
-                USE_VERTEX_LIGHT
-                _LIGHTSAMPLING_ARKTOON
-                _LIGHTSAMPLING_CUBED
-                _MATCAPBLENDMODE_UNUSED
-                _MATCAPBLENDMODE_ADD
-                _MATCAPBLENDMODE_LIGHTEN
-                _MATCAPBLENDMODE_SCREEN
-                _SHADOWCAPBLENDMODE_UNUSED
-                _SHADOWCAPBLENDMODE_DARKEN
-                _SHADOWCAPBLENDMODE_MULTIPLY
-                _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
-                _ALPHATEST_ON
-                _ALPHABLEND_ON
-                _ALPHAPREMULTIPLY_ON
-
-                その他Toggleで定義されていた奴とか、過去につかってたキーワード
-            */
         }
 
         static void UpdateHandler(string apiResult)

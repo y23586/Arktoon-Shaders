@@ -150,6 +150,12 @@ namespace ArktoonShaders
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
         {
             Material material = materialEditor.target as Material;
+
+            // バージョンを逐一確認して、アセットバージョンが高い場合はマテリアルをマイグレーション
+            if( material.GetInt("_Version") < ArktoonManager.AssetVersionInt) {
+                ArktoonMigrator.MigrateArktoonMaterial(material);
+            }
+
             Shader shader = material.shader;
 
             // shader.nameによって調整可能なプロパティを制御する。
@@ -284,6 +290,15 @@ namespace ArktoonShaders
             LightSampling = FindProperty("_LightSampling", props);
             UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props);
             if(isFade) ZWrite = FindProperty("_ZWrite", props);
+
+            // TODO: プロパティを引っこ抜いても描画できるようにするためのテスト
+            // var nothingparam = FindProperty("_ZWrite", props, false);
+            // if(nothingparam != null) {
+            //     Debug.Log("nothingparam is " + nothingparam.ToString());
+            // } else {
+            //     Debug.Log("nothingparam is null");
+            // }
+
 
             EditorGUIUtility.labelWidth = 0f;
 
