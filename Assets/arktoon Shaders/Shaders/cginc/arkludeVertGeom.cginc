@@ -40,11 +40,18 @@ v2g vert(appdata_full v) {
 
     #ifndef ARKTOON_ADD
         // 頂点ライティングが必要な場合に取得
-        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON) && defined(USE_VERTEX_LIGHT)
-            o.lightColor0 = unity_LightColor[0].rgb;
-            o.lightColor1 = unity_LightColor[1].rgb;
-            o.lightColor2 = unity_LightColor[2].rgb;
-            o.lightColor3 = unity_LightColor[3].rgb;
+        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON)
+            if (_UseVertexLight) {
+                o.lightColor0 = unity_LightColor[0].rgb;
+                o.lightColor1 = unity_LightColor[1].rgb;
+                o.lightColor2 = unity_LightColor[2].rgb;
+                o.lightColor3 = unity_LightColor[3].rgb;
+            } else {
+                o.lightColor0 = 0;
+                o.lightColor1 = 0;
+                o.lightColor2 = 0;
+                o.lightColor3 = 0;
+            }
         #else
             o.lightColor0 = 0;
             o.lightColor1 = 0;
@@ -125,102 +132,113 @@ struct VertexOutput {
 void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
 {
     VertexOutput o;
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
-    for (int i = 2; i >= 0; i--)
-    {
-        float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
-        float width = _OutlineWidth * _OutlineWidthMask_var;
+    #if !defined(ARKTOON_REFRACTED)
+    if (_UseOutline) {
+        for (int i = 2; i >= 0; i--)
+        {
+            float4 _OutlineTexture_var = tex2Dlod (_OutlineTexture, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineTexture), 0, 0));
+            float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
+            float width = _OutlineWidth * _OutlineWidthMask_var;
 
-        o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
-        o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
-        o.uv0 = IN[i].uv0;
-        o.col = fixed4( _OutlineColor.r, _OutlineColor.g, _OutlineColor.b, 1);
-        o.color = IN[i].color;
-        o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
-        o.tangentDir = IN[i].tangentDir;
-        o.bitangentDir = IN[i].bitangentDir;
-        o.isOutline = true;
-        o.faceSign = -1;
-        o.lightIntensityIfBackface = 1;
+            o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
+            o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
+            o.uv0 = IN[i].uv0;
+            o.col = fixed4( _OutlineColor.rgb * _OutlineTexture_var.rgb, 1);
+            o.color = IN[i].color;
+            o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
+            o.tangentDir = IN[i].tangentDir;
+            o.bitangentDir = IN[i].bitangentDir;
+            o.isOutline = true;
+            o.faceSign = -1;
+            o.lightIntensityIfBackface = 1;
 
-        // Pass-through the shadow coordinates if this pass has shadows.
-        #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-        o._ShadowCoord = IN[i]._ShadowCoord;
-        #endif
-
-        // Pass-through the fog coordinates if this pass has shadows.
-        #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-        o.fogCoord = IN[i].fogCoord;
-        #endif
-
-        #ifdef ARKTOON_REFRACTED
-            o.projPos = IN[i].projPos;
-        #endif
-
-        #ifndef ARKTOON_ADD
-            o.lightColor0          = IN[i].lightColor0;
-            o.lightColor1          = IN[i].lightColor1;
-            o.lightColor2          = IN[i].lightColor2;
-            o.lightColor3          = IN[i].lightColor3;
-            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                calcAmbientByShade4PointLights(0, o);
-            #else
-                o.ambientAttenuation = o.ambientIndirect = 0;
+            // Pass-through the shadow coordinates if this pass has shadows.
+            #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
+            o._ShadowCoord = IN[i]._ShadowCoord;
             #endif
-        #endif
 
-        tristream.Append(o);
+            // Pass-through the fog coordinates if this pass has shadows.
+            #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+            o.fogCoord = IN[i].fogCoord;
+            #endif
+
+            #ifdef ARKTOON_REFRACTED
+                o.projPos = IN[i].projPos;
+            #endif
+
+            #ifndef ARKTOON_ADD
+                o.lightColor0          = IN[i].lightColor0;
+                o.lightColor1          = IN[i].lightColor1;
+                o.lightColor2          = IN[i].lightColor2;
+                o.lightColor3          = IN[i].lightColor3;
+                #if UNITY_SHOULD_SAMPLE_SH
+                    if (_UseVertexLight) {
+                        calcAmbientByShade4PointLights(0, o);
+                    } else {
+                        o.ambientAttenuation = o.ambientIndirect = 0;
+                    }
+                #else
+                    o.ambientAttenuation = o.ambientIndirect = 0;
+                #endif
+            #endif
+
+            tristream.Append(o);
+        }
+
+        tristream.RestartStrip();
     }
-
-    tristream.RestartStrip();
     #endif
 
-    #ifdef DOUBLE_SIDED
-    for (int iii = 2; iii >= 0; iii--)
-    {
-        o.pos = UnityObjectToClipPos(IN[iii].vertex);
-        o.uv0 = IN[iii].uv0;
-        o.col = fixed4(1., 1., 1., 0.);
-        o.color = IN[iii].color;
-        o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
-        o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
-        o.tangentDir = IN[iii].tangentDir;
-        o.bitangentDir = IN[iii].bitangentDir;
-        o.isOutline = false;
-        o.faceSign = -1;
-        o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
+    if (_UseDoubleSided) {
+        for (int iii = 2; iii >= 0; iii--)
+        {
+            o.pos = UnityObjectToClipPos(IN[iii].vertex);
+            o.uv0 = IN[iii].uv0;
+            o.col = fixed4(1., 1., 1., 0.);
+            o.color = IN[iii].color;
+            o.posWorld = mul(unity_ObjectToWorld, IN[iii].vertex);
+            o.normalDir = UnityObjectToWorldNormal(IN[iii].normal);
+            o.tangentDir = IN[iii].tangentDir;
+            o.bitangentDir = IN[iii].bitangentDir;
+            o.isOutline = false;
+            o.faceSign = -1;
+            o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
 
-        // Pass-through the shadow coordinates if this pass has shadows.
-        #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-        o._ShadowCoord = IN[iii]._ShadowCoord;
-        #endif
-
-        // Pass-through the fog coordinates if this pass has shadows.
-        #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-        o.fogCoord = IN[iii].fogCoord;
-        #endif
-
-        #ifdef ARKTOON_REFRACTED
-            o.projPos = IN[iii].projPos;
-        #endif
-
-        #ifndef ARKTOON_ADD
-            o.lightColor0          = IN[iii].lightColor0;
-            o.lightColor1          = IN[iii].lightColor1;
-            o.lightColor2          = IN[iii].lightColor2;
-            o.lightColor3          = IN[iii].lightColor3;
-            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
-            #else
-                o.ambientAttenuation = o.ambientIndirect = 0;
+            // Pass-through the shadow coordinates if this pass has shadows.
+            #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
+            o._ShadowCoord = IN[iii]._ShadowCoord;
             #endif
-        #endif
 
-        tristream.Append(o);
+            // Pass-through the fog coordinates if this pass has shadows.
+            #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+            o.fogCoord = IN[iii].fogCoord;
+            #endif
+
+            #ifdef ARKTOON_REFRACTED
+                o.projPos = IN[iii].projPos;
+            #endif
+
+            #ifndef ARKTOON_ADD
+                o.lightColor0          = IN[iii].lightColor0;
+                o.lightColor1          = IN[iii].lightColor1;
+                o.lightColor2          = IN[iii].lightColor2;
+                o.lightColor3          = IN[iii].lightColor3;
+                #if UNITY_SHOULD_SAMPLE_SH
+                    if (_UseVertexLight) {
+                        calcAmbientByShade4PointLights(_DoubleSidedFlipBackfaceNormal, o);
+                    } else {
+                        o.ambientAttenuation = o.ambientIndirect = 0;
+                    }
+                #else
+                    o.ambientAttenuation = o.ambientIndirect = 0;
+                #endif
+            #endif
+
+            tristream.Append(o);
+        }
+
+        tristream.RestartStrip();
     }
-
-    tristream.RestartStrip();
-    #endif
 
     for (int ii = 0; ii < 3; ii++)
     {
@@ -255,8 +273,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.lightColor1          = IN[ii].lightColor1;
             o.lightColor2          = IN[ii].lightColor2;
             o.lightColor3          = IN[ii].lightColor3;
-            #if UNITY_SHOULD_SAMPLE_SH && defined(USE_VERTEX_LIGHT)
-                calcAmbientByShade4PointLights(0, o);
+            #if UNITY_SHOULD_SAMPLE_SH
+                if (_UseVertexLight) {
+                    calcAmbientByShade4PointLights(0, o);
+                } else {
+                    o.ambientAttenuation = o.ambientIndirect = 0;
+                }
             #else
                 o.ambientAttenuation = o.ambientIndirect = 0;
             #endif

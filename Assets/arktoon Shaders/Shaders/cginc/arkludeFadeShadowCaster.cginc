@@ -12,17 +12,12 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_AlphaMask); uniform float4 _AlphaMask_ST;
     #undef UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS
 #endif
 
-#if (defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)) && defined(UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS)
+#if defined(UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS)
     #define UNITY_STANDARD_USE_DITHER_MASK 1
 #endif
 
-#if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
 #define UNITY_STANDARD_USE_SHADOW_UVS 1
-#endif
-
-#if !defined(V2F_SHADOW_CASTER_NOPOS_IS_EMPTY) || defined(UNITY_STANDARD_USE_SHADOW_UVS)
 #define UNITY_STANDARD_USE_SHADOW_OUTPUT_STRUCT 1
-#endif
 
 #ifdef UNITY_STANDARD_USE_DITHER_MASK
 sampler3D   _DitherMaskLOD;
@@ -76,13 +71,11 @@ half4 fragShadowCaster (
         float4 _MainTex_var = UNITY_SAMPLE_TEX2D(_MainTex, TRANSFORM_TEX(i.tex, _MainTex));
         fixed _AlphaMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_AlphaMask, _MainTex, TRANSFORM_TEX(i.tex, _AlphaMask)).r;
         half alpha = _MainTex_var.a*_Color.a*_AlphaMask_var;
-        #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
-            #if defined(UNITY_STANDARD_USE_DITHER_MASK)
-                half alphaRef = tex3D(_DitherMaskLOD, float3(vpos.xy*0.25,alpha*0.9375)).a;
-                clip (alphaRef - 0.01);
-            #else
-                clip (alpha - _CutoutCutoutAdjust);
-            #endif
+        #if defined(UNITY_STANDARD_USE_DITHER_MASK)
+            half alphaRef = tex3D(_DitherMaskLOD, float3(vpos.xy*0.25,alpha*0.9375)).a;
+            clip (alphaRef - 0.01);
+        #else
+            clip (alpha - _CutoutCutoutAdjust);
         #endif
     #endif
     SHADOW_CASTER_FRAGMENT(i)

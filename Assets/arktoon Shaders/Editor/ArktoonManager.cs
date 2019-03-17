@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.IO;
 using UnityEditor.Callbacks;
+using System.Linq;
+using System;
 using System.Text.RegularExpressions;
 
 namespace ArktoonShaders
@@ -12,29 +14,70 @@ namespace ArktoonShaders
     {
         static string url = "https://api.github.com/repos/synqark/Arktoon-Shaders/releases/latest";
         static UnityWebRequest www;
-        static string version = "1.0.1.1";
+        public static readonly string version = "1.0.2.2";
+
+        /// <summary>
+        /// アセットが示すバージョンをintで返却
+        /// マイグレーション時の移行先バージョンとして使われる
+        /// </summary>
+        /// <value></value>
+        public static int AssetVersionInt {
+            get
+            {
+                var new_version = ArktoonManager.version;
+                System.Version newVersion = new System.Version(new_version);
+                return newVersion.Major * 1000 + newVersion.Minor * 100 + newVersion.Build * 10 + newVersion.Revision;
+            }
+        }
+
+        /// <summary>
+        /// プロジェクトに記録されているArktoonのバージョンをintで返却
+        /// マイグレーション時にマテリアルにバージョン情報が記載されていない場合に、移行元バージョンとして使われる
+        /// そのため、存在しない場合はマイグレーション最小値である1.0.1.1固定となる。
+        /// </summary>
+        /// <value></value>
+        public static int LocalVersionInt {
+            get
+            {
+                string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
+                if(string.IsNullOrEmpty(localVersion)) localVersion = "1.0.1.1";
+                System.Version existVersion = new System.Version(localVersion);
+                return existVersion.Major * 1000 + existVersion.Minor * 100 + existVersion.Build * 10 + existVersion.Revision;
+            }
+        }
+
+        public static readonly List<string> variations = new List<string>(){
+                "arktoon/Opaque",
+                "arktoon/Fade",
+                "arktoon/AlphaCutout",
+                "arktoon/FadeRefracted",
+                "arktoon/Stencil/Reader/Cutout",
+                "arktoon/Stencil/Reader/Double/FadeFade",
+                "arktoon/Stencil/Reader/Fade",
+                "arktoon/Stencil/Writer/Cutout",
+                "arktoon/Stencil/WriterMask/Cutout"
+                // TODO:これ動的にならないかな？
+        };
 
         [DidReloadScripts(0)]
-        static void CheckVersion ()
+        private static void CheckVersion ()
         {
             if(EditorApplication.isPlayingOrWillChangePlaymode) return;
+
+            // ローカルバージョンを確認
             Debug.Log ("[Arktoon] Checking local version.");
             string localVersion = EditorUserSettings.GetConfigValue("arktoon_version_local") ?? "";
 
             if (!localVersion.Equals(version)) {
-                // 直前のバージョンと異なるか新規インポートなので、とりあえずReimportを走らせる
-                Debug.Log ("[Arktoon] Version change detected : Force reimport.");
-                string guidArktoonManager   = AssetDatabase.FindAssets("ArktoonManager t:script")[0];
-                string pathToArktoonManager = AssetDatabase.GUIDToAssetPath(guidArktoonManager);
-                string pathToShaderDir      = Directory.GetParent(Path.GetDirectoryName(pathToArktoonManager)) + "/Shaders";
-                AssetDatabase.ImportAsset(pathToShaderDir, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
+                // Arktoonが更新または新規にインストールされているので、既存のマテリアルの更新を行う。
+                ArktoonMigrator.Migrate();
             }
-
-            // 更新後ローカルバージョンをセット
+            // ローカルバージョンをセット
             EditorUserSettings.SetConfigValue("arktoon_version_local", version);
+
+            // リモート(githubのpublic release)のバージョンを取得
             Debug.Log ("[Arktoon] Checking remote version.");
             www = UnityWebRequest.Get(url);
-
             #if UNITY_2017_OR_NEWER
             www.SendWebRequest();
             #else
@@ -46,7 +89,7 @@ namespace ArktoonShaders
             EditorApplication.update += EditorUpdate;
         }
 
-        static void EditorUpdate()
+        private static void EditorUpdate()
         {
             while (!www.isDone) return;
 
@@ -54,14 +97,14 @@ namespace ArktoonShaders
                 if (www.isNetworkError || www.isHttpError) {
                     Debug.Log(www.error);
                 } else {
-                    updateHandler(www.downloadHandler.text);
+                    UpdateHandler(www.downloadHandler.text);
                 }
             #else
                 #pragma warning disable 0618
                 if (www.isError) {
                     Debug.Log(www.error);
                 } else {
-                    updateHandler(www.downloadHandler.text);
+                    UpdateHandler(www.downloadHandler.text);
                 }
                 #pragma warning restore 0618
             #endif
@@ -69,7 +112,7 @@ namespace ArktoonShaders
             EditorApplication.update -= EditorUpdate;
         }
 
-        static void updateHandler(string apiResult)
+        static void UpdateHandler(string apiResult)
         {
             gitJson git = JsonUtility.FromJson<gitJson>(apiResult);
             string version = git.tag_name;
