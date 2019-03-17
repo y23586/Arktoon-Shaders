@@ -46,6 +46,7 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionParallaxDepthMask); uniform float4 _Emiss
 uniform float _EmissionParallaxDepthMaskInvert;
 
 // Double Side
+uniform int _UseDoubleSided;
 uniform float _DoubleSidedBackfaceLightIntensity;
 uniform float _DoubleSidedFlipBackfaceNormal;
 
@@ -60,23 +61,28 @@ uniform int _ShadowSteps;
 uniform sampler2D _ShadowStrengthMask; uniform float4 _ShadowStrengthMask_ST;
 
 // Custom shade1
+uniform int _ShadowPlanBUsePlanB;
 uniform float _ShadowPlanBDefaultShadowMix;
 uniform float _ShadowPlanBHueShiftFromBase;
 uniform float _ShadowPlanBSaturationFromBase;
 uniform float _ShadowPlanBValueFromBase;
+uniform int _ShadowPlanBUseCustomShadowTexture;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowPlanBCustomShadowTexture); uniform float4 _ShadowPlanBCustomShadowTexture_ST;
 uniform float4 _ShadowPlanBCustomShadowTextureRGB;
 
 // Cutsom shade2
+uniform int _CustomShadow2nd;
 uniform float _ShadowPlanB2border;
 uniform float _ShadowPlanB2borderBlur;
 uniform float _ShadowPlanB2HueShiftFromBase;
 uniform float _ShadowPlanB2SaturationFromBase;
 uniform float _ShadowPlanB2ValueFromBase;
+uniform int _ShadowPlanB2UseCustomShadowTexture;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowPlanB2CustomShadowTexture); uniform float4 _ShadowPlanB2CustomShadowTexture_ST;
 uniform float4 _ShadowPlanB2CustomShadowTextureRGB;
 
 // Outline
+uniform int _UseOutline;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_OutlineMask); uniform float4 _OutlineMask_ST;
 uniform float _OutlineCutoffRange;
 uniform float _OutlineTextureColorRate;
@@ -91,6 +97,7 @@ uniform float _OutlineSaturationFromBase;
 uniform float _OutlineValueFromBase;
 
 // Gloss
+uniform int _UseGloss;
 uniform float _GlossBlend;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_GlossBlendMask); uniform float4 _GlossBlendMask_ST;
 uniform float _GlossPower;
@@ -107,6 +114,7 @@ uniform float _PointShadowUseStep;
 uniform int _PointShadowSteps;
 
 // MatCap
+uniform int _MatcapBlendMode;
 uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
 uniform float _MatcapBlend;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_MatcapBlendMask); uniform float4 _MatcapBlendMask_ST;
@@ -115,6 +123,8 @@ uniform float _MatcapNormalMix;
 uniform float _MatcapShadeMix;
 
 // Reflection
+uniform int _UseReflection;
+uniform int _UseReflectionProbe;
 uniform float _ReflectionReflectionPower;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ReflectionReflectionMask); uniform float4 _ReflectionReflectionMask_ST;
 uniform float _ReflectionNormalMix;
@@ -124,6 +134,7 @@ uniform samplerCUBE _ReflectionCubemap;
 uniform half4  _ReflectionCubemap_HDR;
 
 // Rim
+uniform int _UseRim;
 uniform float _RimFresnelPower;
 uniform float _RimUpperSideWidth;
 uniform float4 _RimColor;
@@ -134,10 +145,14 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_RimBlendMask); uniform float4 _RimBlendMask_ST;
 uniform sampler2D _RimTexture; uniform float4 _RimTexture_ST;
 
 // Shade cap (Shadow cap)
+uniform int _ShadowCapBlendMode;
 uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowCapBlendMask); uniform float4 _ShadowCapBlendMask_ST;
 uniform float _ShadowCapBlend;
 uniform float _ShadowCapNormalMix;
+
+// Use vertexLight
+uniform int _UseVertexLight;
 
 // Vertex Color Blend
 uniform float _VertexColorBlendDiffuse;
@@ -146,6 +161,12 @@ uniform float _VertexColorBlendEmissive;
 // Shade from other objects.
 uniform float _OtherShadowAdjust;
 uniform float _OtherShadowBorderSharpness;
+
+// Experimental Cap calculation
+uniform int _UsePositionRelatedCalc;
+
+// light sampling
+uniform int _LightSampling;
 
 // Refraction IF refracted
 #ifdef ARKTOON_REFRACTED

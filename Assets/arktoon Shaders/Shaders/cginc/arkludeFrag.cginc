@@ -20,12 +20,12 @@ float4 frag(VertexOutput i) : COLOR {
     Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse);
 
     // アウトラインであればDiffuseとColorを混ぜる
-    #ifdef USE_OUTLINE_COLOR_SHIFT
+    if (_OutlineUseColorShift) {
         float3 Outline_Diff_HSV = CalculateHSV((Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
         Diffuse = lerp(Diffuse, Outline_Diff_HSV, i.isOutline);
-    #else
+    } else {
         Diffuse = lerp(Diffuse, (Diffuse * _OutlineTextureColorRate + i.col * (1 - _OutlineTextureColorRate)), i.isOutline);
-    #endif
+    }
 
     #ifdef ARKTOON_CUTOUT
         clip((_MainTex_var.a * REF_COLOR.a) - _CutoutCutoutAdjust);
@@ -38,16 +38,18 @@ float4 frag(VertexOutput i) : COLOR {
         }
     #endif
 
-    // 光源サンプリング方法
-    #ifdef _LIGHTSAMPLING_ARKTOON
+    // 光源サンプリング方法(0:Arktoon, 1:Cubed)
+    float3 ShadeSH9Plus = float3(0,0,0);
+    float3 ShadeSH9Minus = float3(0,0,0);
+    if (_LightSampling == 0) {
         // 明るい部分と暗い部分をサンプリング・グレースケールでリマッピングして全面の光量を再計算
-        float3 ShadeSH9Plus = GetSHLength();
-        float3 ShadeSH9Minus = ShadeSH9(float4(0,0,0,1));
-    #elif _LIGHTSAMPLING_CUBED
+        ShadeSH9Plus = GetSHLength();
+        ShadeSH9Minus = ShadeSH9(float4(0,0,0,1));
+    } else {
         // 空間上、真上を向いたときの光と真下を向いたときの光でサンプリング
-        float3 ShadeSH9Plus = ShadeSH9Direct();
-        float3 ShadeSH9Minus = ShadeSH9Indirect();
-    #endif
+        ShadeSH9Plus = ShadeSH9Direct();
+        ShadeSH9Minus = ShadeSH9Indirect();
+    }
 
     // 陰の計算
     float3 directLighting = saturate((ShadeSH9Plus+lightColor));
@@ -86,27 +88,29 @@ float4 frag(VertexOutput i) : COLOR {
     float additionalContributionMultiplier = 1;
     additionalContributionMultiplier *= i.lightIntensityIfBackface;
 
-    #ifdef _SHADOWCAPBLENDMODE_LIGHT_SHUTTER
+    if (_ShadowCapBlendMode == 2) { // Light Shutter
         float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-        #ifdef USE_POSITION_RELATED_CALC
+        float2 transformShadowCap = float2(0,0);
+        if (_UsePositionRelatedCalc) {
             float3 transformShadowCapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
             float3 transformShadowCapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz;
             float2 transformShadowCap_old = transformShadowCapNormal.rg*0.5+0.5;
             transformShadowCapNormal  *= float3(-1,-1,1);
             float3 transformShadowCapCombined = transformShadowCapViewDir * dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z - transformShadowCapNormal;
-            float2 transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, max(0,transformShadowCapNormal.z));
-        #else
-            float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
-        #endif
+            transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, max(0,transformShadowCapNormal.z));
+        } else {
+            transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
+        }
         float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
         float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
         additionalContributionMultiplier *= max(0,(1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend));
-    #endif
+    }
 
     directContribution *= additionalContributionMultiplier;
 
     // 頂点ライティング：PixelLightから溢れた4光源をそれぞれ計算
-    #ifdef USE_VERTEX_LIGHT
+    float3 coloredLight_sum = float3(0,0,0);
+    if (_UseVertexLight) {
         fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
         float VertexShadowborderMin = max(0, _PointShadowborder - _PointShadowborderBlur_var/2.0);
         float VertexShadowborderMax = min(1, _PointShadowborder + _PointShadowborderBlur_var/2.0);
@@ -120,49 +124,50 @@ float4 frag(VertexOutput i) : COLOR {
         float3 coloredLight_2 = max(directContributionVertex.b * i.lightColor2 * i.ambientAttenuation.b, i.lightColor2 * i.ambientIndirect.b * (1-_PointShadowStrength));
         float3 coloredLight_3 = max(directContributionVertex.a * i.lightColor3 * i.ambientAttenuation.a, i.lightColor3 * i.ambientIndirect.a * (1-_PointShadowStrength));
         float3 coloredLight_sum = (coloredLight_0 + coloredLight_1 + coloredLight_2 + coloredLight_3) * _PointAddIntensity;
-    #else
-        float3 coloredLight_sum = float3(0,0,0);
-    #endif
+    }
 
     float3 finalLight = lerp(indirectLighting,directLighting,directContribution)+coloredLight_sum;
 
     // カスタム陰を使っている場合、directContributionや直前のfinalLightを使い、finalLightを上書きする
-    #ifdef USE_SHADE_TEXTURE
+    float3 toonedMap = float3(0,0,0);
+    if (_ShadowPlanBUsePlanB) {
         float3 shadeMixValue = lerp(directLighting, finalLight, _ShadowPlanBDefaultShadowMix);
-        #ifdef USE_CUSTOM_SHADOW_TEXTURE
+        float3 ShadeMap = float3(0,0,0);
+        if (_ShadowPlanBUseCustomShadowTexture) {
             float4 _ShadowPlanBCustomShadowTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowPlanBCustomShadowTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowPlanBCustomShadowTexture));
             float3 shadowCustomTexture = _ShadowPlanBCustomShadowTexture_var.rgb * _ShadowPlanBCustomShadowTextureRGB.rgb;
-            float3 ShadeMap = shadowCustomTexture*shadeMixValue;
-        #else
+            ShadeMap = shadowCustomTexture*shadeMixValue;
+        } else {
             float3 Diff_HSV = CalculateHSV(Diffuse, _ShadowPlanBHueShiftFromBase, _ShadowPlanBSaturationFromBase, _ShadowPlanBValueFromBase);
-            float3 ShadeMap = Diff_HSV*shadeMixValue;
-        #endif
+            ShadeMap = Diff_HSV*shadeMixValue;
+        }
 
-        #ifdef USE_CUSTOM_SHADOW_2ND
+        if (_CustomShadow2nd) {
             float ShadowborderMin2 = max(0, (_ShadowPlanB2border * _Shadowborder) - _ShadowPlanB2borderBlur/2);
             float ShadowborderMax2 = min(1, (_ShadowPlanB2border * _Shadowborder) + _ShadowPlanB2borderBlur/2);
             float directContribution2 = 1.0 - ((1.0 - saturate(( (saturate(remappedLight2) - ShadowborderMin2)) / (ShadowborderMax2 - ShadowborderMin2))));  // /2の部分をパラメーターにしたい
             directContribution2 *= additionalContributionMultiplier;
-            #ifdef USE_CUSTOM_SHADOW_TEXTURE_2ND
+            float3 ShadeMap2 = float3(0,0,0);
+            if (_ShadowPlanB2UseCustomShadowTexture) {
                 float4 _ShadowPlanB2CustomShadowTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowPlanB2CustomShadowTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowPlanB2CustomShadowTexture));
                 float3 shadowCustomTexture2 = _ShadowPlanB2CustomShadowTexture_var.rgb * _ShadowPlanB2CustomShadowTextureRGB.rgb;
                 shadowCustomTexture2 =  lerp(shadowCustomTexture2, shadowCustomTexture2 * i.color,_VertexColorBlendDiffuse); // 頂点カラーを合成
-                float3 ShadeMap2 = shadowCustomTexture2*shadeMixValue;
-            #else
+                ShadeMap2 = shadowCustomTexture2*shadeMixValue;
+            } else {
                 float3 Diff_HSV2 = CalculateHSV(Diffuse, _ShadowPlanB2HueShiftFromBase, _ShadowPlanB2SaturationFromBase, _ShadowPlanB2ValueFromBase);
-                float3 ShadeMap2 = Diff_HSV2*shadeMixValue;
-            #endif
+                ShadeMap2 = Diff_HSV2*shadeMixValue;
+            }
             ShadeMap = lerp(ShadeMap2,ShadeMap,directContribution2);
-        #endif
+        }
 
         finalLight = lerp(ShadeMap,directLighting,directContribution)+coloredLight_sum;
-        float3 ToonedMap = lerp(ShadeMap,Diffuse*finalLight,finalLight);
-    #else
-        float3 ToonedMap = Diffuse*finalLight;
-    #endif
+        toonedMap = lerp(ShadeMap,Diffuse*finalLight,finalLight);
+    } else {
+        toonedMap = Diffuse*finalLight;
+    }
 
     // アウトラインであればShadeMixを反映
-    ToonedMap = lerp(ToonedMap, (ToonedMap * _OutlineShadeMix + (Diffuse+(Diffuse*coloredLight_sum)) * (1 - _OutlineShadeMix)), i.isOutline);
+    toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + (Diffuse+(Diffuse*coloredLight_sum)) * (1 - _OutlineShadeMix)), i.isOutline);
 
     float3 ReflectionMap = float3(0,0,0);
     float3 specular = float3(0,0,0);
@@ -170,12 +175,11 @@ float4 frag(VertexOutput i) : COLOR {
     float3 RimLight = float3(0,0,0);
     float3 shadowcap = float3(1000,1000,1000);
 
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
-    if (!i.isOutline) {
+    #if !defined(ARKTOON_REFRACTED)
+    if (_UseOutline == 0 || !i.isOutline) {
     #endif
-
         // オプション：Reflection
-        #ifdef USE_REFLECTION
+        if (_UseReflection) {
             float3 normalDirectionReflection = normalize(mul( float3(normalLocal.r*_ReflectionNormalMix,normalLocal.g*_ReflectionNormalMix,normalLocal.b), tangentTransform ));
             float reflNdotV = abs(dot( normalDirectionReflection, viewDirection ));
             float _ReflectionSmoothnessMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectionReflectionMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ReflectionReflectionMask));
@@ -183,14 +187,15 @@ float4 frag(VertexOutput i) : COLOR {
             float perceptualRoughnessRefl = 1.0 - reflectionSmoothness;
             float3 reflDir = reflect(-viewDirection, normalDirectionReflection);
             float roughnessRefl = SmoothnessToRoughness(reflectionSmoothness);
-            #ifdef USE_REFLECTION_PROBE
-                float3 indirectSpecular = GetIndirectSpecular(lightColor, lightDirection,
+            float3 indirectSpecular = float3(0,0,0);
+            if (_UseReflectionProbe) {
+                indirectSpecular = GetIndirectSpecular(lightColor, lightDirection,
                     normalDirectionReflection, viewDirection, reflDir, attenuation, roughnessRefl, i.posWorld.xyz
                 );
                 if (any(indirectSpecular.xyz) == 0) indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
-            #else
-                float3 indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
-            #endif
+            } else {
+                indirectSpecular = GetIndirectSpecularCubemap(_ReflectionCubemap, _ReflectionCubemap_HDR, reflDir, roughnessRefl);
+            }
             float3 specularColorRefl = reflectionSmoothness;
             float specularMonochromeRefl;
             float3 diffuseColorRefl = Diffuse;
@@ -205,12 +210,12 @@ float4 frag(VertexOutput i) : COLOR {
             indirectSpecular *= FresnelLerp (specularColorRefl, grazingTermRefl, reflNdotV);
             indirectSpecular *= surfaceReduction *lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
             float reflSuppress = _ReflectionSuppressBaseColorValue * reflectionSmoothness;
-            ToonedMap = lerp(ToonedMap,ToonedMap * (1-surfaceReduction), reflSuppress);
+            toonedMap = lerp(toonedMap,toonedMap * (1-surfaceReduction), reflSuppress);
             ReflectionMap = indirectSpecular*lerp(float3(1,1,1), finalLight,_ReflectionShadeMix);
-        #endif
+        }
 
         // オプション：Gloss
-        #ifdef USE_GLOSS
+        if(_UseGloss) {
             float glossNdotV = abs(dot( normalDirection, viewDirection ));
             float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
             float gloss = _GlossBlend * _GlossBlendMask_var;
@@ -241,28 +246,29 @@ float4 frag(VertexOutput i) : COLOR {
             float3 directSpecular = attenColor*specularPBL*FresnelTerm(specularColor, LdotH);
             half grazingTerm = saturate( gloss + specularMonochrome );
             specular = attenuation * directSpecular * _GlossColor.rgb;
-        #endif
+        }
 
         // オプション：MatCap
-        #if defined(_MATCAPBLENDMODE_LIGHTEN) || defined(_MATCAPBLENDMODE_ADD) || defined(_MATCAPBLENDMODE_SCREEN)
+        if (_MatcapBlendMode < 3) {
             float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            #ifdef USE_POSITION_RELATED_CALC
+            float2 transformMatcap = float2(0,0);
+            if (_UsePositionRelatedCalc) {
                 float3 transformMatcapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
                 float3 transformMatcapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz;
                 float2 transformMatcap_old = transformMatcapNormal.rg*0.5+0.5;
                 transformMatcapNormal *= float3(-1,-1,1);
                 float3 transformMatcapCombined = transformMatcapViewDir * dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z - transformMatcapNormal;
-                float2 transformMatcap = lerp(((transformMatcapCombined.rg*0.5)+0.5), transformMatcap_old, max(0,transformMatcapNormal.z));
-            #else
-                float2 transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
-            #endif
+                transformMatcap = lerp(((transformMatcapCombined.rg*0.5)+0.5), transformMatcap_old, max(0,transformMatcapNormal.z));
+            } else {
+                transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
+            }
             float4 _MatcapTexture_var = tex2D(_MatcapTexture,TRANSFORM_TEX(transformMatcap, _MatcapTexture));
             float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
             matcap = ((_MatcapColor.rgb*_MatcapTexture_var.rgb)*_MatcapBlendMask_var.rgb*_MatcapBlend) * lerp(float3(1,1,1), finalLight,_MatcapShadeMix);
-        #endif
+        }
 
         // オプション：Rim
-        #ifdef USE_RIM
+        if (_UseRim) {
             float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = tex2D(_RimTexture,TRANSFORM_TEX(i.uv0, _RimTexture));
             RimLight = (
@@ -276,47 +282,47 @@ float4 frag(VertexOutput i) : COLOR {
                             * _RimBlendMask_var
                             * lerp(float3(1,1,1), finalLight,_RimShadeMix)
                         );
-        #endif
+        }
 
         // オプション:ShadeCap
-        #if defined(_SHADOWCAPBLENDMODE_DARKEN) || defined(_SHADOWCAPBLENDMODE_MULTIPLY)
+        if (_ShadowCapBlendMode < 2) {
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
-            #ifdef USE_POSITION_RELATED_CALC
+            float2 transformShadowCap = float2(0,0);
+            if (_UsePositionRelatedCalc) {
                 float3 transformShadowCapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
                 float3 transformShadowCapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz;
                 float2 transformShadowCap_old = transformShadowCapNormal.rg*0.5+0.5;
                 transformShadowCapNormal  *= float3(-1,-1,1);
                 float3 transformShadowCapCombined = transformShadowCapViewDir * dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z - transformShadowCapNormal;
-                float2 transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, max(0,transformShadowCapNormal.z));
-            #else
-                float2 transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
-            #endif
+                transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, max(0,transformShadowCapNormal.z));
+            } else {
+                transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
+            }
             float4 _ShadowCapTexture_var = tex2D(_ShadowCapTexture,TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
             float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - ((1.0 - (_ShadowCapTexture_var.rgb))*_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
-        #endif
-
-    #if defined(USE_OUTLINE) && !defined(ARKTOON_REFRACTED)
+        }
+    #if !defined(ARKTOON_REFRACTED)
     }
     #endif
 
-    float3 finalcolor2 = ToonedMap+ReflectionMap + specular;
+    float3 finalcolor2 = toonedMap+ReflectionMap + specular;
 
     // ShadeCapのブレンドモード
-    #ifdef _SHADOWCAPBLENDMODE_DARKEN
+    if (_ShadowCapBlendMode == 0) { // Darken
         finalcolor2 = min(finalcolor2, shadowcap);
-    #elif _SHADOWCAPBLENDMODE_MULTIPLY
+    } else if  (_ShadowCapBlendMode == 1) { // Multiply
         finalcolor2 = finalcolor2 * shadowcap;
-    #endif
+    }
 
     // MatCapのブレンドモード
-    #ifdef _MATCAPBLENDMODE_LIGHTEN
-        finalcolor2 = max(finalcolor2, matcap);
-    #elif _MATCAPBLENDMODE_ADD
+    if (_MatcapBlendMode == 0) { // Add
         finalcolor2 = finalcolor2 + matcap;
-    #elif _MATCAPBLENDMODE_SCREEN
+    } else if (_MatcapBlendMode == 1) { // Lighten
+        finalcolor2 = max(finalcolor2, matcap);
+    } else if (_MatcapBlendMode == 2) { // Screen
         finalcolor2 = 1-(1-finalcolor2) * (1-matcap);
-    #endif
+    }
 
     // 屈折
     #ifdef ARKTOON_REFRACTED
@@ -328,13 +334,13 @@ float4 frag(VertexOutput i) : COLOR {
 
     // Emission Parallax
     float3 emissionParallax = float3(0,0,0);
-    #ifdef USE_EMISSION_PARALLLAX
+    if(_UseEmissionParallax) {
         float _EmissionParallaxDepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxDepthMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionParallaxDepthMask)).r;
         float2 emissionParallaxTransform = _EmissionParallaxDepth * (_EmissionParallaxDepthMask_var - _EmissionParallaxDepthMaskInvert) * mul(tangentTransform, viewDirection).xy + i.uv0;
         float _EmissionMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionParallaxMask)).r;
         float3 _EmissionParallaxTex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionParallaxTex, REF_MAINTEX, TRANSFORM_TEX(emissionParallaxTransform, _EmissionParallaxTex)).rgb * _EmissionParallaxColor.rgb;
-        emissionParallax = lerp(0, _EmissionParallaxTex_var * _EmissionMask_var, _UseEmissionParallax);
-    #endif
+        emissionParallax = _EmissionParallaxTex_var * _EmissionMask_var;
+    }
 
     // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(REF_EMISSIONMAP,TRANSFORM_TEX(i.uv0, REF_EMISSIONMAP)).rgb *REF_EMISSIONCOLOR.rgb;

@@ -150,6 +150,12 @@ namespace ArktoonShaders
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
         {
             Material material = materialEditor.target as Material;
+
+            // バージョンを逐一確認して、アセットバージョンが高い場合はマテリアルをマイグレーション
+            if( material.GetInt("_Version") < ArktoonManager.AssetVersionInt) {
+                ArktoonMigrator.MigrateArktoonMaterial(material);
+            }
+
             Shader shader = material.shader;
 
             // shader.nameによって調整可能なプロパティを制御する。
@@ -284,6 +290,15 @@ namespace ArktoonShaders
             LightSampling = FindProperty("_LightSampling", props);
             UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props);
             if(isFade) ZWrite = FindProperty("_ZWrite", props);
+
+            // TODO: プロパティを引っこ抜いても描画できるようにするためのテスト
+            // var nothingparam = FindProperty("_ZWrite", props, false);
+            // if(nothingparam != null) {
+            //     Debug.Log("nothingparam is " + nothingparam.ToString());
+            // } else {
+            //     Debug.Log("nothingparam is null");
+            // }
+
 
             EditorGUIUtility.labelWidth = 0f;
 
@@ -438,8 +453,8 @@ namespace ArktoonShaders
                 // Gloss
                 UIHelper.ShurikenHeader("Gloss");
                 materialEditor.DrawShaderPropertySameLIne(UseGloss);
-                var useGloss = UseGloss.floatValue;
-                if(useGloss > 0)
+                var isEnabledGloss = UseGloss.floatValue;
+                if(isEnabledGloss > 0)
                 {
                     UIHelper.DrawWithGroup(() => {
                         UIHelper.DrawWithGroup(() => {
@@ -476,8 +491,8 @@ namespace ArktoonShaders
                                 materialEditor.TextureScaleOffsetPropertyIndent(OutlineTexture);
                                 materialEditor.ShaderProperty(OutlineTextureColorRate,"Base Color Mix");
                                 materialEditor.ShaderProperty(OutlineUseColorShift, "Use Color Shift");
-                                var useOutlineColorShift = OutlineUseColorShift.floatValue;
-                                if(useOutlineColorShift > 0) {
+                                var isEnabledOutlineColorShift = OutlineUseColorShift.floatValue;
+                                if(isEnabledOutlineColorShift > 0) {
                                     EditorGUI.indentLevel ++;
                                     materialEditor.ShaderProperty(OutlineHueShiftFromBase, "Hue Shift");
                                     materialEditor.ShaderProperty(OutlineSaturationFromBase, "Saturation");
@@ -662,12 +677,8 @@ namespace ArktoonShaders
                             VertexColorBlendDiffuse.floatValue = 0f;
                             VertexColorBlendEmissive.floatValue = 0f;
                             UseVertexLight.floatValue = 1f;
-                            material.EnableKeyword("USE_VERTEX_LIGHT");
                             LightSampling.floatValue = 0f;
-                            material.EnableKeyword("_LIGHTSAMPLING_ARKTOON");
-                            material.DisableKeyword("_LIGHTSAMPLING_CUBED");
                             UsePositionRelatedCalc.floatValue = 0f;
-                            material.DisableKeyword("USE_POSITION_RELATED_CALC");
                         }
                         UIHelper.DrawWithGroup(() => {
                             EditorGUILayout.LabelField("Lights", EditorStyles.boldLabel);
@@ -849,4 +860,58 @@ namespace ArktoonShaders
             EditorGUILayout.EndHorizontal();
         }
     }
+
+    // シェーダーキーワードを作らないToggle (Unity 2018.2以降で存在すつUIToggleと同じ。)
+    internal class MaterialATSToggleDrawer : MaterialPropertyDrawer
+    {
+        public MaterialATSToggleDrawer()
+        {
+        }
+
+        public MaterialATSToggleDrawer(string keyword)
+        {
+        }
+
+        protected virtual void SetKeyword(MaterialProperty prop, bool on)
+        {
+        }
+
+        static bool IsPropertyTypeSuitable(MaterialProperty prop)
+        {
+            return prop.type == MaterialProperty.PropType.Float || prop.type == MaterialProperty.PropType.Range;
+        }
+
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
+            return base.GetPropertyHeight(prop, label, editor);
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            bool value = (Math.Abs(prop.floatValue) > 0.001f);
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+            value = EditorGUI.Toggle(position, label, value);
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck())
+            {
+                prop.floatValue = value ? 1.0f : 0.0f;
+                SetKeyword(prop, value);
+            }
+        }
+
+        public override void Apply(MaterialProperty prop)
+        {
+            base.Apply(prop);
+            if (!IsPropertyTypeSuitable(prop))
+                return;
+
+            if (prop.hasMixedValue)
+                return;
+
+            SetKeyword(prop, (Math.Abs(prop.floatValue) > 0.001f));
+        }
+    }
+
 }
