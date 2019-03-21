@@ -174,3 +174,12 @@ uniform sampler2D _GrabTexture;
 uniform float _RefractionFresnelExp;
 uniform float _RefractionStrength;
 #endif
+
+// ScrolledEmission
+#ifdef ARKTOON_SCROLLED_EMISSION
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionScrollTex); uniform float4 _EmissionScrollTex_ST;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionScrollMask); uniform float4 _EmissionScrollMask_ST;
+uniform float4 _EmissionScrollColor;
+uniform float _EmissionScrollU;
+uniform float _EmissionScrollV;
+#endif

@@ -342,9 +342,21 @@ float4 frag(VertexOutput i) : COLOR {
         emissionParallax = _EmissionParallaxTex_var * _EmissionMask_var;
     }
 
+    #ifdef ARKTOON_SCROLLED_EMISSION
+        float time = _Time.r;
+        float2 emissionScrollTransform = i.uv0
+        + float2(fmod(_EmissionScrollU * time, 1.0 / _EmissionScrollTex_ST.x), fmod(time * _EmissionScrollV, 1.0 / _EmissionScrollTex_ST.y));
+        float _EmissionScrollMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionScrollMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionScrollMask)).r;
+        float3 _EmissionScrollTex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionScrollTex, REF_MAINTEX, TRANSFORM_TEX(emissionScrollTransform, _EmissionScrollTex)).rgb * _EmissionScrollColor.rgb;
+
+        float3 emissionScroll = _EmissionScrollTex_var * _EmissionScrollMask_var;
+    #else
+        float3 emissionScroll = float3(0,0,0);
+    #endif
+
     // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(REF_EMISSIONMAP,TRANSFORM_TEX(i.uv0, REF_EMISSIONMAP)).rgb *REF_EMISSIONCOLOR.rgb;
-    _Emission = _Emission + emissionParallax;
+    _Emission = _Emission + emissionParallax + emissionScroll;
     float3 emissive = max( lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive) , RimLight) * !i.isOutline;
     float3 finalColor = emissive + finalcolor2;
 

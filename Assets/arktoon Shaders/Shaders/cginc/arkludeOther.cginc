@@ -67,7 +67,7 @@ float3 viewReflectDirection, float attenuation, float roughness, float3 worldPos
     ugls_en_data.roughness = roughness;
     ugls_en_data.reflUVW = viewReflectDirection;
     float3 indirectSpecular = UnityGI_IndirectSpecular(d, 1.0h, ugls_en_data);
-    return indirectSpecular;
+    return saturate(indirectSpecular);
 }
 
 float3 GetIndirectSpecularCubemap(samplerCUBE _ReflectionCubemap, half4 _ReflectionCubemap_HDR, float3 viewReflectDirection, float roughness){

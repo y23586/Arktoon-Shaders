@@ -139,6 +139,14 @@ namespace ArktoonShaders
         MaterialProperty BackfaceColorMultiply;
         MaterialProperty LightSampling;
         MaterialProperty UsePositionRelatedCalc;
+        MaterialProperty EmissionScrollTex;
+        MaterialProperty EmissionScrollMask;
+        MaterialProperty EmissionScrollColor;
+        MaterialProperty EmissionScrollU;
+        MaterialProperty EmissionScrollV;
+
+        // TODO: そろそろShaderUtil.GetPropertiesで一括処理したい。
+        // ただ、その場合は、カスタムインスペクタで定義していない追加のプロパティを、このファイルを弄らずに動的に表示できるようにしてあげたい（改変の負荷軽減のため）
 
         #endregion
 
@@ -162,143 +170,141 @@ namespace ArktoonShaders
             bool isOpaque = shader.name.Contains("Opaque");
             bool isFade = shader.name.Contains("Fade");
             bool isCutout = shader.name.Contains("Cutout");
-            bool isStencilWriter = shader.name.Contains("Stencil/Writer");
-            bool isStencilReader = shader.name.Contains("Stencil/Reader");
+            bool isStencilWriter = shader.name.Contains("Stencil/Writer") || shader.name.Contains("StencilWriter");
+            bool isStencilReader = shader.name.Contains("Stencil/Reader") || shader.name.Contains("StencilReader");
             bool isStencilReaderDouble = shader.name.Contains("Stencil/Reader/Double");
             bool isStencilWriterMask = shader.name.Contains("Stencil/WriterMask");
             bool isRefracted = shader.name.Contains("Refracted");
+            bool isScrolledEmission = shader.name.Contains("ScrolledEmission");
 
             // FindProperties
-            BaseTexture = FindProperty("_MainTex", props);
-            BaseColor = FindProperty("_Color", props);
-            Normalmap = FindProperty("_BumpMap", props);
-            BumpScale = FindProperty("_BumpScale", props);
-            EmissionMap = FindProperty("_EmissionMap", props);
-            EmissionColor = FindProperty("_EmissionColor", props);
-            if(isFade) AlphaMask = FindProperty("_AlphaMask", props);
-            if(isStencilReaderDouble) BaseTextureSecondary = FindProperty("_MainTexSecondary", props);
-            if(isStencilReaderDouble) BaseColorSecondary = FindProperty("_ColorSecondary", props);
-            if(isStencilReaderDouble) NormalmapSecondary = FindProperty("_BumpMapSecondary", props);
-            if(isStencilReaderDouble) BumpScaleSecondary = FindProperty("_BumpScaleSecondary", props);
-            if(isStencilReaderDouble) EmissionMapSecondary = FindProperty("_EmissionMapSecondary", props);
-            if(isStencilReaderDouble) EmissionColorSecondary = FindProperty("_EmissionColorSecondary", props);
-            UseEmissionParallax = FindProperty("_UseEmissionParallax", props);
-            EmissionParallaxColor = FindProperty("_EmissionParallaxColor", props);
-            EmissionParallaxTex = FindProperty("_EmissionParallaxTex", props);
-            EmissionParallaxMask = FindProperty("_EmissionParallaxMask", props);
-            EmissionParallaxDepth = FindProperty("_EmissionParallaxDepth", props);
-            EmissionParallaxDepthMask = FindProperty("_EmissionParallaxDepthMask", props);
-            EmissionParallaxDepthMaskInvert = FindProperty("_EmissionParallaxDepthMaskInvert", props);
-            if(isCutout) CutoutCutoutAdjust = FindProperty("_CutoutCutoutAdjust", props);
-            Shadowborder = FindProperty("_Shadowborder", props);
-            ShadowborderBlur = FindProperty("_ShadowborderBlur", props);
-            ShadowborderBlurMask = FindProperty("_ShadowborderBlurMask", props);
-            ShadowStrength = FindProperty("_ShadowStrength", props);
-            ShadowStrengthMask = FindProperty("_ShadowStrengthMask", props);
-            ShadowIndirectIntensity = FindProperty("_ShadowIndirectIntensity", props);
-            ShadowUseStep = FindProperty("_ShadowUseStep", props);
-            ShadowSteps = FindProperty("_ShadowSteps", props);
-            PointAddIntensity = FindProperty("_PointAddIntensity", props);
-            PointShadowStrength = FindProperty("_PointShadowStrength", props);
-            PointShadowborder = FindProperty("_PointShadowborder", props);
-            PointShadowborderBlur = FindProperty("_PointShadowborderBlur", props);
-            PointShadowborderBlurMask= FindProperty("_PointShadowborderBlurMask", props);
-            PointShadowUseStep = FindProperty("_PointShadowUseStep", props);
-            PointShadowSteps = FindProperty("_PointShadowSteps", props);
-            ShadowPlanBUsePlanB = FindProperty("_ShadowPlanBUsePlanB", props);
-            ShadowPlanBDefaultShadowMix = FindProperty("_ShadowPlanBDefaultShadowMix", props);
-            ShadowPlanBUseCustomShadowTexture = FindProperty("_ShadowPlanBUseCustomShadowTexture", props);
-            ShadowPlanBHueShiftFromBase = FindProperty("_ShadowPlanBHueShiftFromBase", props);
-            ShadowPlanBSaturationFromBase = FindProperty("_ShadowPlanBSaturationFromBase", props);
-            ShadowPlanBValueFromBase = FindProperty("_ShadowPlanBValueFromBase", props);
-            ShadowPlanBCustomShadowTexture = FindProperty("_ShadowPlanBCustomShadowTexture", props);
-            ShadowPlanBCustomShadowTextureRGB = FindProperty("_ShadowPlanBCustomShadowTextureRGB", props);
-            CustomShadow2nd = FindProperty("_CustomShadow2nd", props);
-            ShadowPlanB2border = FindProperty("_ShadowPlanB2border", props);
-            ShadowPlanB2borderBlur = FindProperty("_ShadowPlanB2borderBlur", props);
-            ShadowPlanB2HueShiftFromBase = FindProperty("_ShadowPlanB2HueShiftFromBase", props);
-            ShadowPlanB2SaturationFromBase = FindProperty("_ShadowPlanB2SaturationFromBase", props);
-            ShadowPlanB2ValueFromBase = FindProperty("_ShadowPlanB2ValueFromBase", props);
-            ShadowPlanB2UseCustomShadowTexture = FindProperty("_ShadowPlanB2UseCustomShadowTexture", props);
-            ShadowPlanB2CustomShadowTexture = FindProperty("_ShadowPlanB2CustomShadowTexture", props);
-            ShadowPlanB2CustomShadowTextureRGB = FindProperty("_ShadowPlanB2CustomShadowTextureRGB", props);
-            UseGloss = FindProperty("_UseGloss", props);
-            GlossBlend = FindProperty("_GlossBlend", props);
-            GlossBlendMask = FindProperty("_GlossBlendMask", props);
-            GlossPower = FindProperty("_GlossPower", props);
-            GlossColor = FindProperty("_GlossColor", props);
-            UseOutline = FindProperty("_UseOutline", props);
-            OutlineWidth = FindProperty("_OutlineWidth", props);
-            if(!isOpaque) OutlineMask = FindProperty("_OutlineMask", props);
-            if(!isOpaque) OutlineCutoffRange = FindProperty("_OutlineCutoffRange", props);
-            OutlineColor = FindProperty("_OutlineColor", props);
-            OutlineTexture = FindProperty("_OutlineTexture", props);
-            OutlineShadeMix = FindProperty("_OutlineShadeMix", props);
-            OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props);
-            OutlineWidthMask = FindProperty("_OutlineWidthMask", props);
-            OutlineUseColorShift = FindProperty("_OutlineUseColorShift", props);
-            OutlineHueShiftFromBase = FindProperty("_OutlineHueShiftFromBase", props);
-            OutlineSaturationFromBase = FindProperty("_OutlineSaturationFromBase", props);
-            OutlineValueFromBase = FindProperty("_OutlineValueFromBase", props);
-            MatcapBlendMode = FindProperty("_MatcapBlendMode", props);
-            MatcapBlend = FindProperty("_MatcapBlend", props);
-            MatcapTexture = FindProperty("_MatcapTexture", props);
-            MatcapColor = FindProperty("_MatcapColor", props);
-            MatcapBlendMask = FindProperty("_MatcapBlendMask", props);
-            MatcapNormalMix = FindProperty("_MatcapNormalMix", props);
-            MatcapShadeMix = FindProperty("_MatcapShadeMix", props);
-            UseReflection = FindProperty("_UseReflection", props);
-            UseReflectionProbe = FindProperty("_UseReflectionProbe", props);
-            ReflectionReflectionPower = FindProperty("_ReflectionReflectionPower", props);
-            ReflectionReflectionMask = FindProperty("_ReflectionReflectionMask", props);
-            ReflectionNormalMix = FindProperty("_ReflectionNormalMix", props);
-            ReflectionShadeMix = FindProperty("_ReflectionShadeMix", props);
-            ReflectionCubemap = FindProperty("_ReflectionCubemap", props);
-            ReflectionSuppressBaseColorValue = FindProperty("_ReflectionSuppressBaseColorValue", props);
-            if(isRefracted) RefractionFresnelExp = FindProperty("_RefractionFresnelExp", props);
-            if(isRefracted) RefractionStrength = FindProperty("_RefractionStrength", props);
-            UseRim = FindProperty("_UseRim", props);
-            RimBlend = FindProperty("_RimBlend", props);
-            RimBlendMask = FindProperty("_RimBlendMask", props);
-            RimShadeMix = FindProperty("_RimShadeMix", props);
-            RimFresnelPower = FindProperty("_RimFresnelPower", props);
-            RimUpperSideWidth = FindProperty("_RimUpperSideWidth", props);
-            RimColor = FindProperty("_RimColor", props);
-            RimTexture = FindProperty("_RimTexture", props);
-            RimUseBaseTexture = FindProperty("_RimUseBaseTexture", props);
-            ShadowCapBlendMode = FindProperty("_ShadowCapBlendMode", props);
-            ShadowCapBlend = FindProperty("_ShadowCapBlend", props);
-            ShadowCapBlendMask = FindProperty("_ShadowCapBlendMask", props);
-            ShadowCapNormalMix = FindProperty("_ShadowCapNormalMix", props);
-            ShadowCapTexture = FindProperty("_ShadowCapTexture", props);
-            if(isStencilWriter || isStencilReader) StencilNumber = FindProperty("_StencilNumber", props);
-            if(isStencilWriterMask) StencilMaskTex = FindProperty("_StencilMaskTex", props);
-            if(isStencilWriterMask) StencilMaskAdjust = FindProperty("_StencilMaskAdjust", props);
-            if(isStencilWriterMask) StencilMaskAlphaDither = FindProperty("_StencilMaskAlphaDither", props);
-            if(isStencilReader) StencilCompareAction = FindProperty("_StencilCompareAction", props);
-            if(isStencilReaderDouble) StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props);
-            if(isStencilReaderDouble) StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props);
-            UseDoubleSided = FindProperty("_UseDoubleSided", props);
-            DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props);
-            DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props);
-            ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props);
-            VertexColorBlendDiffuse = FindProperty("_VertexColorBlendDiffuse", props);
-            VertexColorBlendEmissive = FindProperty("_VertexColorBlendEmissive", props);
-            OtherShadowBorderSharpness = FindProperty("_OtherShadowBorderSharpness", props);
-            OtherShadowAdjust = FindProperty("_OtherShadowAdjust", props);
-            UseVertexLight = FindProperty("_UseVertexLight", props);
-            LightSampling = FindProperty("_LightSampling", props);
-            UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props);
-            if(isFade) ZWrite = FindProperty("_ZWrite", props);
+            BaseTexture = FindProperty("_MainTex", props, false);
+            BaseColor = FindProperty("_Color", props, false);
+            Normalmap = FindProperty("_BumpMap", props, false);
+            BumpScale = FindProperty("_BumpScale", props, false);
+            EmissionMap = FindProperty("_EmissionMap", props, false);
+            EmissionColor = FindProperty("_EmissionColor", props, false);
+            AlphaMask = FindProperty("_AlphaMask", props, false);
+            BaseTextureSecondary = FindProperty("_MainTexSecondary", props, false);
+            BaseColorSecondary = FindProperty("_ColorSecondary", props, false);
+            NormalmapSecondary = FindProperty("_BumpMapSecondary", props, false);
+            BumpScaleSecondary = FindProperty("_BumpScaleSecondary", props, false);
+            EmissionMapSecondary = FindProperty("_EmissionMapSecondary", props, false);
+            EmissionColorSecondary = FindProperty("_EmissionColorSecondary", props, false);
+            UseEmissionParallax = FindProperty("_UseEmissionParallax", props, false);
+            EmissionParallaxColor = FindProperty("_EmissionParallaxColor", props, false);
+            EmissionParallaxTex = FindProperty("_EmissionParallaxTex", props, false);
+            EmissionParallaxMask = FindProperty("_EmissionParallaxMask", props, false);
+            EmissionParallaxDepth = FindProperty("_EmissionParallaxDepth", props, false);
+            EmissionParallaxDepthMask = FindProperty("_EmissionParallaxDepthMask", props, false);
+            EmissionParallaxDepthMaskInvert = FindProperty("_EmissionParallaxDepthMaskInvert", props, false);
+            CutoutCutoutAdjust = FindProperty("_CutoutCutoutAdjust", props, false);
+            Shadowborder = FindProperty("_Shadowborder", props, false);
+            ShadowborderBlur = FindProperty("_ShadowborderBlur", props, false);
+            ShadowborderBlurMask = FindProperty("_ShadowborderBlurMask", props, false);
+            ShadowStrength = FindProperty("_ShadowStrength", props, false);
+            ShadowStrengthMask = FindProperty("_ShadowStrengthMask", props, false);
+            ShadowIndirectIntensity = FindProperty("_ShadowIndirectIntensity", props, false);
+            ShadowUseStep = FindProperty("_ShadowUseStep", props, false);
+            ShadowSteps = FindProperty("_ShadowSteps", props, false);
+            PointAddIntensity = FindProperty("_PointAddIntensity", props, false);
+            PointShadowStrength = FindProperty("_PointShadowStrength", props, false);
+            PointShadowborder = FindProperty("_PointShadowborder", props, false);
+            PointShadowborderBlur = FindProperty("_PointShadowborderBlur", props, false);
+            PointShadowborderBlurMask= FindProperty("_PointShadowborderBlurMask", props, false);
+            PointShadowUseStep = FindProperty("_PointShadowUseStep", props, false);
+            PointShadowSteps = FindProperty("_PointShadowSteps", props, false);
+            ShadowPlanBUsePlanB = FindProperty("_ShadowPlanBUsePlanB", props, false);
+            ShadowPlanBDefaultShadowMix = FindProperty("_ShadowPlanBDefaultShadowMix", props, false);
+            ShadowPlanBUseCustomShadowTexture = FindProperty("_ShadowPlanBUseCustomShadowTexture", props, false);
+            ShadowPlanBHueShiftFromBase = FindProperty("_ShadowPlanBHueShiftFromBase", props, false);
+            ShadowPlanBSaturationFromBase = FindProperty("_ShadowPlanBSaturationFromBase", props, false);
+            ShadowPlanBValueFromBase = FindProperty("_ShadowPlanBValueFromBase", props, false);
+            ShadowPlanBCustomShadowTexture = FindProperty("_ShadowPlanBCustomShadowTexture", props, false);
+            ShadowPlanBCustomShadowTextureRGB = FindProperty("_ShadowPlanBCustomShadowTextureRGB", props, false);
+            CustomShadow2nd = FindProperty("_CustomShadow2nd", props, false);
+            ShadowPlanB2border = FindProperty("_ShadowPlanB2border", props, false);
+            ShadowPlanB2borderBlur = FindProperty("_ShadowPlanB2borderBlur", props, false);
+            ShadowPlanB2HueShiftFromBase = FindProperty("_ShadowPlanB2HueShiftFromBase", props, false);
+            ShadowPlanB2SaturationFromBase = FindProperty("_ShadowPlanB2SaturationFromBase", props, false);
+            ShadowPlanB2ValueFromBase = FindProperty("_ShadowPlanB2ValueFromBase", props, false);
+            ShadowPlanB2UseCustomShadowTexture = FindProperty("_ShadowPlanB2UseCustomShadowTexture", props, false);
+            ShadowPlanB2CustomShadowTexture = FindProperty("_ShadowPlanB2CustomShadowTexture", props, false);
+            ShadowPlanB2CustomShadowTextureRGB = FindProperty("_ShadowPlanB2CustomShadowTextureRGB", props, false);
+            UseGloss = FindProperty("_UseGloss", props, false);
+            GlossBlend = FindProperty("_GlossBlend", props, false);
+            GlossBlendMask = FindProperty("_GlossBlendMask", props, false);
+            GlossPower = FindProperty("_GlossPower", props, false);
+            GlossColor = FindProperty("_GlossColor", props, false);
+            UseOutline = FindProperty("_UseOutline", props, false);
+            OutlineWidth = FindProperty("_OutlineWidth", props, false);
+            OutlineMask = FindProperty("_OutlineMask", props, false);
+            OutlineCutoffRange = FindProperty("_OutlineCutoffRange", props, false);
+            OutlineColor = FindProperty("_OutlineColor", props, false);
+            OutlineTexture = FindProperty("_OutlineTexture", props, false);
+            OutlineShadeMix = FindProperty("_OutlineShadeMix", props, false);
+            OutlineTextureColorRate = FindProperty("_OutlineTextureColorRate", props, false);
+            OutlineWidthMask = FindProperty("_OutlineWidthMask", props, false);
+            OutlineUseColorShift = FindProperty("_OutlineUseColorShift", props, false);
+            OutlineHueShiftFromBase = FindProperty("_OutlineHueShiftFromBase", props, false);
+            OutlineSaturationFromBase = FindProperty("_OutlineSaturationFromBase", props, false);
+            OutlineValueFromBase = FindProperty("_OutlineValueFromBase", props, false);
+            MatcapBlendMode = FindProperty("_MatcapBlendMode", props, false);
+            MatcapBlend = FindProperty("_MatcapBlend", props, false);
+            MatcapTexture = FindProperty("_MatcapTexture", props, false);
+            MatcapColor = FindProperty("_MatcapColor", props, false);
+            MatcapBlendMask = FindProperty("_MatcapBlendMask", props, false);
+            MatcapNormalMix = FindProperty("_MatcapNormalMix", props, false);
+            MatcapShadeMix = FindProperty("_MatcapShadeMix", props, false);
+            UseReflection = FindProperty("_UseReflection", props, false);
+            UseReflectionProbe = FindProperty("_UseReflectionProbe", props, false);
+            ReflectionReflectionPower = FindProperty("_ReflectionReflectionPower", props, false);
+            ReflectionReflectionMask = FindProperty("_ReflectionReflectionMask", props, false);
+            ReflectionNormalMix = FindProperty("_ReflectionNormalMix", props, false);
+            ReflectionShadeMix = FindProperty("_ReflectionShadeMix", props, false);
+            ReflectionCubemap = FindProperty("_ReflectionCubemap", props, false);
+            ReflectionSuppressBaseColorValue = FindProperty("_ReflectionSuppressBaseColorValue", props, false);
+            RefractionFresnelExp = FindProperty("_RefractionFresnelExp", props, false);
+            RefractionStrength = FindProperty("_RefractionStrength", props, false);
+            UseRim = FindProperty("_UseRim", props, false);
+            RimBlend = FindProperty("_RimBlend", props, false);
+            RimBlendMask = FindProperty("_RimBlendMask", props, false);
+            RimShadeMix = FindProperty("_RimShadeMix", props, false);
+            RimFresnelPower = FindProperty("_RimFresnelPower", props, false);
+            RimUpperSideWidth = FindProperty("_RimUpperSideWidth", props, false);
+            RimColor = FindProperty("_RimColor", props, false);
+            RimTexture = FindProperty("_RimTexture", props, false);
+            RimUseBaseTexture = FindProperty("_RimUseBaseTexture", props, false);
+            ShadowCapBlendMode = FindProperty("_ShadowCapBlendMode", props, false);
+            ShadowCapBlend = FindProperty("_ShadowCapBlend", props, false);
+            ShadowCapBlendMask = FindProperty("_ShadowCapBlendMask", props, false);
+            ShadowCapNormalMix = FindProperty("_ShadowCapNormalMix", props, false);
+            ShadowCapTexture = FindProperty("_ShadowCapTexture", props, false);
+            StencilNumber = FindProperty("_StencilNumber", props, false);
+            StencilMaskTex = FindProperty("_StencilMaskTex", props, false);
+            StencilMaskAdjust = FindProperty("_StencilMaskAdjust", props, false);
+            StencilMaskAlphaDither = FindProperty("_StencilMaskAlphaDither", props, false);
+            StencilCompareAction = FindProperty("_StencilCompareAction", props, false);
+            StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props, false);
+            StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props, false);
+            UseDoubleSided = FindProperty("_UseDoubleSided", props, false);
+            DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props, false);
+            DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props, false);
+            ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props, false);
+            VertexColorBlendDiffuse = FindProperty("_VertexColorBlendDiffuse", props, false);
+            VertexColorBlendEmissive = FindProperty("_VertexColorBlendEmissive", props, false);
+            OtherShadowBorderSharpness = FindProperty("_OtherShadowBorderSharpness", props, false);
+            OtherShadowAdjust = FindProperty("_OtherShadowAdjust", props, false);
+            UseVertexLight = FindProperty("_UseVertexLight", props, false);
+            LightSampling = FindProperty("_LightSampling", props, false);
+            UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props, false);
+            ZWrite = FindProperty("_ZWrite", props, false);
 
-            // TODO: プロパティを引っこ抜いても描画できるようにするためのテスト
-            // var nothingparam = FindProperty("_ZWrite", props, false);
-            // if(nothingparam != null) {
-            //     Debug.Log("nothingparam is " + nothingparam.ToString());
-            // } else {
-            //     Debug.Log("nothingparam is null");
-            // }
-
+            EmissionScrollTex = FindProperty("_EmissionScrollTex", props, false);
+            EmissionScrollMask = FindProperty("_EmissionScrollMask", props, false);
+            EmissionScrollColor = FindProperty("_EmissionScrollColor", props, false);
+            EmissionScrollU = FindProperty("_EmissionScrollU", props, false);
+            EmissionScrollV = FindProperty("_EmissionScrollV", props, false);
 
             EditorGUIUtility.labelWidth = 0f;
 
@@ -658,6 +664,25 @@ namespace ArktoonShaders
                     });
                 }
 
+                // Scrolled Emission
+                if(isScrolledEmission)
+                {
+                    UIHelper.ShurikenHeader("Scrolled Emission");
+                    UIHelper.DrawWithGroup(() => {
+                        UIHelper.DrawWithGroup(() => {
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Texture & Color", "Texture and Color"), EmissionScrollTex, EmissionScrollColor);
+                            materialEditor.TextureScaleOffsetPropertyIndent(EmissionScrollTex);
+                            materialEditor.ShaderProperty(EmissionScrollU, "Scroll U");
+                            materialEditor.ShaderProperty(EmissionScrollV, "Scroll V");
+                        });
+                        UIHelper.DrawWithGroup(() => {
+                            materialEditor.TexturePropertySingleLine(new GUIContent("TexCol Mask", "Texture and Color Mask"), EmissionScrollMask);
+                            materialEditor.TextureScaleOffsetPropertyIndent(EmissionScrollMask);
+                        });
+                    });
+                }
+
+
                 // Advanced / Experimental
                 IsShowAdvanced = UIHelper.ShurikenFoldout("Advanced / Experimental (Click to Open)", IsShowAdvanced);
                 if (IsShowAdvanced) {
@@ -861,7 +886,7 @@ namespace ArktoonShaders
         }
     }
 
-    // シェーダーキーワードを作らないToggle (Unity 2018.2以降で存在すつUIToggleと同じ。)
+    // シェーダーキーワードを作らないToggle (Unity 2018.2以降で存在するUIToggleと同じ。)
     internal class MaterialATSToggleDrawer : MaterialPropertyDrawer
     {
         public MaterialATSToggleDrawer()
