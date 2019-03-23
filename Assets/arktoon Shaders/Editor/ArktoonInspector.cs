@@ -129,6 +129,10 @@ namespace ArktoonShaders
         MaterialProperty UseDoubleSided;
         MaterialProperty DoubleSidedFlipBackfaceNormal;
         MaterialProperty DoubleSidedBackfaceLightIntensity;
+        MaterialProperty DoubleSidedBackfaceUseColorShift;
+        MaterialProperty DoubleSidedBackfaceHueShiftFromBase;
+        MaterialProperty DoubleSidedBackfaceSaturationFromBase;
+        MaterialProperty DoubleSidedBackfaceValueFromBase;
         MaterialProperty ShadowCasterCulling;
         MaterialProperty ZWrite;
         MaterialProperty VertexColorBlendDiffuse;
@@ -307,6 +311,10 @@ namespace ArktoonShaders
             UseDoubleSided = FindProperty("_UseDoubleSided", props, false);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props, false);
             DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props, false);
+            DoubleSidedBackfaceUseColorShift = FindProperty("_DoubleSidedBackfaceUseColorShift", props, false);
+            DoubleSidedBackfaceHueShiftFromBase = FindProperty("_DoubleSidedBackfaceHueShiftFromBase", props, false);
+            DoubleSidedBackfaceSaturationFromBase = FindProperty("_DoubleSidedBackfaceSaturationFromBase", props, false);
+            DoubleSidedBackfaceValueFromBase = FindProperty("_DoubleSidedBackfaceValueFromBase", props, false);
             ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props, false);
             VertexColorBlendDiffuse = FindProperty("_VertexColorBlendDiffuse", props, false);
             VertexColorBlendEmissive = FindProperty("_VertexColorBlendEmissive", props, false);
@@ -361,6 +369,16 @@ namespace ArktoonShaders
                             EditorGUI.indentLevel ++;
                             materialEditor.ShaderProperty(DoubleSidedFlipBackfaceNormal, "Flip backface normal");
                             materialEditor.ShaderProperty(DoubleSidedBackfaceLightIntensity, "Backface Light Intensity");
+                            materialEditor.ShaderProperty(DoubleSidedBackfaceUseColorShift, "Use Backface Color Shift");
+                            var backfaceColorShift = DoubleSidedBackfaceUseColorShift.floatValue;
+                            if(backfaceColorShift > 0) {
+                                EditorGUI.indentLevel ++;
+                                materialEditor.ShaderProperty(DoubleSidedBackfaceHueShiftFromBase, "Hue Shift");
+                                materialEditor.ShaderProperty(DoubleSidedBackfaceSaturationFromBase, "Saturation");
+                                materialEditor.ShaderProperty(DoubleSidedBackfaceValueFromBase, "Value");
+                                EditorGUI.indentLevel --;
+                            }
+
                             EditorGUI.indentLevel --;
                         } else {
                             ShadowCasterCulling.floatValue = 2;

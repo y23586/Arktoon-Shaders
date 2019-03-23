@@ -169,6 +169,11 @@ float4 frag(VertexOutput i) : COLOR {
     // アウトラインであればShadeMixを反映
     toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + (Diffuse+(Diffuse*coloredLight_sum)) * (1 - _OutlineShadeMix)), i.isOutline);
 
+    // 裏面であればHSVShiftを反映
+    if(_DoubleSidedBackfaceUseColorShift) {
+        toonedMap = lerp(toonedMap, CalculateHSV(toonedMap, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), i.isBackface);
+    }
+
     float3 ReflectionMap = float3(0,0,0);
     float3 specular = float3(0,0,0);
     float3 matcap = float3(0,0,0);

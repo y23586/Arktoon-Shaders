@@ -9,7 +9,12 @@ Shader "arktoon/FadeRefracted" {
         // Double Sided
         [ATSToggle]_UseDoubleSided ("Double Sided", Int ) = 0
         [ATSToggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
-        _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
+        _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 2) ) = 0.5
+        [ATSToggle]_DoubleSidedBackfaceUseColorShift("Backface Use Color Shift", Int) = 0
+        [PowerSlider(2.0)]_DoubleSidedBackfaceHueShiftFromBase("Backface Hue Shift From Base", Range(-0.5, 0.5)) = 0
+        _DoubleSidedBackfaceSaturationFromBase("Backface Saturation From Base", Range(0, 2)) = 1
+        _DoubleSidedBackfaceValueFromBase("Backface Value From Base", Range(0, 2)) = 1
+        //
         _ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // None:0, Front:1, Back:2
         [Enum(Off, 0, On, 1)]_ZWrite("ZWrite", Float) = 0
         // Common

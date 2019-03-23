@@ -48,6 +48,10 @@ uniform float _EmissionParallaxDepthMaskInvert;
 // Double Side
 uniform int _UseDoubleSided;
 uniform float _DoubleSidedBackfaceLightIntensity;
+uniform int _DoubleSidedBackfaceUseColorShift;
+uniform float _DoubleSidedBackfaceHueShiftFromBase;
+uniform float _DoubleSidedBackfaceSaturationFromBase;
+uniform float _DoubleSidedBackfaceValueFromBase;
 uniform float _DoubleSidedFlipBackfaceNormal;
 
 // Shadow
