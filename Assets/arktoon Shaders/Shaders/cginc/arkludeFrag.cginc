@@ -342,21 +342,39 @@ float4 frag(VertexOutput i) : COLOR {
         emissionParallax = _EmissionParallaxTex_var * _EmissionMask_var;
     }
 
-    #ifdef ARKTOON_SCROLLED_EMISSION
+    #ifdef ARKTOON_EMISSIVE_FREAK
         float time = _Time.r;
-        float2 emissionScrollTransform = i.uv0
-        + float2(fmod(_EmissionScrollU * time, 1.0 / _EmissionScrollTex_ST.x), fmod(time * _EmissionScrollV, 1.0 / _EmissionScrollTex_ST.y));
-        float _EmissionScrollMask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionScrollMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissionScrollMask)).r;
-        float3 _EmissionScrollTex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionScrollTex, REF_MAINTEX, TRANSFORM_TEX(emissionScrollTransform, _EmissionScrollTex)).rgb * _EmissionScrollColor.rgb;
 
-        float3 emissionScroll = _EmissionScrollTex_var * _EmissionScrollMask_var;
+        float2 emissiveFreak1uv = i.uv0 + float2(fmod(_EmissiveFreak1U * time, 1.0 / _EmissiveFreak1Tex_ST.x), fmod(time * _EmissiveFreak1V, 1.0 / _EmissiveFreak1Tex_ST.y));
+        float _EmissiveFreak1DepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak1DepthMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissiveFreak1DepthMask)).r;
+        float2 emissiveFreak1Transform = _EmissiveFreak1Depth * (_EmissiveFreak1DepthMask_var - _EmissiveFreak1DepthMaskInvert) * mul(tangentTransform, viewDirection).xy + emissiveFreak1uv;
+        float _EmissiveFreak1Mask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak1Mask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissiveFreak1Mask)).r;
+        float3 _EmissiveFreak1Tex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak1Tex, REF_MAINTEX, TRANSFORM_TEX(emissiveFreak1Transform, _EmissiveFreak1Tex)).rgb * _EmissiveFreak1Color.rgb;
+        float emissiveFreak1Breathing = sin(90+_EmissiveFreak1Breathing*time) * 0.5 + 0.5;
+        float emissiveFreak1Blink = 1 - ((_EmissiveFreak1Blink*time) % 1.0);
+        float emissiveFreak1Hue = (_EmissiveFreak1HueShift*time) % 1.0;
+        _EmissiveFreak1Tex_var = CalculateHSV(_EmissiveFreak1Tex_var, emissiveFreak1Hue, 1.0, 1.0);
+        float3 emissiveFreak1 = _EmissiveFreak1Tex_var * _EmissiveFreak1Mask_var * emissiveFreak1Breathing * emissiveFreak1Blink;
+
+        float2 emissiveFreak2uv = i.uv0 + float2(fmod(_EmissiveFreak2U * time, 1.0 / _EmissiveFreak2Tex_ST.x), fmod(time * _EmissiveFreak2V, 1.0 / _EmissiveFreak2Tex_ST.y));
+        float _EmissiveFreak2DepthMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak2DepthMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissiveFreak2DepthMask)).r;
+        float2 emissiveFreak2Transform = _EmissiveFreak2Depth * (_EmissiveFreak2DepthMask_var - _EmissiveFreak2DepthMaskInvert) * mul(tangentTransform, viewDirection).xy + emissiveFreak2uv;
+        float _EmissiveFreak2Mask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak2Mask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissiveFreak2Mask)).r;
+        float3 _EmissiveFreak2Tex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak2Tex, REF_MAINTEX, TRANSFORM_TEX(emissiveFreak2Transform, _EmissiveFreak2Tex)).rgb * _EmissiveFreak2Color.rgb;
+        float emissiveFreak2Breathing = sin(90+_EmissiveFreak2Breathing*time) * 0.5 + 0.5;
+        float emissiveFreak2Blink = 1 - ((_EmissiveFreak2Blink*time) % 1.0);
+        float emissiveFreak2Hue = (_EmissiveFreak2HueShift*time) % 1.0;
+        _EmissiveFreak2Tex_var = CalculateHSV(_EmissiveFreak2Tex_var, emissiveFreak2Hue, 1.0, 1.0);
+        float3 emissiveFreak2 = _EmissiveFreak2Tex_var * _EmissiveFreak2Mask_var * emissiveFreak2Breathing * emissiveFreak2Blink;
+
     #else
-        float3 emissionScroll = float3(0,0,0);
+        float3 emissiveFreak1 = float3(0,0,0);
+        float3 emissiveFreak2 = float3(0,0,0);
     #endif
 
     // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(REF_EMISSIONMAP,TRANSFORM_TEX(i.uv0, REF_EMISSIONMAP)).rgb *REF_EMISSIONCOLOR.rgb;
-    _Emission = _Emission + emissionParallax + emissionScroll;
+    _Emission = _Emission + emissionParallax + emissiveFreak1 + emissiveFreak2;
     float3 emissive = max( lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive) , RimLight) * !i.isOutline;
     float3 finalColor = emissive + finalcolor2;
 

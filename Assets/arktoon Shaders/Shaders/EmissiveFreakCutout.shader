@@ -4,14 +4,13 @@
 //
 // 本コードおよびリポジトリ（https://github.com/synqark/Arktoon-Shader) は MIT License を使用して公開しています。
 // 詳細はLICENSEか、https://opensource.org/licenses/mit-license.php を参照してください。
-Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
+Shader "arktoon/_Extra/EmissiveFreak/AlphaCutout" {
     Properties {
         // Double Sided
         [ATSToggle]_UseDoubleSided ("Double Sided", Int ) = 0
         [ATSToggle]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 1) ) = 0.5
         _ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // None:0, Front:1, Back:2
-        [Enum(Off, 0, On, 1)]_ZWrite("ZWrite", Float) = 0
         // Common
         _MainTex ("[Common] Base Texture", 2D) = "white" {}
         _Color ("[Common] Base Color", Color) = (1,1,1,1)
@@ -19,8 +18,6 @@ Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
         _BumpScale ("[Common] Normal scale", Range(0,2)) = 1
         _EmissionMap ("[Common] Emission map", 2D) = "white" {}
         [HDR]_EmissionColor ("[Common] Emission Color", Color) = (0,0,0,1)
-        // Alpha Mask
-        _AlphaMask ("[Alpha] AlphaMask", 2D ) = "white" {}
         // Emission Parallax
         [ATSToggle]_UseEmissionParallax ("[Emission Parallax] Use Emission Parallax", Int ) = 0
         _EmissionParallaxTex ("[Emission Parallax] Texture", 2D ) = "black" {}
@@ -29,9 +26,8 @@ Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
         _EmissionParallaxDepth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
         _EmissionParallaxDepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
         [ATSToggle]_EmissionParallaxDepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
-        // refraction
-        _RefractionFresnelExp ("[Refraction] Fresnel Exp",  Range(0, 10)) = 0
-        _RefractionStrength ("[Refraction] Strength",  Range(-2, 2)) = 0
+        // Cutout
+        _CutoutCutoutAdjust ("Cutout Border Adjust", Range(0, 1)) = 0.5
         // Shadow (received from DirectionalLight, other Indirect(baked) Lights, including SH)
         _Shadowborder ("[Shadow] border ", Range(0, 1)) = 0.6
         _ShadowborderBlur ("[Shadow] border Blur", Range(0, 1)) = 0.05
@@ -135,28 +131,43 @@ Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
         // Legacy MatCap/ShadeCap Calculation
         [ATSToggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
         // ScrolledEmission
-        _EmissionScrollTex ("[ScrolledEmission] Texture", 2D ) = "black" {}
-        [HDR]_EmissionScrollColor ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
-        _EmissionScrollMask ("[ScrolledEmission] Texture", 2D ) = "black" {}
-        _EmissionScrollU ("[ScrolledEmission] U Scroll", Float ) = 0
-        _EmissionScrollV ("[ScrolledEmission] V Scroll", Float ) = 0
+        _EmissiveFreak1Tex ("[ScrolledEmission] Texture", 2D ) = "black" {}
+        [HDR]_EmissiveFreak1Color ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
+        _EmissiveFreak1Mask ("[ScrolledEmission] Texture", 2D ) = "white" {}
+        _EmissiveFreak1U ("[ScrolledEmission] U Scroll", Float ) = 0
+        _EmissiveFreak1V ("[ScrolledEmission] V Scroll", Float ) = 0
+        _EmissiveFreak1Depth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak1DepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak1DepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak1Breathing ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak1Blink ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak1HueShift ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak2Tex ("[ScrolledEmission] Texture", 2D ) = "black" {}
+        [HDR]_EmissiveFreak2Color ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
+        _EmissiveFreak2Mask ("[ScrolledEmission] Texture", 2D ) = "white" {}
+        _EmissiveFreak2U ("[ScrolledEmission] U Scroll", Float ) = 0
+        _EmissiveFreak2V ("[ScrolledEmission] V Scroll", Float ) = 0
+        _EmissiveFreak2Depth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak2DepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak2DepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak2Breathing ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak2Blink ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak2HueShift ("[ScrolledEmission] Texture", Float ) = 0
         // Version
         [HideInInspector]_Version("[hidden] Version", int) = 0
     }
     SubShader {
         Tags {
-            "Queue"="Transparent"
-            "RenderType"="Transparent"
+            "Queue"="AlphaTest"
+            "RenderType" = "TransparentCutout"
+            "IgnoreProjector"="True"
         }
-        GrabPass{ }
         Pass {
             Name "FORWARD"
             Tags {
                 "LightMode"="ForwardBase"
             }
             Cull Back
-            Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite [_ZWrite]
 
             CGPROGRAM
 
@@ -164,13 +175,12 @@ Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
             #pragma vertex vert
             #pragma geometry geom
             #pragma fragment frag
-            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fwdbase_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
-            #define ARKTOON_FADE
-            #define ARKTOON_REFRACTED
-            #define ARKTOON_SCROLLED_EMISSION
+            #define ARKTOON_CUTOUT
+            #define ARKTOON_EMISSIVE_FREAK
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -185,20 +195,18 @@ Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
             }
             Cull Back
             Blend One One
-            ZWrite [_ZWrite]
 
             CGPROGRAM
 
             #pragma vertex vert
             #pragma geometry geom
             #pragma fragment frag
-            #pragma multi_compile_fwdadd
+            #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
-            #define ARKTOON_FADE
+            #define ARKTOON_CUTOUT
             #define ARKTOON_ADD
-            #define ARKTOON_REFRACTED
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -206,27 +214,47 @@ Shader "arktoon/_Extra/ScrolledEmission/FadeRefracted" {
             #include "cginc/arkludeAdd.cginc"
             ENDCG
         }
-
-        // ------------------------------------------------------------------
-        //  Shadow rendering pass
         Pass {
-            Name "SHADOWCASTER"
-            Tags { "LightMode" = "ShadowCaster" }
-
-            ZWrite On ZTest LEqual
+            Name "ShadowCaster"
+            Tags {
+                "LightMode"="ShadowCaster"
+            }
+            Offset 1, 1
             Cull [_ShadowCasterCulling]
 
             CGPROGRAM
-            #pragma target 3.0
-
-            // -------------------------------------
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #pragma fragmentoption ARB_precision_hint_fastest
             #pragma multi_compile_shadowcaster
-
-            #pragma vertex vertShadowCaster
-            #pragma fragment fragShadowCaster
-
-            #include "cginc/arkludeFadeShadowCaster.cginc"
-
+            #pragma multi_compile_fog
+            #pragma only_renderers d3d9 d3d11 glcore gles
+            #pragma target 4.0
+            uniform float _CutoutCutoutAdjust;
+            uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
+            uniform float4 _Color;
+            struct VertexInput {
+                float4 vertex : POSITION;
+                float2 texcoord0 : TEXCOORD0;
+            };
+            struct VertexOutput {
+                V2F_SHADOW_CASTER;
+                float2 uv0 : TEXCOORD1;
+            };
+            VertexOutput vert (VertexInput v) {
+                VertexOutput o = (VertexOutput)0;
+                o.uv0 = v.texcoord0;
+                o.pos = UnityObjectToClipPos( v.vertex );
+                TRANSFER_SHADOW_CASTER(o)
+                return o;
+            }
+            float4 frag(VertexOutput i) : COLOR {
+                float4 _MainTex_var = tex2D(_MainTex,TRANSFORM_TEX(i.uv0, _MainTex));
+                clip((_MainTex_var.a * _Color.a) - _CutoutCutoutAdjust);
+                SHADOW_CASTER_FRAGMENT(i)
+            }
             ENDCG
         }
     }

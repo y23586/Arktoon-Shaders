@@ -4,7 +4,7 @@
 //
 // 本コードおよびリポジトリ（https://github.com/synqark/Arktoon-Shader) は MIT License を使用して公開しています。
 // 詳細はLICENSEか、https://opensource.org/licenses/mit-license.php を参照してください。
-Shader "arktoon/_Extra/ScrolledEmission/Fade" {
+Shader "arktoon/_Extra/EmissiveFreak/Fade" {
     Properties {
         // Double Sided
         [ATSToggle]_UseDoubleSided ("Double Sided", Int ) = 0
@@ -132,11 +132,28 @@ Shader "arktoon/_Extra/ScrolledEmission/Fade" {
         // Legacy MatCap/ShadeCap Calculation
         [ATSToggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
         // ScrolledEmission
-        _EmissionScrollTex ("[ScrolledEmission] Texture", 2D ) = "black" {}
-        [HDR]_EmissionScrollColor ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
-        _EmissionScrollMask ("[ScrolledEmission] Texture", 2D ) = "black" {}
-        _EmissionScrollU ("[ScrolledEmission] U Scroll", Float ) = 0
-        _EmissionScrollV ("[ScrolledEmission] V Scroll", Float ) = 0
+        _EmissiveFreak1Tex ("[ScrolledEmission] Texture", 2D ) = "black" {}
+        [HDR]_EmissiveFreak1Color ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
+        _EmissiveFreak1Mask ("[ScrolledEmission] Texture", 2D ) = "white" {}
+        _EmissiveFreak1U ("[ScrolledEmission] U Scroll", Float ) = 0
+        _EmissiveFreak1V ("[ScrolledEmission] V Scroll", Float ) = 0
+        _EmissiveFreak1Depth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak1DepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak1DepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak1Breathing ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak1Blink ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak1HueShift ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak2Tex ("[ScrolledEmission] Texture", 2D ) = "black" {}
+        [HDR]_EmissiveFreak2Color ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
+        _EmissiveFreak2Mask ("[ScrolledEmission] Texture", 2D ) = "white" {}
+        _EmissiveFreak2U ("[ScrolledEmission] U Scroll", Float ) = 0
+        _EmissiveFreak2V ("[ScrolledEmission] V Scroll", Float ) = 0
+        _EmissiveFreak2Depth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak2DepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak2DepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak2Breathing ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak2Blink ("[ScrolledEmission] Texture", Float ) = 0
+        _EmissiveFreak2HueShift ("[ScrolledEmission] Texture", Float ) = 0
         // Version
         [HideInInspector]_Version("[hidden] Version", int) = 0
     }
@@ -165,7 +182,7 @@ Shader "arktoon/_Extra/ScrolledEmission/Fade" {
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
             #define ARKTOON_FADE
-            #define ARKTOON_SCROLLED_EMISSION
+            #define ARKTOON_EMISSIVE_FREAK
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"

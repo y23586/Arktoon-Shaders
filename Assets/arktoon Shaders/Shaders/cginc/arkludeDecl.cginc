@@ -176,10 +176,28 @@ uniform float _RefractionStrength;
 #endif
 
 // ScrolledEmission
-#ifdef ARKTOON_SCROLLED_EMISSION
-UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionScrollTex); uniform float4 _EmissionScrollTex_ST;
-UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionScrollMask); uniform float4 _EmissionScrollMask_ST;
-uniform float4 _EmissionScrollColor;
-uniform float _EmissionScrollU;
-uniform float _EmissionScrollV;
+#ifdef ARKTOON_EMISSIVE_FREAK
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak1Tex); uniform float4 _EmissiveFreak1Tex_ST;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak1Mask); uniform float4 _EmissiveFreak1Mask_ST;
+uniform float4 _EmissiveFreak1Color;
+uniform float _EmissiveFreak1U;
+uniform float _EmissiveFreak1V;
+uniform float _EmissiveFreak1Depth;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak1DepthMask); uniform float4 _EmissiveFreak1DepthMask_ST;
+uniform float _EmissiveFreak1DepthMaskInvert;
+uniform float _EmissiveFreak1Breathing;
+uniform float _EmissiveFreak1Blink;
+uniform float _EmissiveFreak1HueShift;
+
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak2Tex); uniform float4 _EmissiveFreak2Tex_ST;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak2Mask); uniform float4 _EmissiveFreak2Mask_ST;
+uniform float4 _EmissiveFreak2Color;
+uniform float _EmissiveFreak2U;
+uniform float _EmissiveFreak2V;
+uniform float _EmissiveFreak2Depth;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak2DepthMask); uniform float4 _EmissiveFreak2DepthMask_ST;
+uniform float _EmissiveFreak2DepthMaskInvert;
+uniform float _EmissiveFreak2Breathing;
+uniform float _EmissiveFreak2Blink;
+uniform float _EmissiveFreak2HueShift;
 #endif
