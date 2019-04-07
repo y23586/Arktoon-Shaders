@@ -131,29 +131,37 @@ Shader "arktoon/_Extra/EmissiveFreak/Opaque" {
         [Enum(Arktoon,0, Cubed,1)]_LightSampling("[Light] Sampling Style", Int) = 0
         // Legacy MatCap/ShadeCap Calculation
         [ATSToggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
-        // ScrolledEmission
-        _EmissiveFreak1Tex ("[ScrolledEmission] Texture", 2D ) = "black" {}
-        [HDR]_EmissiveFreak1Color ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
-        _EmissiveFreak1Mask ("[ScrolledEmission] Texture", 2D ) = "white" {}
-        _EmissiveFreak1U ("[ScrolledEmission] U Scroll", Float ) = 0
-        _EmissiveFreak1V ("[ScrolledEmission] V Scroll", Float ) = 0
-        _EmissiveFreak1Depth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
-        _EmissiveFreak1DepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
-        [ATSToggle]_EmissiveFreak1DepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
-        _EmissiveFreak1Breathing ("[ScrolledEmission] Texture", Float ) = 0
-        _EmissiveFreak1Blink ("[ScrolledEmission] Texture", Float ) = 0
-        _EmissiveFreak1HueShift ("[ScrolledEmission] Texture", Float ) = 0
-        _EmissiveFreak2Tex ("[ScrolledEmission] Texture", 2D ) = "black" {}
-        [HDR]_EmissiveFreak2Color ("[ScrolledEmission] Color", Color ) = (1,1,1,1)
-        _EmissiveFreak2Mask ("[ScrolledEmission] Texture", 2D ) = "white" {}
-        _EmissiveFreak2U ("[ScrolledEmission] U Scroll", Float ) = 0
-        _EmissiveFreak2V ("[ScrolledEmission] V Scroll", Float ) = 0
-        _EmissiveFreak2Depth ("[Emission Parallax] Depth", Range(-1, 1) ) = 0
-        _EmissiveFreak2DepthMask ("[Emission Parallax] Depth Mask", 2D ) = "white" {}
-        [ATSToggle]_EmissiveFreak2DepthMaskInvert ("[Emission Parallax] Invert Depth Mask", Float ) = 0
-        _EmissiveFreak2Breathing ("[ScrolledEmission] Texture", Float ) = 0
-        _EmissiveFreak2Blink ("[ScrolledEmission] Texture", Float ) = 0
-        _EmissiveFreak2HueShift ("[ScrolledEmission] Texture", Float ) = 0
+        // EmissiveFreak
+        _EmissiveFreak1Tex ("[EmissiveFreak] Texture", 2D ) = "white" {}
+        [HDR]_EmissiveFreak1Color ("[EmissiveFreak] Color", Color ) = (0,0,0,1)
+        _EmissiveFreak1Mask ("[EmissiveFreak] Mask", 2D ) = "white" {}
+        _EmissiveFreak1U ("[EmissiveFreak] U Scroll", Float ) = 0
+        _EmissiveFreak1V ("[EmissiveFreak] V Scroll", Float ) = 0
+        _EmissiveFreak1Depth ("[EmissiveFreak] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak1DepthMask ("[EmissiveFreak] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak1DepthMaskInvert ("[EmissiveFreak] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak1Breathing ("[EmissiveFreak] Breathing Speed", Float ) = 0
+        _EmissiveFreak1BreathingMix ("[EmissiveFreak] Breathing Factor", Range(0, 1) ) = 0
+        _EmissiveFreak1BlinkOut ("[EmissiveFreak] Blink Out Speed", Float ) = 0
+        _EmissiveFreak1BlinkOutMix ("[EmissiveFreak] Blink Out Factor", Range(0, 1) ) = 0
+        _EmissiveFreak1BlinkIn ("[EmissiveFreak] Blink In", Float ) = 0
+        _EmissiveFreak1BlinkInMix ("[EmissiveFreak] Blink In Factor", Range(0, 1) ) = 0
+        _EmissiveFreak1HueShift ("[EmissiveFreak] Hue Shift Speed", Float ) = 0
+        _EmissiveFreak2Tex ("[EmissiveFreak2] Texture", 2D ) = "white" {}
+        [HDR]_EmissiveFreak2Color ("[EmissiveFreak2] Color", Color ) = (0,0,0,1)
+        _EmissiveFreak2Mask ("[EmissiveFreak2] Mask", 2D ) = "white" {}
+        _EmissiveFreak2U ("[EmissiveFreak2] U Scroll", Float ) = 0
+        _EmissiveFreak2V ("[EmissiveFreak2] V Scroll", Float ) = 0
+        _EmissiveFreak2Depth ("[EmissiveFreak2] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak2DepthMask ("[EmissiveFreak2] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak2DepthMaskInvert ("[EmissiveFreak2] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak2Breathing ("[EmissiveFreak2] Breathing Speed", Float ) = 0
+        _EmissiveFreak2BreathingMix ("[EmissiveFreak2] Breathing Factor", Range(0, 1) ) = 0
+        _EmissiveFreak2BlinkOut ("[EmissiveFreak2] Blink Out Speed", Float ) = 0
+        _EmissiveFreak2BlinkOutMix ("[EmissiveFreak2] Blink Out Factor", Range(0, 1) ) = 0
+        _EmissiveFreak2BlinkIn ("[EmissiveFreak2] Blink In", Float ) = 0
+        _EmissiveFreak2BlinkInMix ("[EmissiveFreak2] Blink In Factor", Range(0, 1) ) = 0
+        _EmissiveFreak2HueShift ("[EmissiveFreak2] Hue Shift Speed", Float ) = 0
         // Version
         [HideInInspector]_Version("[hidden] Version", int) = 0
     }

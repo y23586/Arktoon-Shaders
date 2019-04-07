@@ -161,7 +161,11 @@ Material:
     - _Cutoff: 0.5
     - _CutoutCutoutAdjust: 0.749
     - _DetailNormalMapScale: 1
+    - _DoubleSidedBackfaceHueShiftFromBase: 0
     - _DoubleSidedBackfaceLightIntensity: 0.5
+    - _DoubleSidedBackfaceSaturationFromBase: 1
+    - _DoubleSidedBackfaceUseColorShift: 0
+    - _DoubleSidedBackfaceValueFromBase: 1
     - _DoubleSidedFlipBackfaceNormal: 0
     - _DstBlend: 0
     - _EmissionParallaxDepth: 0
@@ -250,7 +254,7 @@ Material:
     - _UseRim: 1
     - _UseShadowCap: 0
     - _UseVertexLight: 1
-    - _Version: 1022
+    - _Version: 1023
     - _VertexColorBlendDiffuse: 0
     - _VertexColorBlendEmissive: 0
     - _ZWrite: 0
