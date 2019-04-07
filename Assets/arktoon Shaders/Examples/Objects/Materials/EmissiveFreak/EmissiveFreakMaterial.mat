@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: material 4
-  m_Shader: {fileID: 4800000, guid: abc253a50f12dc0478eb8c149b35af54, type: 3}
+  m_Name: EmissiveFreakMaterial
+  m_Shader: {fileID: 4800000, guid: 6e08acecbe384864d82690f1704a89bf, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -19,7 +19,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseTexture:
-        m_Texture: {fileID: 2800000, guid: af4dae3c66f957c45a9fb9d57f26dcad, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3784a951dbf03b645afc723f23aea29b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -39,11 +39,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 47c95c2343f176e47b666b929de8f68c, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _EmissionMask:
-        m_Texture: {fileID: 2800000, guid: 1bd6ae9520d378f408445f9d4124d0f7, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionParallaxDepthMask:
@@ -55,23 +51,47 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionParallaxTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: c7e141183bc6c5c40a37d02d5dc415e6, type: 3}
+        m_Scale: {x: 3, y: 3}
         m_Offset: {x: 0, y: 0}
     - _Emissionmap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissiveFreak1DepthMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissiveFreak1Mask:
+        m_Texture: {fileID: 2800000, guid: 47c95c2343f176e47b666b929de8f68c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissiveFreak1Tex:
+        m_Texture: {fileID: 2800000, guid: 4d1297e8a783e3242a35e699af99982c, type: 3}
+        m_Scale: {x: 0.2, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissiveFreak2DepthMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissiveFreak2Mask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissiveFreak2Tex:
+        m_Texture: {fileID: 2800000, guid: 5d87d8e428ab7dc43b51a4ace5e8f55c, type: 3}
+        m_Scale: {x: 0.3, y: 0.3}
         m_Offset: {x: 0, y: 0}
     - _GlossBlendMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 3784a951dbf03b645afc723f23aea29b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MatcapBlendMask:
-        m_Texture: {fileID: 2800000, guid: 2535c9c47d22fa74cb975bc6bf822ac7, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MatcapMask:
@@ -91,10 +111,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _OutlineMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -127,7 +143,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RimBlendMask:
-        m_Texture: {fileID: 2800000, guid: 47c95c2343f176e47b666b929de8f68c, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RimTexture:
@@ -162,16 +178,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _StencilMaskTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
     - _Cull: 2
     - _CustomShadow2nd: 0
     - _Cutoff: 0.5
-    - _CutoutCutoutAdjust: 0.749
+    - _CutoutCutoutAdjust: 0.741
     - _DetailNormalMapScale: 1
     - _DoubleSidedBackfaceHueShiftFromBase: 0
     - _DoubleSidedBackfaceLightIntensity: 0.5
@@ -180,8 +192,32 @@ Material:
     - _DoubleSidedBackfaceValueFromBase: 1
     - _DoubleSidedFlipBackfaceNormal: 0
     - _DstBlend: 0
-    - _EmissionParallaxDepth: -0.052
+    - _EmissionParallaxDepth: -0.25
     - _EmissionParallaxDepthMaskInvert: 0
+    - _EmissiveFreak1Blink: 0
+    - _EmissiveFreak1BlinkIn: 0
+    - _EmissiveFreak1BlinkInMix: 0
+    - _EmissiveFreak1BlinkOut: 0
+    - _EmissiveFreak1BlinkOutMix: 0
+    - _EmissiveFreak1Breathing: 25
+    - _EmissiveFreak1BreathingMix: 0.502
+    - _EmissiveFreak1Depth: 0
+    - _EmissiveFreak1DepthMaskInvert: 0
+    - _EmissiveFreak1HueShift: 5
+    - _EmissiveFreak1U: 0
+    - _EmissiveFreak1V: 0
+    - _EmissiveFreak2Blink: 0
+    - _EmissiveFreak2BlinkIn: 0
+    - _EmissiveFreak2BlinkInMix: 0
+    - _EmissiveFreak2BlinkOut: 0
+    - _EmissiveFreak2BlinkOutMix: 0
+    - _EmissiveFreak2Breathing: 0
+    - _EmissiveFreak2BreathingMix: 0
+    - _EmissiveFreak2Depth: -0.1
+    - _EmissiveFreak2DepthMaskInvert: 0
+    - _EmissiveFreak2HueShift: 0
+    - _EmissiveFreak2U: 0
+    - _EmissiveFreak2V: 30
     - _GlossBlend: 0
     - _GlossMapScale: 1
     - _GlossPower: 0.5
@@ -189,7 +225,7 @@ Material:
     - _GlossyReflections: 1
     - _LightSampling: 0
     - _MatcapBlend: 2.27
-    - _MatcapBlendMode: 0
+    - _MatcapBlendMode: 3
     - _MatcapBoost: 1.475
     - _MatcapNormalMix: 2
     - _MatcapShadeMix: 0
@@ -199,11 +235,10 @@ Material:
     - _OcclusionStrength: 1
     - _OtherShadowAdjust: -0.1
     - _OtherShadowBorderSharpness: 3
-    - _OutlineCutoffRange: 0
     - _OutlineHueShiftFromBase: 0
     - _OutlineSaturationFromBase: 1
     - _OutlineShadeMix: 0
-    - _OutlineTextureColorRate: 0.05
+    - _OutlineTextureColorRate: 0
     - _OutlineUseColorShift: 0
     - _OutlineValueFromBase: 1
     - _OutlineWidth: 0.03
@@ -220,15 +255,13 @@ Material:
     - _ReflectionRoughness: 0
     - _ReflectionShadeMix: 0
     - _ReflectionSuppressBaseColorValue: 1
-    - _RefractionFresnelExp: 0
-    - _RefractionStrength: 0
-    - _RimBlend: 2.304
-    - _RimFresnelPower: 3.29
+    - _RimBlend: 0
+    - _RimFresnelPower: 1
     - _RimShadeMix: 0
     - _RimUpperSideWidth: 0
     - _RimUseBaseTexture: 0
-    - _ShadowBoarderMax: 0.5
-    - _ShadowBoarderMin: 0.49
+    - _ShadowBoarderMax: 0.55
+    - _ShadowBoarderMin: 0.499
     - _ShadowCapBlend: 1.21
     - _ShadowCapBlendMode: 3
     - _ShadowCapNormalMix: 0
@@ -255,37 +288,35 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _StencilCompareAction: 6
-    - _StencilMaskAdjust: 0.5
-    - _StencilMaskAlphaDither: 1
-    - _StencilNumber: 5
     - _UVSec: 0
     - _UseDoubleSided: 0
-    - _UseEmissionParallax: 0
+    - _UseEmissionParallax: 1
     - _UseGloss: 0
     - _UseLegacyCapCalc: 0
     - _UseMatcap: 0
-    - _UseOutline: 0
+    - _UseOutline: 1
     - _UseOutlineWidthMask: 0
     - _UsePositionRelatedCalc: 0
     - _UseReflection: 0
-    - _UseReflectionProbe: 1
-    - _UseRim: 1
+    - _UseReflectionProbe: 0
+    - _UseRim: 0
     - _UseShadowCap: 0
     - _UseVertexLight: 1
     - _Version: 1023
     - _VertexColorBlendDiffuse: 0
     - _VertexColorBlendEmissive: 0
-    - _ZWrite: 0
+    - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0, g: 0.08646043, b: 0.4044118, a: 1}
-    - _EmissionColor: {r: 1, g: 0, b: 0, a: 1}
+    - _BaseColor: {r: 0.992647, g: 0.5474156, b: 0.5474156, a: 1}
+    - _Color: {r: 0.3083164, g: 0.5588235, b: 0.20955881, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionParallaxColor: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissiveFreak1Color: {r: 1, g: 0.9752535, b: 0.102941155, a: 1}
+    - _EmissiveFreak2Color: {r: 0, g: 1, b: 0.75172424, a: 1}
     - _GlossColor: {r: 1, g: 1, b: 1, a: 1}
     - _MatcapColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 0, g: 1, b: 0.75172424, a: 1}
+    - _OutlineColor: {r: 0.1102941, g: 0, b: 0, a: 1}
+    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowCapColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowPlanB2CustomShadowTextureRGB: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowPlanBCustomShadowTextureRGB: {r: 1, g: 1, b: 1, a: 1}

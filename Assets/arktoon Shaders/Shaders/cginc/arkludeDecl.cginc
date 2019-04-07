@@ -48,6 +48,10 @@ uniform float _EmissionParallaxDepthMaskInvert;
 // Double Side
 uniform int _UseDoubleSided;
 uniform float _DoubleSidedBackfaceLightIntensity;
+uniform int _DoubleSidedBackfaceUseColorShift;
+uniform float _DoubleSidedBackfaceHueShiftFromBase;
+uniform float _DoubleSidedBackfaceSaturationFromBase;
+uniform float _DoubleSidedBackfaceValueFromBase;
 uniform float _DoubleSidedFlipBackfaceNormal;
 
 // Shadow
@@ -115,7 +119,7 @@ uniform int _PointShadowSteps;
 
 // MatCap
 uniform int _MatcapBlendMode;
-uniform sampler2D _MatcapTexture; uniform float4 _MatcapTexture_ST;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_MatcapTexture); uniform float4 _MatcapTexture_ST;
 uniform float _MatcapBlend;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_MatcapBlendMask); uniform float4 _MatcapBlendMask_ST;
 uniform float4 _MatcapColor;
@@ -142,11 +146,11 @@ uniform fixed _RimUseBaseTexture;
 uniform float _RimBlend;
 uniform float _RimShadeMix;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_RimBlendMask); uniform float4 _RimBlendMask_ST;
-uniform sampler2D _RimTexture; uniform float4 _RimTexture_ST;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_RimTexture); uniform float4 _RimTexture_ST;
 
 // Shade cap (Shadow cap)
 uniform int _ShadowCapBlendMode;
-uniform sampler2D _ShadowCapTexture; uniform float4 _ShadowCapTexture_ST;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowCapTexture); uniform float4 _ShadowCapTexture_ST;
 UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowCapBlendMask); uniform float4 _ShadowCapBlendMask_ST;
 uniform float _ShadowCapBlend;
 uniform float _ShadowCapNormalMix;
@@ -173,4 +177,40 @@ uniform int _LightSampling;
 uniform sampler2D _GrabTexture;
 uniform float _RefractionFresnelExp;
 uniform float _RefractionStrength;
+#endif
+
+// ScrolledEmission
+#ifdef ARKTOON_EMISSIVE_FREAK
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak1Tex); uniform float4 _EmissiveFreak1Tex_ST;
+uniform float4 _EmissiveFreak1Color;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak1Mask); uniform float4 _EmissiveFreak1Mask_ST;
+uniform float _EmissiveFreak1U;
+uniform float _EmissiveFreak1V;
+uniform float _EmissiveFreak1Depth;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak1DepthMask); uniform float4 _EmissiveFreak1DepthMask_ST;
+uniform float _EmissiveFreak1DepthMaskInvert;
+uniform float _EmissiveFreak1Breathing;
+uniform float _EmissiveFreak1BreathingMix;
+uniform float _EmissiveFreak1BlinkOut;
+uniform float _EmissiveFreak1BlinkOutMix;
+uniform float _EmissiveFreak1BlinkIn;
+uniform float _EmissiveFreak1BlinkInMix;
+uniform float _EmissiveFreak1HueShift;
+
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak2Tex); uniform float4 _EmissiveFreak2Tex_ST;
+uniform float4 _EmissiveFreak2Color;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak2Mask); uniform float4 _EmissiveFreak2Mask_ST;
+uniform float _EmissiveFreak2U;
+uniform float _EmissiveFreak2V;
+uniform float _EmissiveFreak2Depth;
+UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissiveFreak2DepthMask); uniform float4 _EmissiveFreak2DepthMask_ST;
+uniform float _EmissiveFreak2DepthMaskInvert;
+uniform float _EmissiveFreak2Breathing;
+uniform float _EmissiveFreak2BreathingMix;
+uniform float _EmissiveFreak2BlinkOut;
+uniform float _EmissiveFreak2BlinkOutMix;
+uniform float _EmissiveFreak2BlinkIn;
+uniform float _EmissiveFreak2BlinkInMix;
+uniform float _EmissiveFreak2HueShift;
+
 #endif

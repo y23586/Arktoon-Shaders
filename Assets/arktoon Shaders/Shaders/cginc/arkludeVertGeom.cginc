@@ -78,6 +78,7 @@ struct VertexOutput {
     fixed isOutline : IS_OUTLINE; // bool(GLSL対応でfixed)
     fixed faceSign : FACE_SIGN; // int(GLSL対応でfixed)
     float lightIntensityIfBackface : LIGHT_INTENSITY;
+    fixed isBackface : IS_BACKFACE;
     SHADOW_COORDS(6)
     UNITY_FOG_COORDS(7)
     fixed4 color : COLOR1;
@@ -151,6 +152,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.isOutline = true;
             o.faceSign = -1;
             o.lightIntensityIfBackface = 1;
+            o.isBackface = 0;
 
             // Pass-through the shadow coordinates if this pass has shadows.
             #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -203,6 +205,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
             o.isOutline = false;
             o.faceSign = -1;
             o.lightIntensityIfBackface = _DoubleSidedBackfaceLightIntensity;
+            o.isBackface = 1;
 
             // Pass-through the shadow coordinates if this pass has shadows.
             #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -253,6 +256,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
         o.isOutline = false;
         o.faceSign = 1;
         o.lightIntensityIfBackface = 1;
+        o.isBackface = 0;
 
         // Pass-through the shadow coordinates if this pass has shadows.
         #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)

@@ -4,7 +4,7 @@
 //
 // 本コードおよびリポジトリ（https://github.com/synqark/Arktoon-Shader) は MIT License を使用して公開しています。
 // 詳細はLICENSEか、https://opensource.org/licenses/mit-license.php を参照してください。
-Shader "arktoon/Stencil/WriterMask/Cutout" {
+Shader "arktoon/_Extra/EmissiveFreak/StencilWriterCutout" {
     Properties {
         // Double Sided
         [ATSToggle]_UseDoubleSided ("Double Sided", Int ) = 0
@@ -125,9 +125,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         _ShadowCapTexture ("[ShadowCap] Texture", 2D) = "white" {}
         // Stencil(Writer)
         _StencilNumber ("[StencilWriter] Number", int) = 5
-        _StencilMaskTex ("[StencilWriter] Mask Texture", 2D) = "white" {}
-        _StencilMaskAdjust ("[StencilWriter] Mask Texture Adjust", Range(0, 1)) = 0.5
-        _StencilMaskAlphaDither ("[StencilWriter] StencilAlpha(Dither)", Range(0, 1)) = 1.0
         // vertex color blend
         _VertexColorBlendDiffuse ("[VertexColor] Blend to diffuse", Range(0,1)) = 0
         _VertexColorBlendEmissive ("[VertexColor] Blend to emissive", Range(0,1)) = 0
@@ -140,6 +137,37 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
         [Enum(Arktoon,0, Cubed,1)]_LightSampling("[Light] Sampling Style", Int) = 0
         // Legacy MatCap/ShadeCap Calculation
         [ATSToggle]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
+        // EmissiveFreak
+        _EmissiveFreak1Tex ("[EmissiveFreak] Texture", 2D ) = "white" {}
+        [HDR]_EmissiveFreak1Color ("[EmissiveFreak] Color", Color ) = (0,0,0,1)
+        _EmissiveFreak1Mask ("[EmissiveFreak] Mask", 2D ) = "white" {}
+        _EmissiveFreak1U ("[EmissiveFreak] U Scroll", Float ) = 0
+        _EmissiveFreak1V ("[EmissiveFreak] V Scroll", Float ) = 0
+        _EmissiveFreak1Depth ("[EmissiveFreak] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak1DepthMask ("[EmissiveFreak] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak1DepthMaskInvert ("[EmissiveFreak] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak1Breathing ("[EmissiveFreak] Breathing Speed", Float ) = 0
+        _EmissiveFreak1BreathingMix ("[EmissiveFreak] Breathing Factor", Range(0, 1) ) = 0
+        _EmissiveFreak1BlinkOut ("[EmissiveFreak] Blink Out Speed", Float ) = 0
+        _EmissiveFreak1BlinkOutMix ("[EmissiveFreak] Blink Out Factor", Range(0, 1) ) = 0
+        _EmissiveFreak1BlinkIn ("[EmissiveFreak] Blink In", Float ) = 0
+        _EmissiveFreak1BlinkInMix ("[EmissiveFreak] Blink In Factor", Range(0, 1) ) = 0
+        _EmissiveFreak1HueShift ("[EmissiveFreak] Hue Shift Speed", Float ) = 0
+        _EmissiveFreak2Tex ("[EmissiveFreak2] Texture", 2D ) = "white" {}
+        [HDR]_EmissiveFreak2Color ("[EmissiveFreak2] Color", Color ) = (0,0,0,1)
+        _EmissiveFreak2Mask ("[EmissiveFreak2] Mask", 2D ) = "white" {}
+        _EmissiveFreak2U ("[EmissiveFreak2] U Scroll", Float ) = 0
+        _EmissiveFreak2V ("[EmissiveFreak2] V Scroll", Float ) = 0
+        _EmissiveFreak2Depth ("[EmissiveFreak2] Depth", Range(-1, 1) ) = 0
+        _EmissiveFreak2DepthMask ("[EmissiveFreak2] Depth Mask", 2D ) = "white" {}
+        [ATSToggle]_EmissiveFreak2DepthMaskInvert ("[EmissiveFreak2] Invert Depth Mask", Float ) = 0
+        _EmissiveFreak2Breathing ("[EmissiveFreak2] Breathing Speed", Float ) = 0
+        _EmissiveFreak2BreathingMix ("[EmissiveFreak2] Breathing Factor", Range(0, 1) ) = 0
+        _EmissiveFreak2BlinkOut ("[EmissiveFreak2] Blink Out Speed", Float ) = 0
+        _EmissiveFreak2BlinkOutMix ("[EmissiveFreak2] Blink Out Factor", Range(0, 1) ) = 0
+        _EmissiveFreak2BlinkIn ("[EmissiveFreak2] Blink In", Float ) = 0
+        _EmissiveFreak2BlinkInMix ("[EmissiveFreak2] Blink In Factor", Range(0, 1) ) = 0
+        _EmissiveFreak2HueShift ("[EmissiveFreak2] Hue Shift Speed", Float ) = 0
         // Version
         [HideInInspector]_Version("[hidden] Version", int) = 0
     }
@@ -149,8 +177,9 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             "RenderType" = "TransparentCutout"
         }
         Pass {
-            Name "STENCIL_WRITER"
+            Name "FORWARD"
             Tags {
+                "LightMode"="ForwardBase"
             }
             Cull Back
 
@@ -159,28 +188,6 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
                 Comp Always
                 Pass Replace
             }
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma geometry geom
-            #pragma fragment frag
-            #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 4.0
-            #define ARKTOON_CUTOUT
-
-            #include "cginc/arkludeDecl.cginc"
-            #include "cginc/arkludeOther.cginc"
-            #include "cginc/arkludeVertGeom.cginc"
-            #include "cginc/arkludeFragOnlyStencilWrite.cginc"
-            ENDCG
-        }
-        Pass {
-            Name "FORWARD"
-            Tags {
-                "LightMode"="ForwardBase"
-            }
-            Cull Back
 
             CGPROGRAM
 
@@ -193,6 +200,7 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
             #define ARKTOON_CUTOUT
+            #define ARKTOON_EMISSIVE_FREAK
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -207,6 +215,12 @@ Shader "arktoon/Stencil/WriterMask/Cutout" {
             }
             Cull Back
             Blend One One
+
+            Stencil {
+                Ref [_StencilNumber]
+                Comp Always
+                Pass Replace
+            }
 
             CGPROGRAM
 
