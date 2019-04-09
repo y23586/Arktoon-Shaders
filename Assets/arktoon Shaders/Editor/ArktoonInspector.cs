@@ -736,7 +736,7 @@ namespace ArktoonShaders
                 // Scrolled Emission
                 if(isEmissiveFreak)
                 {
-                    UIHelper.ShurikenHeader("EXTRA: Emissive Freak");
+                    UIHelper.ShurikenHeader("Emissive Freak");
                     UIHelper.DrawWithGroup(() => {
                         UIHelper.DrawWithGroup(() => {
                             EditorGUILayout.LabelField("1st", EditorStyles.boldLabel);
