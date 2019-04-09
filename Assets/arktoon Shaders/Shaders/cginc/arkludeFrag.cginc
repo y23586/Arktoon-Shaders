@@ -172,6 +172,7 @@ float4 frag(VertexOutput i) : COLOR {
     // 裏面であればHSVShiftを反映
     if(_DoubleSidedBackfaceUseColorShift) {
         toonedMap = lerp(toonedMap, CalculateHSV(toonedMap, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), i.isBackface);
+        Diffuse = lerp(Diffuse, CalculateHSV(Diffuse, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), i.isBackface);
     }
 
     float3 ReflectionMap = float3(0,0,0);

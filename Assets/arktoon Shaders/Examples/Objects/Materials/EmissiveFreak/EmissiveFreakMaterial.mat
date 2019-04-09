@@ -213,7 +213,7 @@ Material:
     - _EmissiveFreak2BlinkOutMix: 0
     - _EmissiveFreak2Breathing: 0
     - _EmissiveFreak2BreathingMix: 0
-    - _EmissiveFreak2Depth: -0.1
+    - _EmissiveFreak2Depth: 0
     - _EmissiveFreak2DepthMaskInvert: 0
     - _EmissiveFreak2HueShift: 0
     - _EmissiveFreak2U: 0
@@ -302,7 +302,7 @@ Material:
     - _UseRim: 0
     - _UseShadowCap: 0
     - _UseVertexLight: 1
-    - _Version: 1023
+    - _Version: 1024
     - _VertexColorBlendDiffuse: 0
     - _VertexColorBlendEmissive: 0
     - _ZWrite: 1

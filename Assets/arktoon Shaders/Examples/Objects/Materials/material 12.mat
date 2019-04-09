@@ -168,7 +168,7 @@ Material:
     - _DoubleSidedBackfaceValueFromBase: 1
     - _DoubleSidedFlipBackfaceNormal: 0
     - _DstBlend: 0
-    - _EmissionParallaxDepth: -1
+    - _EmissionParallaxDepth: -0.5
     - _EmissionParallaxDepthMaskInvert: 0
     - _GlossBlend: 0.743
     - _GlossMapScale: 1
@@ -254,7 +254,7 @@ Material:
     - _UseRim: 0
     - _UseShadowCap: 0
     - _UseVertexLight: 1
-    - _Version: 1023
+    - _Version: 1024
     - _VertexColorBlendDiffuse: 0
     - _VertexColorBlendEmissive: 0
     - _ZWrite: 0

@@ -165,11 +165,11 @@ Material:
     - _Cutoff: 0.5
     - _CutoutCutoutAdjust: 0.741
     - _DetailNormalMapScale: 1
-    - _DoubleSidedBackfaceHueShiftFromBase: 0
+    - _DoubleSidedBackfaceHueShiftFromBase: 0.026
     - _DoubleSidedBackfaceLightIntensity: 0.5
-    - _DoubleSidedBackfaceSaturationFromBase: 1
-    - _DoubleSidedBackfaceUseColorShift: 0
-    - _DoubleSidedBackfaceValueFromBase: 1
+    - _DoubleSidedBackfaceSaturationFromBase: 1.73
+    - _DoubleSidedBackfaceUseColorShift: 1
+    - _DoubleSidedBackfaceValueFromBase: 1.24
     - _DoubleSidedFlipBackfaceNormal: 0
     - _DstBlend: 0
     - _EmissionParallaxDepth: -0.146
@@ -222,7 +222,7 @@ Material:
     - _ShadowCapBlend: 1.21
     - _ShadowCapBlendMode: 3
     - _ShadowCapNormalMix: 0
-    - _ShadowCasterCulling: 2
+    - _ShadowCasterCulling: 0
     - _ShadowIndirectIntensity: 0.25
     - _ShadowPlanB2HueShiftFromBase: 0
     - _ShadowPlanB2SaturationFromBase: 1
@@ -246,7 +246,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _UseDoubleSided: 0
+    - _UseDoubleSided: 1
     - _UseEmissionParallax: 0
     - _UseGloss: 0
     - _UseLegacyCapCalc: 0
@@ -259,14 +259,14 @@ Material:
     - _UseRim: 1
     - _UseShadowCap: 0
     - _UseVertexLight: 1
-    - _Version: 1023
+    - _Version: 1024
     - _VertexColorBlendDiffuse: 0
     - _VertexColorBlendEmissive: 0
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.992647, g: 0.5474156, b: 0.5474156, a: 1}
     - _Color: {r: 1, g: 0.6592292, b: 0.5588235, a: 1}
-    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0.31617647, g: 0.31617647, b: 0.31617647, a: 1}
     - _EmissionParallaxColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlossColor: {r: 1, g: 1, b: 1, a: 1}
     - _MatcapColor: {r: 1, g: 1, b: 1, a: 1}
