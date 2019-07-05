@@ -373,7 +373,10 @@ namespace ArktoonShaders
                 UIHelper.ShurikenHeader("Common");
                 UIHelper.DrawWithGroup(() => {
                     materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Base Color Texture (RGB)"), BaseTexture, BaseColor);
+					UIHelper.DrawWithGroup(() => {
                     materialEditor.TexturePropertySingleLine(new GUIContent("Normal Map", "Normal Map (RGB)"), Normalmap, BumpScale);
+					materialEditor.TextureScaleOffsetPropertyIndent(Normalmap);
+					});
                     materialEditor.TexturePropertySingleLine(new GUIContent("Emission", "Emission (RGB)"), EmissionMap, EmissionColor);
 
                     // materialEditor.ShaderProperty(Cull, "Cull");
