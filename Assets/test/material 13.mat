@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: material
+  m_Name: material 13
   m_Shader: {fileID: 4800000, guid: 4e37d1f795f1af645a83bd46003347ae, type: 3}
   m_ShaderKeywords: _CULL_BACK _NORMALMAP
   m_LightmapFlags: 4
@@ -162,7 +162,7 @@ Material:
     - _Cutoff: 0.5
     - _CutoutCutoutAdjust: 0.741
     - _DetailNormalMapScale: 1
-    - _DoubleSidedBackfaceHueShiftFromBase: -0.086
+    - _DoubleSidedBackfaceHueShiftFromBase: -0.163
     - _DoubleSidedBackfaceLightIntensity: 1.396
     - _DoubleSidedBackfaceSaturationFromBase: 1
     - _DoubleSidedBackfaceUseColorShift: 1
@@ -194,7 +194,7 @@ Material:
     - _OutlineTextureColorRate: 1
     - _OutlineUseColorShift: 0
     - _OutlineValueFromBase: 1
-    - _OutlineWidth: 6.54
+    - _OutlineWidth: 0
     - _Parallax: 0.02
     - _PointAddIntensity: 1
     - _PointShadowSteps: 2
@@ -208,8 +208,8 @@ Material:
     - _ReflectionRoughness: 0
     - _ReflectionShadeMix: 0
     - _ReflectionSuppressBaseColorValue: 1
-    - _RimBlend: 0
-    - _RimFresnelPower: 1
+    - _RimBlend: 3
+    - _RimFresnelPower: 0
     - _RimShadeMix: 0
     - _RimUpperSideWidth: 0
     - _RimUseBaseTexture: 0
@@ -252,7 +252,7 @@ Material:
     - _UsePositionRelatedCalc: 0
     - _UseReflection: 0
     - _UseReflectionProbe: 0
-    - _UseRim: 0
+    - _UseRim: 1
     - _UseShadowCap: 0
     - _UseVertexLight: 1
     - _Version: 1025
@@ -261,7 +261,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.992647, g: 0.5474156, b: 0.5474156, a: 1}
-    - _Color: {r: 1, g: 0.9537525, b: 0.5808823, a: 1}
+    - _Color: {r: 1, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionParallaxColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlossColor: {r: 1, g: 1, b: 1, a: 1}
