@@ -127,10 +127,10 @@ float4 frag(VertexOutput i) : COLOR {
         //複数の掛け算は基本的にスカラーを左に寄せるだけでベクトル演算が減って最適化に繋がります。
         float4 tmpColoredLightFactorAttenuated = directContributionVertex * i.ambientAttenuation;
         float4 tmpColoredLightFactorIndirect = mad(i.ambientIndirect,-_PointShadowStrength,i.ambientIndirect);
-        float3 coloredLight_0 = max(tmpColoredLightFactorAttenuated.r * i.lightColor0 ,tmpColoredLightFactorIndirect.r * i.lightColor0);
-        float3 coloredLight_1 = max(tmpColoredLightFactorAttenuated.g * i.lightColor1 ,tmpColoredLightFactorIndirect.g * i.lightColor1);
-        float3 coloredLight_2 = max(tmpColoredLightFactorAttenuated.b * i.lightColor2 ,tmpColoredLightFactorIndirect.b * i.lightColor2);
-        float3 coloredLight_3 = max(tmpColoredLightFactorAttenuated.a * i.lightColor3 ,tmpColoredLightFactorIndirect.a * i.lightColor3);
+        float3 coloredLight_0 = max(tmpColoredLightFactorAttenuated.r ,tmpColoredLightFactorIndirect.r) * i.lightColor0;
+        float3 coloredLight_1 = max(tmpColoredLightFactorAttenuated.g ,tmpColoredLightFactorIndirect.g) * i.lightColor1;
+        float3 coloredLight_2 = max(tmpColoredLightFactorAttenuated.b ,tmpColoredLightFactorIndirect.b) * i.lightColor2;
+        float3 coloredLight_3 = max(tmpColoredLightFactorAttenuated.a ,tmpColoredLightFactorIndirect.a) * i.lightColor3;
         coloredLight_sum = (coloredLight_0 + coloredLight_1 + coloredLight_2 + coloredLight_3) * _PointAddIntensity;
     }
 
