@@ -15,7 +15,7 @@ Shader "arktoon/_Extra/EmissiveFreak/Fade" {
         _DoubleSidedBackfaceSaturationFromBase("Backface Saturation From Base", Range(0, 2)) = 1
         _DoubleSidedBackfaceValueFromBase("Backface Value From Base", Range(0, 2)) = 1
         //
-        _ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // None:0, Front:1, Back:2
+        _Cull("[hidden] Shadow Caster Culling", Int) = 2 // None:0, Front:1, Back:2
         [Enum(Off, 0, On, 1)]_ZWrite("ZWrite", Float) = 0
         // Common
         _MainTex ("[Common] Base Texture", 2D) = "white" {}
@@ -238,7 +238,7 @@ Shader "arktoon/_Extra/EmissiveFreak/Fade" {
             Tags { "LightMode" = "ShadowCaster" }
 
             ZWrite On ZTest LEqual
-            Cull [_ShadowCasterCulling]
+            Cull [_Cull]
 
             CGPROGRAM
             #pragma target 3.0

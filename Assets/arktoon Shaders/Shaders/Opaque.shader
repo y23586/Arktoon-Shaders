@@ -7,15 +7,13 @@
 Shader "Arktoon 2018/Opaque" {
     Properties {
         // Double Sided
-        [Toggle(_)]_UseDoubleSided ("Double Sided", Int ) = 0
+        [KeywordEnum(None, Front, Back)] _Cull("Cull", Int) = 2
         [Toggle(_)]_DoubleSidedFlipBackfaceNormal ("Flip backface normal", Float ) = 0
         _DoubleSidedBackfaceLightIntensity ("Backface Light intensity", Range(0, 2) ) = 0.5
         [Toggle(_)]_DoubleSidedBackfaceUseColorShift("Backface Use Color Shift", Int) = 0
         [PowerSlider(2.0)]_DoubleSidedBackfaceHueShiftFromBase("Backface Hue Shift From Base", Range(-0.5, 0.5)) = 0
         _DoubleSidedBackfaceSaturationFromBase("Backface Saturation From Base", Range(0, 2)) = 1
         _DoubleSidedBackfaceValueFromBase("Backface Value From Base", Range(0, 2)) = 1
-        //
-        _ShadowCasterCulling("[hidden] Shadow Caster Culling", Int) = 2 // None:0, Front:1, Back:2
         // Common
         _MainTex ("[Common] Base Texture", 2D) = "white" {}
         _Color ("[Common] Base Color", Color) = (1,1,1,1)
@@ -144,7 +142,7 @@ Shader "Arktoon 2018/Opaque" {
             Tags {
                 "LightMode"="ForwardBase"
             }
-            Cull Back
+            Cull [_Cull]
 
             CGPROGRAM
 
@@ -168,7 +166,7 @@ Shader "Arktoon 2018/Opaque" {
             Tags {
                 "LightMode"="ForwardAdd"
             }
-            Cull Back
+            Cull [_Cull]
             Blend One One
 
             CGPROGRAM
@@ -194,7 +192,7 @@ Shader "Arktoon 2018/Opaque" {
                 "LightMode"="ShadowCaster"
             }
             Offset 1, 1
-            Cull [_ShadowCasterCulling]
+            Cull [_Cull]
 
             CGPROGRAM
             #pragma vertex vert

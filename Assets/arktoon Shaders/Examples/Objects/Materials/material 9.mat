@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: material 9
   m_Shader: {fileID: 4800000, guid: 73ccad7277f2ff74493c7fe514368a4a, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _CULL_NONE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -254,7 +254,7 @@ Material:
     - _UseOutline: 0
     - _UseOutlineWidthMask: 0
     - _UsePositionRelatedCalc: 0
-    - _UseReflection: 1
+    - _UseReflection: 0
     - _UseReflectionProbe: 1
     - _UseRim: 1
     - _UseShadowCap: 0

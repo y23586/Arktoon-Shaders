@@ -126,14 +126,13 @@ namespace ArktoonShaders
         MaterialProperty StencilMaskTex;
         MaterialProperty StencilMaskAdjust;
         MaterialProperty StencilMaskAlphaDither;
-        MaterialProperty UseDoubleSided;
+        MaterialProperty Cull;
         MaterialProperty DoubleSidedFlipBackfaceNormal;
         MaterialProperty DoubleSidedBackfaceLightIntensity;
         MaterialProperty DoubleSidedBackfaceUseColorShift;
         MaterialProperty DoubleSidedBackfaceHueShiftFromBase;
         MaterialProperty DoubleSidedBackfaceSaturationFromBase;
         MaterialProperty DoubleSidedBackfaceValueFromBase;
-        MaterialProperty ShadowCasterCulling;
         MaterialProperty ZWrite;
         MaterialProperty VertexColorBlendDiffuse;
         MaterialProperty VertexColorBlendEmissive;
@@ -316,14 +315,13 @@ namespace ArktoonShaders
             StencilCompareAction = FindProperty("_StencilCompareAction", props, false);
             StencilNumberSecondary = FindProperty("_StencilNumberSecondary", props, false);
             StencilCompareActionSecondary = FindProperty("_StencilCompareActionSecondary", props, false);
-            UseDoubleSided = FindProperty("_UseDoubleSided", props, false);
+            Cull = FindProperty("_Cull", props, false);
             DoubleSidedFlipBackfaceNormal = FindProperty("_DoubleSidedFlipBackfaceNormal", props, false);
             DoubleSidedBackfaceLightIntensity = FindProperty("_DoubleSidedBackfaceLightIntensity", props, false);
             DoubleSidedBackfaceUseColorShift = FindProperty("_DoubleSidedBackfaceUseColorShift", props, false);
             DoubleSidedBackfaceHueShiftFromBase = FindProperty("_DoubleSidedBackfaceHueShiftFromBase", props, false);
             DoubleSidedBackfaceSaturationFromBase = FindProperty("_DoubleSidedBackfaceSaturationFromBase", props, false);
             DoubleSidedBackfaceValueFromBase = FindProperty("_DoubleSidedBackfaceValueFromBase", props, false);
-            ShadowCasterCulling = FindProperty("_ShadowCasterCulling", props, false);
             VertexColorBlendDiffuse = FindProperty("_VertexColorBlendDiffuse", props, false);
             VertexColorBlendEmissive = FindProperty("_VertexColorBlendEmissive", props, false);
             OtherShadowBorderSharpness = FindProperty("_OtherShadowBorderSharpness", props, false);
@@ -385,12 +383,10 @@ namespace ArktoonShaders
                         materialEditor.TextureScaleOffsetPropertyIndent(EmissionMap);
                     });
 
-                    // materialEditor.ShaderProperty(Cull, "Cull");
                     UIHelper.DrawWithGroup(() => {
-                        materialEditor.ShaderProperty(UseDoubleSided, "Is Double Sided");
-                        var doublesided = UseDoubleSided.floatValue;
-                        if(doublesided > 0){
-                            ShadowCasterCulling.floatValue = 0;
+                        materialEditor.ShaderProperty(Cull, "Cull");
+                        var culling = Cull.floatValue;
+                        if(culling < 2){
                             EditorGUI.indentLevel ++;
                             materialEditor.ShaderProperty(DoubleSidedFlipBackfaceNormal, "Flip backface normal");
                             materialEditor.ShaderProperty(DoubleSidedBackfaceLightIntensity, "Backface Light Intensity");
@@ -403,11 +399,9 @@ namespace ArktoonShaders
                                 materialEditor.ShaderProperty(DoubleSidedBackfaceValueFromBase, "Value");
                                 EditorGUI.indentLevel --;
                             }
-
                             EditorGUI.indentLevel --;
-                        } else {
-                            ShadowCasterCulling.floatValue = 2;
                         }
+
                         if(isFade) materialEditor.ShaderProperty(ZWrite, "ZWrite");
                     });
                 });

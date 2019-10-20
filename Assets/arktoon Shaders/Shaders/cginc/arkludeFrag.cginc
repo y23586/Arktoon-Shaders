@@ -1,6 +1,12 @@
-float4 frag(VertexOutput i) : COLOR {
+float4 frag(VertexOutput i, fixed facing : VFACE) : COLOR {
 
-    float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, i.faceSign, _DoubleSidedFlipBackfaceNormal));
+    clip(1 - i.isOutline + facing);
+
+    // 表裏の制御
+    fixed faceSign = facing > 0 ? 1 : -1; //
+    bool isFrontFace = facing > 0;
+
+    float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(UnityWorldSpaceViewDir(i.posWorld.xyz));
     float3 _BumpMap_var = UnpackScaleNormal(tex2D(REF_BUMPMAP,TRANSFORM_TEX(i.uv0, REF_BUMPMAP)), REF_BUMPSCALE);
     float3 normalLocal = _BumpMap_var.rgb;
@@ -89,7 +95,8 @@ float4 frag(VertexOutput i) : COLOR {
     // 光の受光に関する更なる補正
     // ・LightIntensityIfBackface(裏面を描画中に変動する受光倍率)
     // ・ShadowCapのModeがLightShutterの時にかかるマスク乗算
-    float additionalContributionMultiplier = i.lightIntensityIfBackface;
+    float additionalContributionMultiplier = 1;
+    additionalContributionMultiplier *= lerp(_DoubleSidedBackfaceLightIntensity, 1, isFrontFace);
 
     if (_ShadowCapBlendMode == 2) { // Light Shutter
         float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
@@ -180,8 +187,8 @@ float4 frag(VertexOutput i) : COLOR {
 
     // 裏面であればHSVShiftを反映
     if(_DoubleSidedBackfaceUseColorShift) {
-        toonedMap = lerp(toonedMap, CalculateHSV(toonedMap, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), i.isBackface);
-        Diffuse = lerp(Diffuse, CalculateHSV(Diffuse, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), i.isBackface);
+        toonedMap = lerp(toonedMap, CalculateHSV(toonedMap, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), !isFrontFace);
+        Diffuse = lerp(Diffuse, CalculateHSV(Diffuse, _DoubleSidedBackfaceHueShiftFromBase, _DoubleSidedBackfaceSaturationFromBase, _DoubleSidedBackfaceValueFromBase), !isFrontFace);
     }
 
     float3 ReflectionMap = float3(0,0,0);
@@ -289,7 +296,7 @@ float4 frag(VertexOutput i) : COLOR {
             RimLight = (
                             lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
                             * pow(
-                                saturate(1.0 - saturate(dot(normalDirection * lerp(i.faceSign, 1, _DoubleSidedFlipBackfaceNormal), viewDirection) ) + _RimUpperSideWidth)
+                                saturate(1.0 - saturate(dot(normalDirection * lerp(faceSign, 1, _DoubleSidedFlipBackfaceNormal), viewDirection) ) + _RimUpperSideWidth)
                                 , _RimFresnelPower
                                 )
                             * _RimBlend
