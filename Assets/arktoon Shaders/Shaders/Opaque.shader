@@ -4,7 +4,7 @@
 //
 // 本コードおよびリポジトリ（https://github.com/synqark/Arktoon-Shader) は MIT License を使用して公開しています。
 // 詳細はLICENSEか、https://opensource.org/licenses/mit-license.php を参照してください。
-Shader "arktoon/Opaque" {
+Shader "Arktoon 2018/Opaque" {
     Properties {
         // Double Sided
         [ATSToggle]_UseDoubleSided ("Double Sided", Int ) = 0
