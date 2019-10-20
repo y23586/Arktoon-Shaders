@@ -109,8 +109,9 @@ namespace ArktoonShaders
         MaterialProperty RimBlend;
         MaterialProperty RimBlendMask;
         MaterialProperty RimShadeMix;
-        MaterialProperty RimFresnelPower;
-        MaterialProperty RimUpperSideWidth;
+        MaterialProperty RimBlendStart;
+        MaterialProperty RimBlendEnd;
+        MaterialProperty RimPow;
         MaterialProperty RimColor;
         MaterialProperty RimTexture;
         MaterialProperty RimUseBaseTexture;
@@ -298,8 +299,9 @@ namespace ArktoonShaders
             RimBlend = FindProperty("_RimBlend", props, false);
             RimBlendMask = FindProperty("_RimBlendMask", props, false);
             RimShadeMix = FindProperty("_RimShadeMix", props, false);
-            RimFresnelPower = FindProperty("_RimFresnelPower", props, false);
-            RimUpperSideWidth = FindProperty("_RimUpperSideWidth", props, false);
+            RimBlendStart = FindProperty("_RimBlendStart", props, false);
+            RimBlendEnd = FindProperty("_RimBlendEnd", props, false);
+            RimPow = FindProperty("_RimPow", props, false);
             RimColor = FindProperty("_RimColor", props, false);
             RimTexture = FindProperty("_RimTexture", props, false);
             RimUseBaseTexture = FindProperty("_RimUseBaseTexture", props, false);
@@ -637,6 +639,11 @@ namespace ArktoonShaders
                 if(useRim > 0)
                 {
                     UIHelper.DrawWithGroup(() => {
+
+                        materialEditor.ShaderProperty(RimBlendStart,"Blend Start");
+                        materialEditor.ShaderProperty(RimBlendEnd,"Blend End");
+                        materialEditor.ShaderProperty(RimPow,"Power type");
+
                         UIHelper.DrawWithGroup(() => {
                             materialEditor.TexturePropertySingleLine(new GUIContent("Blend & Mask", "Blend and Mask Texture"), RimBlendMask, RimBlend);
                             materialEditor.TextureScaleOffsetPropertyIndent(RimBlendMask);
@@ -647,8 +654,6 @@ namespace ArktoonShaders
                             materialEditor.ShaderProperty(RimUseBaseTexture,"Use Base Color");
                         });
                         materialEditor.ShaderProperty(RimShadeMix,"Shadow mix");
-                        materialEditor.ShaderProperty(RimFresnelPower,"Fresnel Power");
-                        materialEditor.ShaderProperty(RimUpperSideWidth,"Upper side width");
                     });
                 }
 

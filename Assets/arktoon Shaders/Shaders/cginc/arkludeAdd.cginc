@@ -165,15 +165,20 @@ float4 frag(VertexOutput i, fixed facing : VFACE) : COLOR {
         if (_UseRim) {
             float _RimBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _RimBlendMask));
             float4 _RimTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_RimTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _RimTexture));
+
+            float rimNdotV = abs(dot( normalDirection, viewDirection ));
+            float oneMinusRimNdotV = 1 - rimNdotV; // 0:正面 ~ 1:真横
+            float value = (oneMinusRimNdotV - _RimBlendStart) / (_RimBlendEnd - _RimBlendStart);
+            float rimPow3 = value*value*value;
+            float rimPow5 = Pow5(value);
+            float valueTotal = min(1, lerp(value, lerp(rimPow3, rimPow5, max(0, _RimPow-1)), min(1,_RimPow)));
+
             RimLight = (
-                lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
-                * pow(
-                    min(1.0, 1.0 - max(0, dot(normalDirection, viewDirection)) + _RimUpperSideWidth)
-                    , _RimFresnelPower
-                )
-                * _RimBlend
-                * _RimColor.rgb
-                * _RimBlendMask_var
+                    lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
+                    * valueTotal
+                    * _RimBlend
+                    * _RimColor.rgb
+                    * _RimBlendMask_var
             );
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
         }

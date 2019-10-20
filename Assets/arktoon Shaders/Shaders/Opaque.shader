@@ -106,8 +106,9 @@ Shader "Arktoon 2018/Opaque" {
         _RimBlend ("[Rim] Blend", Range(0, 3)) = 1
         _RimBlendMask ("[Rim] Blend Mask", 2D) = "white" {}
         _RimShadeMix("[Rim] Shade Mix", Range(0, 1)) = 0
-        [PowerSlider(3.0)]_RimFresnelPower ("[Rim] Fresnel Power", Range(0, 200)) = 1
-        _RimUpperSideWidth("[Rim] Upper width", Range(0, 1)) = 0
+        _RimBlendStart("[Rim] Blend start", Range(0, 1)) = 0
+        _RimBlendEnd("[Rim] Blend end", Range(0, 1)) = 0
+        [Enum(Linear,0, Pow3,1, Pow5,2)] _RimPow ("[Rim] Power Type", Int) = 1
         [HDR]_RimColor ("[Rim] Color", Color) = (1,1,1,1)
         _RimTexture ("[Rim] Texture", 2D) = "white" {}
         [Toggle(_)] _RimUseBaseTexture ("[Rim] Use Base Texture", Float ) = 0

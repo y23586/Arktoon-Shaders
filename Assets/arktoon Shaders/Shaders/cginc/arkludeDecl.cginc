@@ -138,8 +138,9 @@ uniform half4  _ReflectionCubemap_HDR;
 
 // Rim
 uniform int _UseRim;
-uniform float _RimFresnelPower;
-uniform float _RimUpperSideWidth;
+uniform float _RimBlendStart;
+uniform float _RimBlendEnd;
+uniform float _RimPow;
 uniform float4 _RimColor;
 uniform fixed _RimUseBaseTexture;
 uniform float _RimBlend;
