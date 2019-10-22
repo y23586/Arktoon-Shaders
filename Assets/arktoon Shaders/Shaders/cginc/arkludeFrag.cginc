@@ -7,10 +7,8 @@ float4 frag(
     ,  bool isFrontFace : SV_IsFrontFace
     ) : SV_Target
 {
-    // 表裏の制御
-    fixed faceSign = isFrontFace ? 1 : -1; //
-
-    //
+    // 表裏・アウトライン
+    fixed faceSign = isFrontFace ? 1 : -1;
     bool isOutline = i.color.a;
 
     // アウトラインの裏面は常に削除
@@ -35,11 +33,9 @@ float4 frag(
     float3 Diffuse = (_MainTex_var.rgb*REF_COLOR.rgb);
     Diffuse = lerp(Diffuse, Diffuse * i.color, _VertexColorBlendDiffuse);
 
-
     #ifdef ARKTOON_CUTOUT
         clip((_MainTex_var.a * REF_COLOR.a) - _CutoutCutoutAdjust);
     #endif
-
 
     #ifdef ARKTOON_OUTLINE
         if (isOutline) {
@@ -92,10 +88,8 @@ float4 frag(
     float otherShadow = saturate(saturate(mad(attenuation,2 ,-1))+mad(_OtherShadowBorderSharpness,-selfShade,_OtherShadowBorderSharpness));
     float tmpDirectContributionFactor0 = saturate(dot(lightColor,grayscale_for_light())*1.5);
     directContribution = lerp(0, directContribution, saturate(1-(mad(tmpDirectContributionFactor0,-otherShadow,tmpDirectContributionFactor0))));
+    directContribution = lerp(directContribution, min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1)), _ShadowUseStep);
 
-    // #ifdef USE_SHADOW_STEPS
-        directContribution = lerp(directContribution, min(1,floor(directContribution * _ShadowSteps) / (_ShadowSteps - 1)), _ShadowUseStep);
-    // #endif
     float tmpDirectContributionFactor1 = _ShadowStrengthMask_var * _ShadowStrength;
     directContribution = 1.0 - mad(tmpDirectContributionFactor1,-directContribution,tmpDirectContributionFactor1);
 
@@ -130,9 +124,8 @@ float4 frag(
     float VertexShadowborderMin = saturate(_PointShadowborder - _PointShadowborderBlur_var/2.0);
     float VertexShadowborderMax = saturate(_PointShadowborder + _PointShadowborderBlur_var/2.0);
     float4 directContributionVertex = 1.0 - ((1.0 - saturate(( (saturate(i.ambientAttenuation) - VertexShadowborderMin)) / (VertexShadowborderMax - VertexShadowborderMin))));
-    // #ifdef USE_POINT_SHADOW_STEPS
-        directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
-    // #endif
+    directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
+
     directContributionVertex *= additionalContributionMultiplier;
     //ベクトル演算を減らしつつ、複数のスカラー演算を一つのベクトル演算にまとめました。
     //現代のPC向けGPUはほぼ100%がスカラー型であり、ベクトル演算は基本的にその次元数分ALU負荷が倍増します。

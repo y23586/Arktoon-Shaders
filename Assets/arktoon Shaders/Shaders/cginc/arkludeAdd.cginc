@@ -7,10 +7,8 @@ float4 frag(
     ,  bool isFrontFace : SV_IsFrontFace
     ) : SV_Target
 {
-    // 表裏の制御
-    fixed faceSign = isFrontFace ? 1 : -1; //
-
-    //
+    // 表裏・アウトライン
+    fixed faceSign = isFrontFace ? 1 : -1;
     bool isOutline = i.color.a;
 
     // アウトラインの裏面は常に削除
@@ -29,7 +27,7 @@ float4 frag(
     UNITY_LIGHT_ATTENUATION(attenuation,i, i.posWorld.xyz);
     float4 _MainTex_var = UNITY_SAMPLE_TEX2D(REF_MAINTEX, TRANSFORM_TEX(i.uv0, REF_MAINTEX));
     float3 Diffuse = (_MainTex_var.rgb*REF_COLOR.rgb);
-    Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse); // 頂点カラーを合成
+    Diffuse = lerp(Diffuse, Diffuse * i.color, _VertexColorBlendDiffuse);
 
     #ifdef ARKTOON_CUTOUT
         clip((_MainTex_var.a * REF_COLOR.a) - _CutoutCutoutAdjust);
@@ -60,9 +58,7 @@ float4 frag(
 
     float lightContribution = dot(lightDirection, normalDirection)*attenuation;
     float directContribution = 1.0 - ((1.0 - saturate(( (saturate(lightContribution) - ShadowborderMin)) / (ShadowborderMax - ShadowborderMin))));
-    // #ifdef USE_POINT_SHADOW_STEPS
-        directContribution = lerp(directContribution, saturate(floor(directContribution * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
-    // #endif
+    directContribution = lerp(directContribution, saturate(floor(directContribution * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
 
     // 光の受光に関する更なる補正
     // ・LightIntensityIfBackface(裏面を描画中に変動する受光倍率)
@@ -93,22 +89,21 @@ float4 frag(
     float3 toonedMap = Diffuse * coloredLight;
 
     float3 specular = float3(0,0,0);
-    float3 shadowcap = float3(1000,1000,1000);
     float3 matcap = float3(0,0,0);
     float3 RimLight = float3(0,0,0);
+    float3 shadowcap = float3(1000,1000,1000);
 
     #if !defined(ARKTOON_REFRACTED) && defined(ARKTOON_OUTLINE)
     if (!isOutline) {
     #endif
         // オプション：Gloss
         if(_UseGloss) {
+            float glossNdotV = abs(dot( normalDirection, viewDirection ));
             float _GlossBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_GlossBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _GlossBlendMask));
-
             float gloss = _GlossBlend * _GlossBlendMask_var;
             float perceptualRoughness = 1.0 - gloss;
             float roughness = perceptualRoughness * perceptualRoughness;
             float specPow = exp2( gloss * 10.0+1.0);
-
             float NdotL = saturate(dot( normalDirection, lightDirection ));
             float LdotH = saturate(dot(lightDirection, halfDirection));
             float3 specularColor = _GlossPower;
@@ -116,10 +111,9 @@ float4 frag(
             float3 diffuseColor = Diffuse;
             diffuseColor = DiffuseAndSpecularFromMetallic( diffuseColor, specularColor, specularColor, specularMonochrome );
             specularMonochrome = 1.0-specularMonochrome;
-            float NdotV = abs(dot( normalDirection, viewDirection ));
             float NdotH = saturate(dot( normalDirection, halfDirection ));
             float VdotH = saturate(dot( viewDirection, halfDirection ));
-            float visTerm = SmithJointGGXVisibilityTerm( NdotL, NdotV, roughness );
+            float visTerm = SmithJointGGXVisibilityTerm( NdotL, glossNdotV, roughness );
             float normTerm = GGXTerm(NdotH, roughness);
             float specularPBL = (visTerm*normTerm) * UNITY_PI;
             #ifdef UNITY_COLORSPACE_GAMMA
@@ -165,7 +159,7 @@ float4 frag(
                 float3 transformMatcapCombined = transformMatcapViewDir * (dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z) + transformMatcapNormal;
                 transformMatcap = lerp(((transformMatcapCombined.rg*0.5)+0.5), transformMatcap_old, saturate(-transformMatcapNormal.z));
             } else {
-                transformMatcap = (mul( unity_WorldToCamera, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
+                transformMatcap = (mul(unity_WorldToCamera, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
             }
             float4 _MatcapTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapTexture, REF_MAINTEX, TRANSFORM_TEX(transformMatcap, _MatcapTexture));
             float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
@@ -186,11 +180,11 @@ float4 frag(
             float valueTotal = min(1, lerp(value, lerp(rimPow3, rimPow5, max(0, _RimPow-1)), min(1,_RimPow)));
 
             RimLight = (
-                lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
-                * valueTotal
-                * _RimBlend
-                * _RimColor.rgb
-                * _RimBlendMask_var
+                    lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
+                    * valueTotal
+                    * _RimBlend
+                    * _RimColor.rgb
+                    * _RimBlendMask_var
             );
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
         }
@@ -220,7 +214,7 @@ float4 frag(
         fixed _AlphaMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_AlphaMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _AlphaMask)).r;
         fixed4 finalRGBA = fixed4(finalColor * (_MainTex_var.a * REF_COLOR.a * _AlphaMask_var),0);
     #else
-        fixed4 finalRGBA = fixed4(finalColor * 1,0);
+        fixed4 finalRGBA = fixed4(finalColor, 0);
     #endif
     UNITY_APPLY_FOG(i.fogCoord, finalRGBA);
     return finalRGBA;
