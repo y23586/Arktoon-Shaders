@@ -7,7 +7,7 @@ struct VertexOutput
     // float4 tangent : TANGENT;
     float3 normal : NORMAL;
     float2 uv0 : TEXCOORD0;
-    fixed4 color : COLOR; // .a=1はアウトライン, a=0
+    fixed4 color : COLOR0; // .a=1はアウトライン, a=0
 
     #ifdef ARKTOON_OUTLINE
         float4 pos : CLIP_POS;
@@ -68,7 +68,7 @@ struct v2g
 struct g2f {
 
     float2 uv0 : TEXCOORD0;
-    fixed4 color : COLOR1;
+    fixed4 color : COLOR0;
 
     float4 pos : SV_POSITION;
     float3 normalDir : TEXCOORD3;
