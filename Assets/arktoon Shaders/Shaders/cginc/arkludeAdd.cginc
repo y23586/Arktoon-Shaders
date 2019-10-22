@@ -1,16 +1,20 @@
-float4 frag(g2f i, fixed facing : VFACE) : COLOR {
-
-    i.normalDir = normalize(i.normalDir);
-
+float4 frag(
+    #ifdef ARKTOON_OUTLINE
+        g2f i
+    #else
+        VertexOutput i
+    #endif
+    ,  bool isFrontFace : SV_IsFrontFace
+    ) : COLOR
+{
     // 表裏の制御
-    fixed faceSign = facing > 0 ? 1 : -1;
-    bool isFrontFace = facing > 0;
+    fixed faceSign = isFrontFace ? 1 : -1; //
 
     //
     bool isOutline = i.color.a;
 
     // アウトラインの裏面は常に削除
-    clip(1 - isOutline + facing);
+    clip(1 - isOutline + isFrontFace - 0.001);
 
     float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(UnityWorldSpaceViewDir(i.posWorld.xyz));

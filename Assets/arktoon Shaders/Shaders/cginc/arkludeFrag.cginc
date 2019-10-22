@@ -4,18 +4,17 @@ float4 frag(
     #else
         VertexOutput i
     #endif
-    , fixed facing : VFACE
+    ,  bool isFrontFace : SV_IsFrontFace
     ) : COLOR
 {
     // 表裏の制御
-    fixed faceSign = facing > 0 ? 1 : -1; //
-    bool isFrontFace = facing > 0;
+    fixed faceSign = isFrontFace ? 1 : -1; //
 
     //
     bool isOutline = i.color.a;
 
     // アウトラインの裏面は常に削除
-    clip(1 - isOutline + facing);
+    clip(1 - isOutline + isFrontFace - 0.001);
 
     float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(UnityWorldSpaceViewDir(i.posWorld.xyz));
