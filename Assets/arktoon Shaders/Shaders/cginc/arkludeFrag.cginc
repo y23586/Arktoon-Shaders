@@ -102,14 +102,13 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
         float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
         float2 transformShadowCap = float2(0,0);
         if (_UsePositionRelatedCalc) {
-            float3 transformShadowCapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);//Unityのビュー座標の闇を吸収しているような処理が見られるけどUNITY_MATRIX_Vの代わりにunity_WorldToCameraを使えばもっとシンプルになるかも
-            float3 transformShadowCapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz;
+            float3 transformShadowCapViewDir = mul( unity_WorldToCamera, float4(viewDirection,0) ).xyz - float3(0,0,1);
+            float3 transformShadowCapNormal = mul( unity_WorldToCamera, float4(normalDirectionShadowCap,0) ).xyz;
             float2 transformShadowCap_old = transformShadowCapNormal.rg*0.5+0.5;
-            transformShadowCapNormal  *= float3(-1,-1,1);
-            float3 transformShadowCapCombined = transformShadowCapViewDir * dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z - transformShadowCapNormal;
-            transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, saturate(transformShadowCapNormal.z));//saturateに置換可能なmaxだったため置き換えましたが多分この場合movが入るため高速化に繋がらないと思う・・・
+            float3 transformShadowCapCombined = transformShadowCapViewDir * (dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z) + transformShadowCapNormal;
+            transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, saturate(-transformShadowCapNormal.z));//saturateに置換可能なmaxだったため置き換えましたが多分この場合movが入るため高速化に繋がらないと思う・・・
         } else {
-            transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
+            transformShadowCap = (mul( unity_WorldToCamera, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
         }
         float4 _ShadowCapTexture_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapTexture, REF_MAINTEX, TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
         float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
@@ -275,14 +274,13 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
             float3 normalDirectionMatcap = normalize(mul( float3(normalLocal.r*_MatcapNormalMix,normalLocal.g*_MatcapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
             float2 transformMatcap = float2(0,0);
             if (_UsePositionRelatedCalc) {
-                float3 transformMatcapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
-                float3 transformMatcapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz;
+                float3 transformMatcapViewDir = mul( unity_WorldToCamera, float4(viewDirection,0) ).xyz - float3(0,0,1);
+                float3 transformMatcapNormal = mul( unity_WorldToCamera, float4(normalDirectionMatcap,0) ).xyz;
                 float2 transformMatcap_old = transformMatcapNormal.rg*0.5+0.5;
-                transformMatcapNormal *= float3(-1,-1,1);
-                float3 transformMatcapCombined = transformMatcapViewDir * dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z - transformMatcapNormal;
-                transformMatcap = lerp(((transformMatcapCombined.rg*0.5)+0.5), transformMatcap_old, max(0,transformMatcapNormal.z));
+                float3 transformMatcapCombined = transformMatcapViewDir * (dot(transformMatcapViewDir, transformMatcapNormal) / transformMatcapViewDir.z) + transformMatcapNormal;
+                transformMatcap = lerp(((transformMatcapCombined.rg*0.5)+0.5), transformMatcap_old, saturate(-transformMatcapNormal.z));
             } else {
-                transformMatcap = (mul( UNITY_MATRIX_V, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
+                transformMatcap = (mul(unity_WorldToCamera, float4(normalDirectionMatcap,0) ).xyz.rg*0.5+0.5);
             }
             float4 _MatcapTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapTexture, REF_MAINTEX, TRANSFORM_TEX(transformMatcap, _MatcapTexture));
             float4 _MatcapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_MatcapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _MatcapBlendMask));
@@ -316,14 +314,13 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
             float3 normalDirectionShadowCap = normalize(mul( float3(normalLocal.r*_ShadowCapNormalMix,normalLocal.g*_ShadowCapNormalMix,normalLocal.b), tangentTransform )); // Perturbed normals
             float2 transformShadowCap = float2(0,0);
             if (_UsePositionRelatedCalc) {
-                float3 transformShadowCapViewDir = mul( UNITY_MATRIX_V, float4(viewDirection,0) ).xyz * float3(-1,-1,1) + float3(0,0,1);
-                float3 transformShadowCapNormal = mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz;
+                float3 transformShadowCapViewDir = mul( unity_WorldToCamera, float4(viewDirection,0) ).xyz - float3(0,0,1);
+                float3 transformShadowCapNormal = mul( unity_WorldToCamera, float4(normalDirectionShadowCap,0) ).xyz;
                 float2 transformShadowCap_old = transformShadowCapNormal.rg*0.5+0.5;
-                transformShadowCapNormal  *= float3(-1,-1,1);
-                float3 transformShadowCapCombined = transformShadowCapViewDir * dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z - transformShadowCapNormal;
-                transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, max(0,transformShadowCapNormal.z));
+                float3 transformShadowCapCombined = transformShadowCapViewDir * (dot(transformShadowCapViewDir, transformShadowCapNormal) / transformShadowCapViewDir.z) + transformShadowCapNormal;
+                transformShadowCap = lerp(((transformShadowCapCombined.rg*0.5)+0.5), transformShadowCap_old, saturate(-transformShadowCapNormal.z));
             } else {
-                transformShadowCap = (mul( UNITY_MATRIX_V, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
+                transformShadowCap = (mul( unity_WorldToCamera, float4(normalDirectionShadowCap,0) ).xyz.rg*0.5+0.5);
             }
             float4 _ShadowCapTexture_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapTexture, REF_MAINTEX, TRANSFORM_TEX(transformShadowCap, _ShadowCapTexture));
             float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
@@ -354,7 +351,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
     // 屈折
     #ifdef ARKTOON_REFRACTED
         float refractionValue = pow(1.0-saturate(dot(normalDirection, viewDirection)),_RefractionFresnelExp);
-        float2 sceneUVs = (i.projPos.xy / i.projPos.w) + ((refractionValue*_RefractionStrength) * mul( UNITY_MATRIX_V, float4(normalDirection,0) ).xyz.rgb.rg);
+        float2 sceneUVs = (i.projPos.xy / i.projPos.w) + ((refractionValue*_RefractionStrength) * mul(unity_WorldToCamera, float4(normalDirection,0) ).xyz.rgb.rg);
         float4 sceneColor = tex2D(_GrabTexture, sceneUVs);
     #endif
 
@@ -377,7 +374,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
         float2 emissiveFreak1Transform = _EmissiveFreak1Depth * (_EmissiveFreak1DepthMask_var - _EmissiveFreak1DepthMaskInvert) * mul(tangentTransform, viewDirection).xy + emissiveFreak1uv;
         float _EmissiveFreak1Mask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak1Mask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissiveFreak1Mask)).r;
         float3 _EmissiveFreak1Tex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak1Tex, REF_MAINTEX, TRANSFORM_TEX(emissiveFreak1Transform, _EmissiveFreak1Tex)).rgb * _EmissiveFreak1Color.rgb;
-        float emissiveFreak1Breathing = sin(90+_EmissiveFreak1Breathing*time) * 0.5 + 0.5;//HLSLのレファレンス(https://docs.microsoft.com/ja-jp/windows/win32/direct3dhlsl/dx-graphics-hlsl-sin)によるとsinは度数単位の値ではなくラジアン単位の値を取るそうです。本当にこれ合ってますか？
+        float emissiveFreak1Breathing = cos(_EmissiveFreak1Breathing*time) * 0.5 + 0.5;//sin(x+π/2)=cos(x)
         float emissiveFreak1BlinkOut = 1 - ((_EmissiveFreak1BlinkOut*time) % 1.0);
         float emissiveFreak1BlinkIn = (_EmissiveFreak1BlinkIn*time) % 1.0;
         float emissiveFreak1Hue = (_EmissiveFreak1HueShift*time) % 1.0;
@@ -392,7 +389,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
         float2 emissiveFreak2Transform = _EmissiveFreak2Depth * (_EmissiveFreak2DepthMask_var - _EmissiveFreak2DepthMaskInvert) * mul(tangentTransform, viewDirection).xy + emissiveFreak2uv;
         float _EmissiveFreak2Mask_var =  UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak2Mask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _EmissiveFreak2Mask)).r;
         float3 _EmissiveFreak2Tex_var = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissiveFreak2Tex, REF_MAINTEX, TRANSFORM_TEX(emissiveFreak2Transform, _EmissiveFreak2Tex)).rgb * _EmissiveFreak2Color.rgb;
-        float emissiveFreak2Breathing = sin(90+_EmissiveFreak2Breathing*time) * 0.5 + 0.5;//HLSLのレファレンス(https://docs.microsoft.com/ja-jp/windows/win32/direct3dhlsl/dx-graphics-hlsl-sin)によるとsinは度数単位の値ではなくラジアン単位の値を取るそうです。本当にこれ合ってますか？
+        float emissiveFreak2Breathing = cos(_EmissiveFreak2Breathing*time) * 0.5 + 0.5;//sin(x+π/2)=cos(x)
         float emissiveFreak2BlinkOut = 1 - ((_EmissiveFreak2BlinkOut*time) % 1.0);
         float emissiveFreak2BlinkIn = (_EmissiveFreak2BlinkIn*time) % 1.0;
         float emissiveFreak2Hue = (_EmissiveFreak2HueShift*time) % 1.0;
