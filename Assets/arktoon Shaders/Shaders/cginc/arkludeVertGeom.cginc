@@ -30,7 +30,7 @@ struct VertexOutput
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD7;
+        noperspective float4 projPos : TEXCOORD7; // TODO:ラスタライザでの補間に深度を考慮しないよう指定？後で詳しく調べる
     #endif
 };
 
@@ -59,7 +59,7 @@ struct v2g
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD7;
+        noperspective float4 projPos : TEXCOORD7; // TODO:ラスタライザでの補間に深度を考慮しないよう指定？後で詳しく調べる
     #endif
 };
 
@@ -85,7 +85,7 @@ struct g2f {
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD7;
+        noperspective float4 projPos : TEXCOORD7; // TODO:ラスタライザでの補間に深度を考慮しないよう指定？後で詳しく調べる
     #endif
 };
 

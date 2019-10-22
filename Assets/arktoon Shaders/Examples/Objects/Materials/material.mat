@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: material
   m_Shader: {fileID: 4800000, guid: 73ccad7277f2ff74493c7fe514368a4a, type: 3}
-  m_ShaderKeywords: _
+  m_ShaderKeywords: _ _CULL_BACK
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -187,13 +187,13 @@ Material:
     - _OcclusionStrength: 1
     - _OtherShadowAdjust: -0.1
     - _OtherShadowBorderSharpness: 3
-    - _OutlineHueShiftFromBase: 0
+    - _OutlineHueShiftFromBase: 0.5
     - _OutlineSaturationFromBase: 1
-    - _OutlineShadeMix: 0
-    - _OutlineTextureColorRate: 0.752
-    - _OutlineUseColorShift: 0
+    - _OutlineShadeMix: 0.634
+    - _OutlineTextureColorRate: 0.788
+    - _OutlineUseColorShift: 1
     - _OutlineValueFromBase: 1
-    - _OutlineWidth: 8.5
+    - _OutlineWidth: 12.1
     - _Parallax: 0.02
     - _PointAddIntensity: 1
     - _PointShadowSteps: 2

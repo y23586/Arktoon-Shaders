@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: material 3
   m_Shader: {fileID: 4800000, guid: 9566a373fffe627408d31026ce69389d, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _ _CULL_NONE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -156,15 +156,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _Cull: 2
+    - _Cull: 0
     - _CustomShadow2nd: 0
     - _Cutoff: 0.5
     - _CutoutCutoutAdjust: 0.749
     - _DetailNormalMapScale: 1
-    - _DoubleSidedBackfaceHueShiftFromBase: 0
+    - _DoubleSidedBackfaceHueShiftFromBase: 0.272
     - _DoubleSidedBackfaceLightIntensity: 0.5
     - _DoubleSidedBackfaceSaturationFromBase: 1
-    - _DoubleSidedBackfaceUseColorShift: 0
+    - _DoubleSidedBackfaceUseColorShift: 1
     - _DoubleSidedBackfaceValueFromBase: 1
     - _DoubleSidedFlipBackfaceNormal: 0
     - _DstBlend: 0
@@ -208,7 +208,10 @@ Material:
     - _ReflectionShadeMix: 0
     - _ReflectionSuppressBaseColorValue: 1
     - _RimBlend: 0
+    - _RimBlendEnd: 0
+    - _RimBlendStart: 0
     - _RimFresnelPower: 1
+    - _RimPow: 1
     - _RimShadeMix: 0
     - _RimUpperSideWidth: 0
     - _RimUseBaseTexture: 0
