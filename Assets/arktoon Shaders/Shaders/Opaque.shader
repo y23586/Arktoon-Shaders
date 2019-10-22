@@ -149,13 +149,11 @@ Shader "Arktoon 2018/Opaque" {
 
 
             #pragma vertex vert
-            #pragma geometry geom
             #pragma fragment frag
             #pragma multi_compile_fwdbase_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
-            #define ARKTOON_OUTLINE
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -174,14 +172,12 @@ Shader "Arktoon 2018/Opaque" {
             CGPROGRAM
 
             #pragma vertex vert
-			#pragma geometry geom
             #pragma fragment frag
             #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
             #pragma target 4.0
             #define ARKTOON_ADD
-            #define ARKTOON_OUTLINE
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"

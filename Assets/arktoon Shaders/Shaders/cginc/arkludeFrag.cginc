@@ -1,5 +1,12 @@
-float4 frag(g2f i, fixed facing : VFACE) : COLOR {
-
+float4 frag(
+    #ifdef ARKTOON_OUTLINE
+        g2f i
+    #else
+        VertexOutput i
+    #endif
+    , fixed facing : VFACE
+    ) : COLOR
+{
     // 表裏の制御
     fixed faceSign = facing > 0 ? 1 : -1; //
     bool isFrontFace = facing > 0;

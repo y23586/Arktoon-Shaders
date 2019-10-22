@@ -4,24 +4,23 @@ struct VertexOutput
     #ifdef ARKTOON_OUTLINE
         float4 vertex : SV_POSITION;
     #endif
-    // float4 tangent : TANGENT;
-    // float3 normal : NORMAL;
+    // float3 normal : NORMAL; TODO:アウトラインの幅の調整方法を後程検討する。その際にgeom内での膨らまし方によっては使う。
 
     float2 uv0 : TEXCOORD0;
-    fixed4 color : COLOR0; // .a=1はアウトライン, a=0
+    float4 color : COLOR0; // ※ a値をアウトラインの判断に使用。 Outlineであれば1,そうでなければ0
 
     #ifdef ARKTOON_OUTLINE
         float4 pos : CLIP_POS;
     #else
         float4 pos : SV_POSITION;
     #endif
-    float3 normalDir : TEXCOORD4;
-    float3 tangentDir : TEXCOORD5;
-    float3 bitangentDir : TEXCOORD6;
-    float4 posWorld : TEXCOORD7;
+    float3 normalDir : TEXCOORD1;
+    float3 tangentDir : TEXCOORD2;
+    float3 bitangentDir : TEXCOORD3;
+    float4 posWorld : TEXCOORD4;
 
-    SHADOW_COORDS(8)
-    UNITY_FOG_COORDS(9)
+    SHADOW_COORDS(5)
+    UNITY_FOG_COORDS(6)
     #ifndef ARKTOON_ADD
         float3 lightColor0 : LIGHT_COLOR0;
         float3 lightColor1 : LIGHT_COLOR1;
@@ -31,29 +30,26 @@ struct VertexOutput
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD9;
+        float4 projPos : TEXCOORD7;
     #endif
 };
 
 struct v2g
 {
-    // appdata_full
     float4 vertex : SV_POSITION;
-    // float4 tangent : TANGENT;
-    // float3 normal : NORMAL;
+    // float3 normal : NORMAL; TODO:アウトラインの幅の調整方法を後程検討する。その際にgeom内での膨らまし方によっては使う。
 
     float2 uv0 : TEXCOORD0;
-    fixed4 color : COLOR0;
+    float4 color : COLOR0;
 
-    //
     float4 pos : CLIP_POS;
-    float3 normalDir : TEXCOORD4;
-    float3 tangentDir : TEXCOORD5;
-    float3 bitangentDir : TEXCOORD6;
-    float4 posWorld : TEXCOORD7;
+    float3 normalDir : TEXCOORD1;
+    float3 tangentDir : TEXCOORD2;
+    float3 bitangentDir : TEXCOORD3;
+    float4 posWorld : TEXCOORD4;
 
-    SHADOW_COORDS(8)
-    UNITY_FOG_COORDS(9)
+    SHADOW_COORDS(5)
+    UNITY_FOG_COORDS(6)
     #ifndef ARKTOON_ADD
         float3 lightColor0 : LIGHT_COLOR0;
         float3 lightColor1 : LIGHT_COLOR1;
@@ -63,23 +59,23 @@ struct v2g
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD9;
+        float4 projPos : TEXCOORD7;
     #endif
 };
 
 struct g2f {
 
     float2 uv0 : TEXCOORD0;
-    fixed4 color : COLOR0;
+    float4 color : COLOR0;
 
     float4 pos : SV_POSITION;
-    float3 normalDir : TEXCOORD3;
-    float3 tangentDir : TEXCOORD4;
-    float3 bitangentDir : TEXCOORD5;
-    float4 posWorld : TEXCOORD2;
+    float3 normalDir : TEXCOORD1;
+    float3 tangentDir : TEXCOORD2;
+    float3 bitangentDir : TEXCOORD3;
+    float4 posWorld : TEXCOORD4;
 
-    SHADOW_COORDS(6)
-    UNITY_FOG_COORDS(7)
+    SHADOW_COORDS(5)
+    UNITY_FOG_COORDS(6)
     #ifndef ARKTOON_ADD
         float3 lightColor0 : LIGHT_COLOR0;
         float3 lightColor1 : LIGHT_COLOR1;
@@ -89,59 +85,13 @@ struct g2f {
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD8;
+        float4 projPos : TEXCOORD7;
     #endif
 };
 
-VertexOutput vert(appdata_full v) {
-    VertexOutput o;
-    o.uv0 = v.texcoord;
-    // o.normal = v.normal;
-    o.color = fixed4(v.color.rgb, 0);
-    o.normalDir = UnityObjectToWorldNormal(v.normal);
-    o.tangentDir = UnityObjectToWorldDir(v.tangent);
-    o.bitangentDir = cross(o.normalDir, o.tangentDir) * v.tangent.w * unity_WorldTransformParams.w;
-    o.posWorld = mul(unity_ObjectToWorld, v.vertex);
-
-    #ifdef ARKTOON_OUTLINE
-    o.vertex = v.vertex;
-    #endif
-
-    o.pos = UnityObjectToClipPos(v.vertex);
-    TRANSFER_SHADOW(o);
-    UNITY_TRANSFER_FOG(o, o.pos);
-
-    #ifndef ARKTOON_ADD
-        // 頂点ライティングが必要な場合に取得
-        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON)
-            if (_UseVertexLight) {
-                o.lightColor0 = unity_LightColor[0].rgb;
-                o.lightColor1 = unity_LightColor[1].rgb;
-                o.lightColor2 = unity_LightColor[2].rgb;
-                o.lightColor3 = unity_LightColor[3].rgb;
-            } else {
-                o.lightColor0 = 0;
-                o.lightColor1 = 0;
-                o.lightColor2 = 0;
-                o.lightColor3 = 0;
-            }
-        #else
-            o.lightColor0 = 0;
-            o.lightColor1 = 0;
-            o.lightColor2 = 0;
-            o.lightColor3 = 0;
-        #endif
-    #endif
-    #ifdef ARKTOON_REFRACTED
-        o.projPos = ComputeScreenPos (o.pos);
-        COMPUTE_EYEDEPTH(o.projPos.z);
-    #endif
-
-    return o;
-}
 
 #ifndef ARKTOON_ADD
-    inline void calcAmbientByShade4PointLights(float flipNormal, inout g2f o) {
+    inline void calcAmbientByShade4PointLights(float flipNormal, inout VertexOutput o) {
         // Shade4PointLightsを展開して改変
         // {
             // to light vectors
@@ -174,6 +124,57 @@ VertexOutput vert(appdata_full v) {
     }
 #endif
 
+VertexOutput vert(appdata_full v) {
+    VertexOutput o;
+    o.uv0 = v.texcoord;
+    // o.normal = v.normal;
+    o.color = float4(v.color.rgb, 0);
+    o.normalDir = UnityObjectToWorldNormal(v.normal);
+    o.tangentDir = UnityObjectToWorldDir(v.tangent);
+    o.bitangentDir = cross(o.normalDir, o.tangentDir) * v.tangent.w * unity_WorldTransformParams.w;
+    o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+
+    #ifdef ARKTOON_OUTLINE
+    o.vertex = v.vertex;
+    #endif
+
+    o.pos = UnityObjectToClipPos(v.vertex);
+    TRANSFER_SHADOW(o);
+    UNITY_TRANSFER_FOG(o, o.pos);
+
+    #ifndef ARKTOON_ADD
+        // 頂点ライティングが必要な場合に取得
+        #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON)
+            if (_UseVertexLight) {
+                o.lightColor0 = unity_LightColor[0].rgb;
+                o.lightColor1 = unity_LightColor[1].rgb;
+                o.lightColor2 = unity_LightColor[2].rgb;
+                o.lightColor3 = unity_LightColor[3].rgb;
+                calcAmbientByShade4PointLights(0, o);
+            } else {
+                o.lightColor0 = 0;
+                o.lightColor1 = 0;
+                o.lightColor2 = 0;
+                o.lightColor3 = 0;
+                o.ambientAttenuation = o.ambientIndirect = 0;
+            }
+        #else
+            o.lightColor0 = 0;
+            o.lightColor1 = 0;
+            o.lightColor2 = 0;
+            o.lightColor3 = 0;
+            o.ambientAttenuation = o.ambientIndirect = 0;
+        #endif
+    #endif
+
+    #ifdef ARKTOON_REFRACTED
+        o.projPos = ComputeScreenPos (o.pos);
+        COMPUTE_EYEDEPTH(o.projPos.z);
+    #endif
+
+    return o;
+}
+
 [maxvertexcount(6)]
 void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
 {
@@ -189,19 +190,19 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
             o.normalDir = IN[i].normalDir;
             o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
             o.uv0 = IN[i].uv0;
-            o.color = fixed4(IN[i].color.rgb, 1);
+            o.color = float4(IN[i].color.rgb, 1);
             o.posWorld = posWorld;
             o.tangentDir = IN[i].tangentDir;
             o.bitangentDir = IN[i].bitangentDir;
 
             // Pass-through the shadow coordinates if this pass has shadows.
             #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-            o._ShadowCoord = IN[i]._ShadowCoord;
+                o._ShadowCoord = IN[i]._ShadowCoord;
             #endif
 
             // Pass-through the fog coordinates if this pass has shadows.
             #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-            o.fogCoord = IN[i].fogCoord;
+                o.fogCoord = IN[i].fogCoord;
             #endif
 
             #ifdef ARKTOON_REFRACTED
@@ -209,19 +210,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
             #endif
 
             #ifndef ARKTOON_ADD
-                o.lightColor0          = IN[i].lightColor0;
-                o.lightColor1          = IN[i].lightColor1;
-                o.lightColor2          = IN[i].lightColor2;
-                o.lightColor3          = IN[i].lightColor3;
-                #if UNITY_SHOULD_SAMPLE_SH
-                    if (_UseVertexLight) {
-                        calcAmbientByShade4PointLights(0, o);
-                    } else {
-                        o.ambientAttenuation = o.ambientIndirect = 0;
-                    }
-                #else
-                    o.ambientAttenuation = o.ambientIndirect = 0;
-                #endif
+                o.lightColor0        = IN[i].lightColor0;
+                o.lightColor1        = IN[i].lightColor1;
+                o.lightColor2        = IN[i].lightColor2;
+                o.lightColor3        = IN[i].lightColor3;
+                o.ambientAttenuation = IN[i].ambientAttenuation;
+                o.ambientIndirect    = IN[i].ambientIndirect;
             #endif
 
             tristream.Append(o);
@@ -235,7 +229,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
     {
         o.pos = UnityObjectToClipPos(IN[ii].vertex);
         o.uv0 = IN[ii].uv0;
-        o.color = fixed4(IN[ii].color.rgb, 0);
+        o.color = float4(IN[ii].color.rgb, 0);
         o.posWorld = IN[ii].posWorld;
         o.normalDir = IN[ii].normalDir;
         o.tangentDir = IN[ii].tangentDir;
@@ -243,12 +237,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
 
         // Pass-through the shadow coordinates if this pass has shadows.
         #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
-        o._ShadowCoord = IN[ii]._ShadowCoord;
+            o._ShadowCoord = IN[ii]._ShadowCoord;
         #endif
 
         // Pass-through the fog coordinates if this pass has shadows.
         #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
-        o.fogCoord = IN[ii].fogCoord;
+            o.fogCoord = IN[ii].fogCoord;
         #endif
 
         #ifdef ARKTOON_REFRACTED
@@ -256,19 +250,12 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
         #endif
 
         #ifndef ARKTOON_ADD
-            o.lightColor0          = IN[ii].lightColor0;
-            o.lightColor1          = IN[ii].lightColor1;
-            o.lightColor2          = IN[ii].lightColor2;
-            o.lightColor3          = IN[ii].lightColor3;
-            #if UNITY_SHOULD_SAMPLE_SH
-                if (_UseVertexLight) {
-                    calcAmbientByShade4PointLights(0, o);
-                } else {
-                    o.ambientAttenuation = o.ambientIndirect = 0;
-                }
-            #else
-                o.ambientAttenuation = o.ambientIndirect = 0;
-            #endif
+            o.lightColor0        = IN[ii].lightColor0;
+            o.lightColor1        = IN[ii].lightColor1;
+            o.lightColor2        = IN[ii].lightColor2;
+            o.lightColor3        = IN[ii].lightColor3;
+            o.ambientAttenuation = IN[ii].ambientAttenuation;
+            o.ambientIndirect    = IN[ii].ambientIndirect;
         #endif
 
         tristream.Append(o);

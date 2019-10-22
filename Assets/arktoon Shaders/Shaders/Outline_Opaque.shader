@@ -146,7 +146,6 @@ Shader "Arktoon 2018/Outline/Opaque" {
 
             CGPROGRAM
 
-
             #pragma vertex vert
             #pragma geometry geom
             #pragma fragment frag
