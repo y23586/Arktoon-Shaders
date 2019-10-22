@@ -5,7 +5,7 @@ float4 frag(
         VertexOutput i
     #endif
     ,  bool isFrontFace : SV_IsFrontFace
-    ) : COLOR
+    ) : SV_Target
 {
     // 表裏の制御
     fixed faceSign = isFrontFace ? 1 : -1; //
