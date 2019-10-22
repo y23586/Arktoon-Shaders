@@ -1,10 +1,14 @@
 float4 frag(g2f i, fixed facing : VFACE) : COLOR {
 
-    clip(1 - i.isOutline + facing);
-
     // 表裏の制御
     fixed faceSign = facing > 0 ? 1 : -1; //
     bool isFrontFace = facing > 0;
+
+    //
+    bool isOutline = i.color.a;
+
+    // アウトラインの裏面は常に削除
+    clip(1 - isOutline + facing);
 
     float3x3 tangentTransform = float3x3( i.tangentDir, i.bitangentDir, i.normalDir * lerp(1, faceSign, _DoubleSidedFlipBackfaceNormal));
     float3 viewDirection = normalize(UnityWorldSpaceViewDir(i.posWorld.xyz));
@@ -23,14 +27,16 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
 
     float4 _MainTex_var = UNITY_SAMPLE_TEX2D(REF_MAINTEX, TRANSFORM_TEX(i.uv0, REF_MAINTEX));
     float3 Diffuse = (_MainTex_var.rgb*REF_COLOR.rgb);
-    Diffuse = lerp(Diffuse, Diffuse * i.color,_VertexColorBlendDiffuse);
+    Diffuse = lerp(Diffuse, Diffuse * i.color, _VertexColorBlendDiffuse);
 
     // アウトラインであればDiffuseとColorを混ぜる
+    float4 _OutlineTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineTexture));
+    float3 outlineColor = lerp(float3(_OutlineColor.rgb * _OutlineTexture_var.rgb), Diffuse, _OutlineTextureColorRate);
     if (_OutlineUseColorShift) {
-        float3 Outline_Diff_HSV = CalculateHSV((Diffuse * _OutlineTextureColorRate + mad(i.col, - _OutlineTextureColorRate,i.col)), _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
-        Diffuse = lerp(Diffuse, Outline_Diff_HSV, i.isOutline);
+        float3 Outline_Diff_HSV = CalculateHSV(outlineColor, _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
+        Diffuse = lerp(Diffuse, Outline_Diff_HSV, isOutline);
     } else {
-        Diffuse = lerp(Diffuse, (Diffuse * _OutlineTextureColorRate + mad(i.col,-_OutlineTextureColorRate,i.col)), i.isOutline);
+        Diffuse = lerp(Diffuse, outlineColor, isOutline);
     }
 
     #ifdef ARKTOON_CUTOUT
@@ -38,7 +44,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
     #endif
 
     #if defined(ARKTOON_CUTOUT) || defined(ARKTOON_FADE)
-        if (i.isOutline) {
+        if (isOutline) {
             float _OutlineMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
             clip(_OutlineMask_var.r - _OutlineCutoffRange);
         }
@@ -182,7 +188,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
 
     float3 tmpToonedMapFactor = (Diffuse+(Diffuse*coloredLight_sum));
     // アウトラインであればShadeMixを反映
-    toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + mad(tmpToonedMapFactor,-_OutlineShadeMix,tmpToonedMapFactor)), i.isOutline);
+    toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + mad(tmpToonedMapFactor,-_OutlineShadeMix,tmpToonedMapFactor)), isOutline);
 
     // 裏面であればHSVShiftを反映
     if(_DoubleSidedBackfaceUseColorShift) {
@@ -197,7 +203,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
     float3 shadowcap = float3(1000,1000,1000);
 
     #if !defined(ARKTOON_REFRACTED)
-    if (_UseOutline == 0 || !i.isOutline) {
+    if (_UseOutline == 0 || !isOutline) {
     #endif
         // オプション：Reflection
         if (_UseReflection) {
@@ -407,7 +413,7 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
     // Emissive合成・FinalColor計算
     float3 _Emission = tex2D(REF_EMISSIONMAP,TRANSFORM_TEX(i.uv0, REF_EMISSIONMAP)).rgb *REF_EMISSIONCOLOR.rgb;
     _Emission = _Emission + emissionParallax + emissiveFreak1 + emissiveFreak2;
-    float3 emissive = max( lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive) , RimLight) * !i.isOutline;
+    float3 emissive = max( lerp(_Emission.rgb, _Emission.rgb * i.color, _VertexColorBlendEmissive) , RimLight) * !isOutline;
     float3 finalColor = emissive + finalcolor2;
 
     #ifdef ARKTOON_FADE

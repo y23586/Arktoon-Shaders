@@ -1,39 +1,110 @@
-
-struct v2g
+struct VertexOutput
 {
-    float4 vertex : POSITION;
+    // appdata_full
+    #ifdef ARKTOON_OUTLINE
+        float4 vertex : SV_POSITION;
+    #endif
+    // float4 tangent : TANGENT;
     float3 normal : NORMAL;
-    float4 tangent : TANGENT;
     float2 uv0 : TEXCOORD0;
-    float3 normalDir : TEXCOORD3;
-    float3 tangentDir : TEXCOORD4;
-    float3 bitangentDir : TEXCOORD5;
-    float4 pos : CLIP_POS;
-    SHADOW_COORDS(6)
-    UNITY_FOG_COORDS(7)
-    fixed4 color : COLOR;
+    fixed4 color : COLOR; // .a=1はアウトライン, a=0
+
+    #ifdef ARKTOON_OUTLINE
+        float4 pos : CLIP_POS;
+    #else
+        float4 pos : SV_POSITION;
+    #endif
+    float3 normalDir : TEXCOORD4;
+    float3 tangentDir : TEXCOORD5;
+    float3 bitangentDir : TEXCOORD6;
+    float4 posWorld : TEXCOORD7;
+
+    SHADOW_COORDS(8)
+    UNITY_FOG_COORDS(9)
     #ifndef ARKTOON_ADD
         float3 lightColor0 : LIGHT_COLOR0;
         float3 lightColor1 : LIGHT_COLOR1;
         float3 lightColor2 : LIGHT_COLOR2;
         float3 lightColor3 : LIGHT_COLOR3;
+        float4 ambientAttenuation : AMBIENT_ATTEN;
+        float4 ambientIndirect : AMBIENT_INDIRECT;
+    #endif
+    #ifdef ARKTOON_REFRACTED
+        float4 projPos : TEXCOORD9;
+    #endif
+};
+
+struct v2g
+{
+    // appdata_full
+    float4 vertex : SV_POSITION;
+    // float4 tangent : TANGENT;
+    float3 normal : NORMAL;
+    float2 uv0 : TEXCOORD0;
+    fixed4 color : COLOR;
+
+    //
+    float4 pos : CLIP_POS;
+    float3 normalDir : TEXCOORD4;
+    float3 tangentDir : TEXCOORD5;
+    float3 bitangentDir : TEXCOORD6;
+    float4 posWorld : TEXCOORD7;
+
+    SHADOW_COORDS(8)
+    UNITY_FOG_COORDS(9)
+    #ifndef ARKTOON_ADD
+        float3 lightColor0 : LIGHT_COLOR0;
+        float3 lightColor1 : LIGHT_COLOR1;
+        float3 lightColor2 : LIGHT_COLOR2;
+        float3 lightColor3 : LIGHT_COLOR3;
+        float4 ambientAttenuation : AMBIENT_ATTEN;
+        float4 ambientIndirect : AMBIENT_INDIRECT;
+    #endif
+    #ifdef ARKTOON_REFRACTED
+        float4 projPos : TEXCOORD9;
+    #endif
+};
+
+struct g2f {
+
+    float2 uv0 : TEXCOORD0;
+    fixed4 color : COLOR1;
+
+    float4 pos : SV_POSITION;
+    float3 normalDir : TEXCOORD3;
+    float3 tangentDir : TEXCOORD4;
+    float3 bitangentDir : TEXCOORD5;
+    float4 posWorld : TEXCOORD2;
+
+    SHADOW_COORDS(6)
+    UNITY_FOG_COORDS(7)
+    #ifndef ARKTOON_ADD
+        float3 lightColor0 : LIGHT_COLOR0;
+        float3 lightColor1 : LIGHT_COLOR1;
+        float3 lightColor2 : LIGHT_COLOR2;
+        float3 lightColor3 : LIGHT_COLOR3;
+        float4 ambientAttenuation : AMBIENT_ATTEN;
+        float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
         float4 projPos : TEXCOORD8;
     #endif
 };
 
-
-v2g vert(appdata_full v) {
-    v2g o;
+VertexOutput vert(appdata_full v) {
+    VertexOutput o;
     o.uv0 = v.texcoord;
     o.normal = v.normal;
-    o.tangent = v.tangent;
-    o.color = v.color;
+    o.color = fixed4(v.color.rgb, 0);
     o.normalDir = normalize(UnityObjectToWorldNormal(v.normal));
     o.tangentDir = normalize(mul(unity_ObjectToWorld, float4(v.tangent.xyz, 0.0)).xyz);
     o.bitangentDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
+    o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+
+    #ifdef ARKTOON_OUTLINE
     o.vertex = v.vertex;
+    #endif
+
     o.pos = UnityObjectToClipPos(v.vertex);
     TRANSFER_SHADOW(o);
     UNITY_TRANSFER_FOG(o, o.pos);
@@ -66,31 +137,6 @@ v2g vert(appdata_full v) {
 
     return o;
 }
-
-struct g2f {
-    float4 pos : SV_POSITION;
-    float2 uv0 : TEXCOORD0;
-    float4 posWorld : TEXCOORD2;
-    float3 normalDir : TEXCOORD3;
-    float3 tangentDir : TEXCOORD4;
-    float3 bitangentDir : TEXCOORD5;
-    fixed4 col : COLOR0;
-    fixed isOutline : IS_OUTLINE; // bool(GLSL対応でfixed)
-    SHADOW_COORDS(6)
-    UNITY_FOG_COORDS(7)
-    fixed4 color : COLOR1;
-    #ifndef ARKTOON_ADD
-        float3 lightColor0 : LIGHT_COLOR0;
-        float3 lightColor1 : LIGHT_COLOR1;
-        float3 lightColor2 : LIGHT_COLOR2;
-        float3 lightColor3 : LIGHT_COLOR3;
-        float4 ambientAttenuation : AMBIENT_ATTEN;
-        float4 ambientIndirect : AMBIENT_INDIRECT;
-    #endif
-    #ifdef ARKTOON_REFRACTED
-        float4 projPos : TEXCOORD8;
-    #endif
-};
 
 #ifndef ARKTOON_ADD
     inline void calcAmbientByShade4PointLights(float flipNormal, inout g2f o) {
@@ -134,19 +180,17 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
     if (_UseOutline) {
         for (int i = 2; i >= 0; i--)
         {
-            float4 _OutlineTexture_var = tex2Dlod (_OutlineTexture, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineTexture), 0, 0));
+            float4 posWorld = (mul(unity_ObjectToWorld, IN[i].vertex));
             float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
             float width = _OutlineWidth * _OutlineWidthMask_var;
 
             o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
             o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
             o.uv0 = IN[i].uv0;
-            o.col = fixed4( _OutlineColor.rgb * _OutlineTexture_var.rgb, 1);
-            o.color = IN[i].color;
-            o.posWorld = mul(unity_ObjectToWorld, IN[i].vertex);
+            o.color = fixed4(IN[i].color.rgb, 1);
+            o.posWorld = posWorld;
             o.tangentDir = IN[i].tangentDir;
             o.bitangentDir = IN[i].bitangentDir;
-            o.isOutline = true;
 
             // Pass-through the shadow coordinates if this pass has shadows.
             #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
@@ -189,13 +233,11 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
     {
         o.pos = UnityObjectToClipPos(IN[ii].vertex);
         o.uv0 = IN[ii].uv0;
-        o.col = fixed4(1., 1., 1., 0.);
-        o.color = IN[ii].color;
-        o.posWorld = mul(unity_ObjectToWorld, IN[ii].vertex);
+        o.color = fixed4(IN[ii].color.rgb, 0);
+        o.posWorld = IN[ii].posWorld;
         o.normalDir = UnityObjectToWorldNormal(IN[ii].normal);
         o.tangentDir = IN[ii].tangentDir;
         o.bitangentDir = IN[ii].bitangentDir;
-        o.isOutline = false;
 
         // Pass-through the shadow coordinates if this pass has shadows.
         #if defined (SHADOWS_SCREEN) || ( defined (SHADOWS_DEPTH) && defined (SPOT) ) || defined (SHADOWS_CUBE)
