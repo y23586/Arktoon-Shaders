@@ -171,8 +171,7 @@ VertexOutput vert(appdata_full v) {
 void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
 {
     g2f o;
-    #if !defined(ARKTOON_REFRACTED)
-    if (_UseOutline) {
+    #if !defined(ARKTOON_REFRACTED) && defined(ARKTOON_OUTLINE)
         for (int i = 2; i >= 0; i--)
         {
             float4 posWorld = (mul(unity_ObjectToWorld, IN[i].vertex));
@@ -212,9 +211,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
 
             tristream.Append(o);
         }
-
         tristream.RestartStrip();
-    }
     #endif
 
     for (int ii = 0; ii < 3; ii++)

@@ -73,17 +73,17 @@ Shader "Arktoon 2018/Opaque" {
         _GlossPower ("[Gloss] Metallic", Range(0, 1)) = 0.5
         _GlossColor ("[Gloss] Color", Color) = (1,1,1,1)
         // Outline
-        [Toggle(_)]_UseOutline ("[Outline] Enabled", Int) = 0
-        _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
-        _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
-        _OutlineTexture ("[Outline] Texture", 2D) = "white" {}
-        _OutlineShadeMix ("[Outline] Shade Mix", Range(0, 1)) = 0
-        _OutlineTextureColorRate ("[Outline] Texture Color Rate", Range(0, 1)) = 0.05
-        _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
-        [Toggle(_)]_OutlineUseColorShift("[Outline] Use Outline Color Shift", Int) = 0
-        [PowerSlider(2.0)]_OutlineHueShiftFromBase("[Outline] Hue Shift From Base", Range(-0.5, 0.5)) = 0
-        _OutlineSaturationFromBase("[Outline] Saturation From Base", Range(0, 2)) = 1
-        _OutlineValueFromBase("[Outline] Value From Base", Range(0, 2)) = 1
+        // [Toggle(_)]_UseOutline ("[Outline] Enabled", Int) = 0 // カスタムインスペクタでのみ使用
+        // _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
+        // _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
+        // _OutlineTexture ("[Outline] Texture", 2D) = "white" {}
+        // _OutlineShadeMix ("[Outline] Shade Mix", Range(0, 1)) = 0
+        // _OutlineTextureColorRate ("[Outline] Texture Color Rate", Range(0, 1)) = 0.05
+        // _OutlineWidthMask ("[Outline] Outline Width Mask", 2D) = "white" {}
+        // [Toggle(_)]_OutlineUseColorShift("[Outline] Use Outline Color Shift", Int) = 0
+        // [PowerSlider(2.0)]_OutlineHueShiftFromBase("[Outline] Hue Shift From Base", Range(-0.5, 0.5)) = 0
+        // _OutlineSaturationFromBase("[Outline] Saturation From Base", Range(0, 2)) = 1
+        // _OutlineValueFromBase("[Outline] Value From Base", Range(0, 2)) = 1
         // MatCap
         [Enum(Add,0, Lighten,1, Screen,2, Unused,3)] _MatcapBlendMode ("[MatCap] Blend Mode", Int) = 3
         _MatcapBlend ("[MatCap] Blend", Range(0, 3)) = 1

@@ -73,7 +73,7 @@ Shader "arktoon/_Extra/EmissiveFreak/Opaque" {
         _GlossPower ("[Gloss] Metallic", Range(0, 1)) = 0.5
         _GlossColor ("[Gloss] Color", Color) = (1,1,1,1)
         // Outline
-        [Toggle(_)]_UseOutline ("[Outline] Enabled", Int) = 0
+        [Toggle(_)]_UseOutline ("[Outline] Enabled", Int) = 0 // カスタムインスペクタでのみ使用
         _OutlineWidth ("[Outline] Width", Range(0, 20)) = 0.1
         _OutlineColor ("[Outline] Color", Color) = (0,0,0,1)
         _OutlineTexture ("[Outline] Texture", 2D) = "white" {}

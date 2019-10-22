@@ -35,24 +35,28 @@ float4 frag(
     float3 Diffuse = (_MainTex_var.rgb*REF_COLOR.rgb);
     Diffuse = lerp(Diffuse, Diffuse * i.color, _VertexColorBlendDiffuse);
 
-    // アウトラインであればDiffuseとColorを混ぜる
-    float4 _OutlineTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineTexture));
-    float3 outlineColor = lerp(float3(_OutlineColor.rgb * _OutlineTexture_var.rgb), Diffuse, _OutlineTextureColorRate);
-    if (_OutlineUseColorShift) {
-        float3 Outline_Diff_HSV = CalculateHSV(outlineColor, _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
-        Diffuse = lerp(Diffuse, Outline_Diff_HSV, isOutline);
-    } else {
-        Diffuse = lerp(Diffuse, outlineColor, isOutline);
-    }
 
     #ifdef ARKTOON_CUTOUT
         clip((_MainTex_var.a * REF_COLOR.a) - _CutoutCutoutAdjust);
     #endif
 
-    #if defined(ARKTOON_CUTOUT) || defined(ARKTOON_FADE)
+
+    #ifdef ARKTOON_OUTLINE
         if (isOutline) {
-            float _OutlineMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
-            clip(_OutlineMask_var.r - _OutlineCutoffRange);
+            #if defined(ARKTOON_CUTOUT) || defined(ARKTOON_FADE)
+                float _OutlineMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineMask)).r;
+                clip(_OutlineMask_var.r - _OutlineCutoffRange);
+            #endif
+
+            // アウトラインであればDiffuseとColorを混ぜる
+            float4 _OutlineTexture_var = UNITY_SAMPLE_TEX2D_SAMPLER(_OutlineTexture, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _OutlineTexture));
+            float3 outlineColor = lerp(float3(_OutlineColor.rgb * _OutlineTexture_var.rgb), Diffuse, _OutlineTextureColorRate);
+            if (_OutlineUseColorShift) {
+                float3 Outline_Diff_HSV = CalculateHSV(outlineColor, _OutlineHueShiftFromBase, _OutlineSaturationFromBase, _OutlineValueFromBase);
+                Diffuse = Outline_Diff_HSV;
+            } else {
+                Diffuse = outlineColor;
+            }
         }
     #endif
 
@@ -183,7 +187,9 @@ float4 frag(
 
     float3 tmpToonedMapFactor = (Diffuse+(Diffuse*coloredLight_sum));
     // アウトラインであればShadeMixを反映
-    toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + mad(tmpToonedMapFactor,-_OutlineShadeMix,tmpToonedMapFactor)), isOutline);
+    #ifdef ARKTOON_OUTLINE
+        toonedMap = lerp(toonedMap, (toonedMap * _OutlineShadeMix + mad(tmpToonedMapFactor,-_OutlineShadeMix,tmpToonedMapFactor)), isOutline);
+    #endif
 
     // 裏面であればHSVShiftを反映
     if(_DoubleSidedBackfaceUseColorShift) {
@@ -197,8 +203,8 @@ float4 frag(
     float3 RimLight = float3(0,0,0);
     float3 shadowcap = float3(1000,1000,1000);
 
-    #if !defined(ARKTOON_REFRACTED)
-    if (_UseOutline == 0 || !isOutline) {
+    #if !defined(ARKTOON_REFRACTED) && defined(ARKTOON_OUTLINE)
+    if (!isOutline) {
     #endif
         // オプション：Reflection
         if (_UseReflection) {
@@ -327,7 +333,7 @@ float4 frag(
             float4 _ShadowCapBlendMask_var = UNITY_SAMPLE_TEX2D_SAMPLER(_ShadowCapBlendMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _ShadowCapBlendMask));
             shadowcap = (1.0 - mad(_ShadowCapBlendMask_var.rgb,-(_ShadowCapTexture_var.rgb),_ShadowCapBlendMask_var.rgb)*_ShadowCapBlend);
         }
-    #if !defined(ARKTOON_REFRACTED)
+    #if !defined(ARKTOON_REFRACTED) && defined(ARKTOON_OUTLINE)
     }
     #endif
 

@@ -203,6 +203,7 @@ namespace ArktoonShaders
             bool isStencilWriterMask = shader.name.Contains("Stencil/WriterMask");
             bool isRefracted = shader.name.Contains("Refracted");
             bool isEmissiveFreak = shader.name.Contains("/EmissiveFreak/");
+            bool isOutline = shader.name.Contains("/Outline/");
 
             // FindProperties
             BaseTexture = FindProperty("_MainTex", props, false);
@@ -543,7 +544,7 @@ namespace ArktoonShaders
                 }
 
                 // Outline
-                if(!isRefracted) {
+                if(!isRefracted && isOutline) {
                     UIHelper.ShurikenHeader("Outline");
                     materialEditor.DrawShaderPropertySameLIne(UseOutline);
                     var useOutline = UseOutline.floatValue;
