@@ -190,10 +190,10 @@ Material:
     - _OutlineHueShiftFromBase: 0
     - _OutlineSaturationFromBase: 1
     - _OutlineShadeMix: 0
-    - _OutlineTextureColorRate: 0
+    - _OutlineTextureColorRate: 0.752
     - _OutlineUseColorShift: 0
     - _OutlineValueFromBase: 1
-    - _OutlineWidth: 0.03
+    - _OutlineWidth: 8.5
     - _Parallax: 0.02
     - _PointAddIntensity: 1
     - _PointShadowSteps: 2
@@ -208,7 +208,10 @@ Material:
     - _ReflectionShadeMix: 0
     - _ReflectionSuppressBaseColorValue: 1
     - _RimBlend: 0
+    - _RimBlendEnd: 0
+    - _RimBlendStart: 0
     - _RimFresnelPower: 1
+    - _RimPow: 1
     - _RimShadeMix: 0
     - _RimUpperSideWidth: 0
     - _RimUseBaseTexture: 0
@@ -265,7 +268,7 @@ Material:
     - _EmissionParallaxColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlossColor: {r: 1, g: 1, b: 1, a: 1}
     - _MatcapColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0.1102941, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0.80689657, b: 0, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowCapColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowPlanB2CustomShadowTextureRGB: {r: 1, g: 1, b: 1, a: 1}

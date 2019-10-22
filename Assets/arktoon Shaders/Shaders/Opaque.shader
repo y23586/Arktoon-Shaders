@@ -153,7 +153,7 @@ Shader "Arktoon 2018/Opaque" {
             #pragma multi_compile_fwdbase_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 4.0
+            #pragma target 3.0
 
             #include "cginc/arkludeDecl.cginc"
             #include "cginc/arkludeOther.cginc"
@@ -176,7 +176,7 @@ Shader "Arktoon 2018/Opaque" {
             #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_fog
             #pragma only_renderers d3d9 d3d11 glcore gles
-            #pragma target 4.0
+            #pragma target 3.0
             #define ARKTOON_ADD
 
             #include "cginc/arkludeDecl.cginc"
