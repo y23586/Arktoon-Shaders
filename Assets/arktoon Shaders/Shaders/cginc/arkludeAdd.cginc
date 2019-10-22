@@ -172,11 +172,11 @@ float4 frag(g2f i, fixed facing : VFACE) : COLOR {
             float valueTotal = min(1, lerp(value, lerp(rimPow3, rimPow5, max(0, _RimPow-1)), min(1,_RimPow)));
 
             RimLight = (
-                    lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
-                    * valueTotal
-                    * _RimBlend
-                    * _RimColor.rgb
-                    * _RimBlendMask_var
+                lerp( _RimTexture_var.rgb, Diffuse, _RimUseBaseTexture )
+                * valueTotal
+                * _RimBlend
+                * _RimColor.rgb
+                * _RimBlendMask_var
             );
             RimLight = min(RimLight, RimLight * (coloredLight * _RimShadeMix));
         }
