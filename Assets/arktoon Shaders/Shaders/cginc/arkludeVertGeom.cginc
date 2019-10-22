@@ -5,7 +5,8 @@ struct VertexOutput
         float4 vertex : SV_POSITION;
     #endif
     // float4 tangent : TANGENT;
-    float3 normal : NORMAL;
+    // float3 normal : NORMAL;
+
     float2 uv0 : TEXCOORD0;
     fixed4 color : COLOR0; // .a=1はアウトライン, a=0
 
@@ -39,9 +40,10 @@ struct v2g
     // appdata_full
     float4 vertex : SV_POSITION;
     // float4 tangent : TANGENT;
-    float3 normal : NORMAL;
+    // float3 normal : NORMAL;
+
     float2 uv0 : TEXCOORD0;
-    fixed4 color : COLOR;
+    fixed4 color : COLOR0;
 
     //
     float4 pos : CLIP_POS;
@@ -94,11 +96,11 @@ struct g2f {
 VertexOutput vert(appdata_full v) {
     VertexOutput o;
     o.uv0 = v.texcoord;
-    o.normal = v.normal;
+    // o.normal = v.normal;
     o.color = fixed4(v.color.rgb, 0);
-    o.normalDir = normalize(UnityObjectToWorldNormal(v.normal));
-    o.tangentDir = normalize(mul(unity_ObjectToWorld, float4(v.tangent.xyz, 0.0)).xyz);
-    o.bitangentDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
+    o.normalDir = UnityObjectToWorldNormal(v.normal);
+    o.tangentDir = UnityObjectToWorldDir(v.tangent);
+    o.bitangentDir = cross(o.normalDir, o.tangentDir) * v.tangent.w * unity_WorldTransformParams.w;
     o.posWorld = mul(unity_ObjectToWorld, v.vertex);
 
     #ifdef ARKTOON_OUTLINE
@@ -184,7 +186,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
             float _OutlineWidthMask_var = tex2Dlod (_OutlineWidthMask, float4( TRANSFORM_TEX(IN[i].uv0, _OutlineWidthMask), 0, 0));
             float width = _OutlineWidth * _OutlineWidthMask_var;
 
-            o.normalDir = UnityObjectToWorldNormal(IN[i].normal);
+            o.normalDir = IN[i].normalDir;
             o.pos = mul( UNITY_MATRIX_VP, mul( unity_ObjectToWorld, IN[i].vertex ) + float4(normalize(o.normalDir) * (width * 0.01), 0));
             o.uv0 = IN[i].uv0;
             o.color = fixed4(IN[i].color.rgb, 1);
@@ -235,7 +237,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
         o.uv0 = IN[ii].uv0;
         o.color = fixed4(IN[ii].color.rgb, 0);
         o.posWorld = IN[ii].posWorld;
-        o.normalDir = UnityObjectToWorldNormal(IN[ii].normal);
+        o.normalDir = IN[ii].normalDir;
         o.tangentDir = IN[ii].tangentDir;
         o.bitangentDir = IN[ii].bitangentDir;
 
