@@ -339,7 +339,7 @@ float4 frag(VertexOutput i) : COLOR {
     // 屈折
     #ifdef ARKTOON_REFRACTED
         float refractionValue = pow(1.0-saturate(dot(normalDirection, viewDirection)),_RefractionFresnelExp);
-        float2 sceneUVs = (i.projPos.xy / i.projPos.w) + ((refractionValue*_RefractionStrength) * mul(unity_WorldToCamera, float4(normalDirection,0) ).xyz.rgb.rg);
+        float2 sceneUVs = (i.grabUV) + ((refractionValue*_RefractionStrength) * mul(unity_WorldToCamera, float4(normalDirection,0) ).xyz.rgb.rg);
         float4 sceneColor = tex2D(_GrabTexture, sceneUVs);
     #endif
 
