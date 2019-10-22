@@ -1,13 +1,5 @@
 #include "Lighting.cginc"
 
-float3 ShadeSH9Indirect(){
-    return ShadeSH9(half4(0.0, -1.0, 0.0, 1.0));
-}
-
-float3 ShadeSH9Direct(){
-    return ShadeSH9(half4(0.0, 1.0, 0.0, 1.0));
-}
-
 float3 grayscale_vector_node(){
     return float3(0, 0.3823529, 0.01845836);
 }

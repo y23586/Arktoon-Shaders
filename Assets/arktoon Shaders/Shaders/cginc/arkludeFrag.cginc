@@ -56,18 +56,9 @@ float4 frag(
         }
     #endif
 
-    // 光源サンプリング方法(0:Arktoon, 1:Cubed)
-    float3 ShadeSH9Plus = float3(0,0,0);
-    float3 ShadeSH9Minus = float3(0,0,0);
-    if (_LightSampling == 0) {
-        // 明るい部分と暗い部分をサンプリング・グレースケールでリマッピングして全面の光量を再計算
-        ShadeSH9Plus = GetSHLength();
-        ShadeSH9Minus = ShadeSH9(float4(0,0,0,1));
-    } else {
-        // 空間上、真上を向いたときの光と真下を向いたときの光でサンプリング
-        ShadeSH9Plus = ShadeSH9Direct();
-        ShadeSH9Minus = ShadeSH9Indirect();
-    }
+    // 空間光をサンプリング
+    float3 ShadeSH9Plus = GetSHLength();
+    float3 ShadeSH9Minus = ShadeSH9(float4(0,0,0,1));
 
     // 陰の計算
     float3 directLighting = saturate((ShadeSH9Plus+lightColor));

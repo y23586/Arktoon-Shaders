@@ -141,7 +141,6 @@ namespace ArktoonShaders
         MaterialProperty OtherShadowAdjust;
         MaterialProperty UseVertexLight;
         MaterialProperty BackfaceColorMultiply;
-        MaterialProperty LightSampling;
         MaterialProperty UsePositionRelatedCalc;
         MaterialProperty EmissiveFreak1Tex;
         MaterialProperty EmissiveFreak1Mask;
@@ -329,7 +328,6 @@ namespace ArktoonShaders
             OtherShadowBorderSharpness = FindProperty("_OtherShadowBorderSharpness", props, false);
             OtherShadowAdjust = FindProperty("_OtherShadowAdjust", props, false);
             UseVertexLight = FindProperty("_UseVertexLight", props, false);
-            LightSampling = FindProperty("_LightSampling", props, false);
             UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props, false);
             ZWrite = FindProperty("_ZWrite", props, false);
 
@@ -824,15 +822,8 @@ namespace ArktoonShaders
                             VertexColorBlendDiffuse.floatValue = 0f;
                             VertexColorBlendEmissive.floatValue = 0f;
                             UseVertexLight.floatValue = 1f;
-                            LightSampling.floatValue = 0f;
                             UsePositionRelatedCalc.floatValue = 0f;
                         }
-                        UIHelper.DrawWithGroup(() => {
-                            EditorGUILayout.LabelField("Lights", EditorStyles.boldLabel);
-                            EditorGUI.indentLevel ++;
-                            materialEditor.ShaderProperty(LightSampling, "Sampling Style (def:arktoon)");
-                            EditorGUI.indentLevel --;
-                        });
                         UIHelper.DrawWithGroup(() => {
                             EditorGUILayout.LabelField("Directional Shadow", EditorStyles.boldLabel);
                             EditorGUI.indentLevel ++;

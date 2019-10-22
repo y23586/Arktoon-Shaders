@@ -126,8 +126,6 @@ Shader "Arktoon 2018/Opaque" {
         _OtherShadowBorderSharpness ("[Advanced] Other Mesh Shadow Border Sharpness", Range(1, 5)) = 3
         // Per-vertex light switching
         [Toggle(_)]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Int) = 1
-        // Light Sampling
-        [Enum(Arktoon,0, Cubed,1)]_LightSampling("[Light] Sampling Style", Int) = 0
         // Legacy MatCap/ShadeCap Calculation
         [Toggle(_)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
         // Version
