@@ -145,19 +145,11 @@ VertexOutput vert(appdata_full v) {
     #ifndef ARKTOON_ADD
         // 頂点ライティングが必要な場合に取得
         #if UNITY_SHOULD_SAMPLE_SH && defined(VERTEXLIGHT_ON)
-            if (_UseVertexLight) {
-                o.lightColor0 = unity_LightColor[0].rgb;
-                o.lightColor1 = unity_LightColor[1].rgb;
-                o.lightColor2 = unity_LightColor[2].rgb;
-                o.lightColor3 = unity_LightColor[3].rgb;
-                calcAmbientByShade4PointLights(0, o);
-            } else {
-                o.lightColor0 = 0;
-                o.lightColor1 = 0;
-                o.lightColor2 = 0;
-                o.lightColor3 = 0;
-                o.ambientAttenuation = o.ambientIndirect = 0;
-            }
+            o.lightColor0 = unity_LightColor[0].rgb;
+            o.lightColor1 = unity_LightColor[1].rgb;
+            o.lightColor2 = unity_LightColor[2].rgb;
+            o.lightColor3 = unity_LightColor[3].rgb;
+            calcAmbientByShade4PointLights(0, o);
         #else
             o.lightColor0 = 0;
             o.lightColor1 = 0;

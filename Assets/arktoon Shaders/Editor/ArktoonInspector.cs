@@ -139,7 +139,6 @@ namespace ArktoonShaders
         MaterialProperty VertexColorBlendEmissive;
         MaterialProperty OtherShadowBorderSharpness;
         MaterialProperty OtherShadowAdjust;
-        MaterialProperty UseVertexLight;
         MaterialProperty BackfaceColorMultiply;
         MaterialProperty UsePositionRelatedCalc;
         MaterialProperty EmissiveFreak1Tex;
@@ -327,7 +326,6 @@ namespace ArktoonShaders
             VertexColorBlendEmissive = FindProperty("_VertexColorBlendEmissive", props, false);
             OtherShadowBorderSharpness = FindProperty("_OtherShadowBorderSharpness", props, false);
             OtherShadowAdjust = FindProperty("_OtherShadowAdjust", props, false);
-            UseVertexLight = FindProperty("_UseVertexLight", props, false);
             UsePositionRelatedCalc = FindProperty("_UsePositionRelatedCalc", props, false);
             ZWrite = FindProperty("_ZWrite", props, false);
 
@@ -821,7 +819,6 @@ namespace ArktoonShaders
                             ShadowIndirectIntensity.floatValue = 0.25f;
                             VertexColorBlendDiffuse.floatValue = 0f;
                             VertexColorBlendEmissive.floatValue = 0f;
-                            UseVertexLight.floatValue = 1f;
                             UsePositionRelatedCalc.floatValue = 0f;
                         }
                         UIHelper.DrawWithGroup(() => {
@@ -851,7 +848,6 @@ namespace ArktoonShaders
                             {
                                 materialEditor.ShaderProperty(PointShadowSteps, " ");
                             }
-                            materialEditor.ShaderProperty(UseVertexLight, "Use Per-vertex Light");
                             EditorGUI.indentLevel --;
                         });
                         UIHelper.DrawWithGroup(() => {

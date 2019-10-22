@@ -155,9 +155,6 @@ UNITY_DECLARE_TEX2D_NOSAMPLER(_ShadowCapBlendMask); uniform float4 _ShadowCapBle
 uniform float _ShadowCapBlend;
 uniform float _ShadowCapNormalMix;
 
-// Use vertexLight
-uniform int _UseVertexLight;
-
 // Vertex Color Blend
 uniform float _VertexColorBlendDiffuse;
 uniform float _VertexColorBlendEmissive;

@@ -123,8 +123,6 @@ Shader "Arktoon 2018/Outline/Opaque" {
         // advanced tweaking
         _OtherShadowAdjust ("[Advanced] Other Mesh Shadow Adjust", Range(-0.2, 0.2)) = -0.1
         _OtherShadowBorderSharpness ("[Advanced] Other Mesh Shadow Border Sharpness", Range(1, 5)) = 3
-        // Per-vertex light switching
-        [Toggle(_)]_UseVertexLight("[Advanced] Use Per-vertex Lighting", Int) = 1
         // Legacy MatCap/ShadeCap Calculation
         [Toggle(_)]_UsePositionRelatedCalc ("[Mat/ShadowCap] Use Position Related Calc (Experimental)", Int) = 0
         // Version

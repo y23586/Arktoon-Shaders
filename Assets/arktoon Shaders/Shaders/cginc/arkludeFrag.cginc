@@ -122,26 +122,24 @@ float4 frag(
 
     // 頂点ライティング：PixelLightから溢れた4光源をそれぞれ計算
     float3 coloredLight_sum = float3(0,0,0);
-    if (_UseVertexLight) {
-        fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
-        float VertexShadowborderMin = saturate(_PointShadowborder - _PointShadowborderBlur_var/2.0);
-        float VertexShadowborderMax = saturate(_PointShadowborder + _PointShadowborderBlur_var/2.0);
-        float4 directContributionVertex = 1.0 - ((1.0 - saturate(( (saturate(i.ambientAttenuation) - VertexShadowborderMin)) / (VertexShadowborderMax - VertexShadowborderMin))));
-        // #ifdef USE_POINT_SHADOW_STEPS
-            directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
-        // #endif
-        directContributionVertex *= additionalContributionMultiplier;
-        //ベクトル演算を減らしつつ、複数のスカラー演算を一つのベクトル演算にまとめました。
-        //現代のPC向けGPUはほぼ100%がスカラー型であり、ベクトル演算は基本的にその次元数分ALU負荷が倍増します。
-        //複数の掛け算は基本的にスカラーを左に寄せるだけでベクトル演算が減って最適化に繋がります。
-        float4 tmpColoredLightFactorAttenuated = directContributionVertex * i.ambientAttenuation;
-        float4 tmpColoredLightFactorIndirect = mad(i.ambientIndirect,-_PointShadowStrength,i.ambientIndirect);
-        float3 coloredLight_0 = max(tmpColoredLightFactorAttenuated.r ,tmpColoredLightFactorIndirect.r) * i.lightColor0;
-        float3 coloredLight_1 = max(tmpColoredLightFactorAttenuated.g ,tmpColoredLightFactorIndirect.g) * i.lightColor1;
-        float3 coloredLight_2 = max(tmpColoredLightFactorAttenuated.b ,tmpColoredLightFactorIndirect.b) * i.lightColor2;
-        float3 coloredLight_3 = max(tmpColoredLightFactorAttenuated.a ,tmpColoredLightFactorIndirect.a) * i.lightColor3;
-        coloredLight_sum = (coloredLight_0 + coloredLight_1 + coloredLight_2 + coloredLight_3) * _PointAddIntensity;
-    }
+    fixed _PointShadowborderBlur_var = UNITY_SAMPLE_TEX2D_SAMPLER(_PointShadowborderBlurMask, REF_MAINTEX, TRANSFORM_TEX(i.uv0, _PointShadowborderBlurMask)).r * _PointShadowborderBlur;
+    float VertexShadowborderMin = saturate(_PointShadowborder - _PointShadowborderBlur_var/2.0);
+    float VertexShadowborderMax = saturate(_PointShadowborder + _PointShadowborderBlur_var/2.0);
+    float4 directContributionVertex = 1.0 - ((1.0 - saturate(( (saturate(i.ambientAttenuation) - VertexShadowborderMin)) / (VertexShadowborderMax - VertexShadowborderMin))));
+    // #ifdef USE_POINT_SHADOW_STEPS
+        directContributionVertex = lerp(directContributionVertex, min(1,floor(directContributionVertex * _PointShadowSteps) / (_PointShadowSteps - 1)), _PointShadowUseStep);
+    // #endif
+    directContributionVertex *= additionalContributionMultiplier;
+    //ベクトル演算を減らしつつ、複数のスカラー演算を一つのベクトル演算にまとめました。
+    //現代のPC向けGPUはほぼ100%がスカラー型であり、ベクトル演算は基本的にその次元数分ALU負荷が倍増します。
+    //複数の掛け算は基本的にスカラーを左に寄せるだけでベクトル演算が減って最適化に繋がります。
+    float4 tmpColoredLightFactorAttenuated = directContributionVertex * i.ambientAttenuation;
+    float4 tmpColoredLightFactorIndirect = mad(i.ambientIndirect,-_PointShadowStrength,i.ambientIndirect);
+    float3 coloredLight_0 = max(tmpColoredLightFactorAttenuated.r ,tmpColoredLightFactorIndirect.r) * i.lightColor0;
+    float3 coloredLight_1 = max(tmpColoredLightFactorAttenuated.g ,tmpColoredLightFactorIndirect.g) * i.lightColor1;
+    float3 coloredLight_2 = max(tmpColoredLightFactorAttenuated.b ,tmpColoredLightFactorIndirect.b) * i.lightColor2;
+    float3 coloredLight_3 = max(tmpColoredLightFactorAttenuated.a ,tmpColoredLightFactorIndirect.a) * i.lightColor3;
+    coloredLight_sum = (coloredLight_0 + coloredLight_1 + coloredLight_2 + coloredLight_3) * _PointAddIntensity;
 
     float3 finalLight = lerp(indirectLighting,directLighting,directContribution)+coloredLight_sum;
 
