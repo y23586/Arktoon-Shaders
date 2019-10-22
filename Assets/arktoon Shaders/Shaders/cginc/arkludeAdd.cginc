@@ -1,4 +1,4 @@
-float4 frag(VertexOutput i, fixed facing : VFACE) : COLOR {
+float4 frag(g2f i, fixed facing : VFACE) : COLOR {
 
     i.normalDir = normalize(i.normalDir);
 

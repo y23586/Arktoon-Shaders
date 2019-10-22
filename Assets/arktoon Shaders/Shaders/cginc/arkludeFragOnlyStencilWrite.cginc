@@ -3,7 +3,7 @@ uniform float _StencilMaskAdjust;
 uniform float _StencilMaskAlphaDither;
 uniform sampler2D _DitherMaskLOD2D;
 
-float4 frag(VertexOutput i) : COLOR {
+float4 frag(g2f i) : COLOR {
     // MainTex, Color, StencilMask情報をもとにClipするだけ
     float4 _MainTex_var = UNITY_SAMPLE_TEX2D(_MainTex, TRANSFORM_TEX(i.uv0, _MainTex));
     float4 _StencilMaskTex_var = tex2D(_StencilMaskTex,TRANSFORM_TEX(i.uv0, _StencilMaskTex));

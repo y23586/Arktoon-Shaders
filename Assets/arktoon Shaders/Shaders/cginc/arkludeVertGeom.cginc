@@ -67,7 +67,7 @@ v2g vert(appdata_full v) {
     return o;
 }
 
-struct VertexOutput {
+struct g2f {
     float4 pos : SV_POSITION;
     float2 uv0 : TEXCOORD0;
     float4 posWorld : TEXCOORD2;
@@ -93,7 +93,7 @@ struct VertexOutput {
 };
 
 #ifndef ARKTOON_ADD
-    inline void calcAmbientByShade4PointLights(float flipNormal, inout VertexOutput o) {
+    inline void calcAmbientByShade4PointLights(float flipNormal, inout g2f o) {
         // Shade4PointLightsを展開して改変
         // {
             // to light vectors
@@ -126,10 +126,10 @@ struct VertexOutput {
     }
 #endif
 
-[maxvertexcount(9)]
-void geom(triangle v2g IN[3], inout TriangleStream<VertexOutput> tristream)
+[maxvertexcount(6)]
+void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
 {
-    VertexOutput o;
+    g2f o;
     #if !defined(ARKTOON_REFRACTED)
     if (_UseOutline) {
         for (int i = 2; i >= 0; i--)

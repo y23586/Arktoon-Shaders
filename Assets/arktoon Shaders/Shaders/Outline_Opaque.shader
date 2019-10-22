@@ -208,18 +208,18 @@ Shader "Arktoon 2018/Outline/Opaque" {
                 float4 vertex : POSITION;
                 float2 texcoord0 : TEXCOORD0;
             };
-            struct VertexOutput {
+            struct g2f {
                 V2F_SHADOW_CASTER;
                 float2 uv0 : TEXCOORD1;
             };
-            VertexOutput vert (VertexInput v) {
-                VertexOutput o = (VertexOutput)0;
+            g2f vert (VertexInput v) {
+                g2f o = (g2f)0;
                 o.uv0 = v.texcoord0;
                 o.pos = UnityObjectToClipPos( v.vertex );
                 TRANSFER_SHADOW_CASTER(o)
                 return o;
             }
-            float4 frag(VertexOutput i) : COLOR {
+            float4 frag(g2f i) : COLOR {
                 SHADOW_CASTER_FRAGMENT(i)
             }
             ENDCG
