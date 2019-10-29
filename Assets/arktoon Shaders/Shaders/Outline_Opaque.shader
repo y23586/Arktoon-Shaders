@@ -105,6 +105,7 @@ Shader "Arktoon 2018/Outline/Opaque" {
         [Toggle(_)]_UseRim ("[Rim] Enabled", Int) = 0
         _RimBlend ("[Rim] Blend", Range(0, 3)) = 1
         _RimBlendMask ("[Rim] Blend Mask", 2D) = "white" {}
+        _RimShadeMix("[Rim] Shade Mix", Range(0, 1)) = 0
         _RimBlendStart("[Rim] Blend start", Range(0, 1)) = 0
         _RimBlendEnd("[Rim] Blend end", Range(0, 1)) = 0
         [Enum(Linear,0, Pow3,1, Pow5,2)] _RimPow ("[Rim] Power Type", Int) = 1
