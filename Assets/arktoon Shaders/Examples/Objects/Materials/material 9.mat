@@ -222,8 +222,8 @@ Material:
     - _RimUseBaseTexture: 0
     - _ShadowBoarderMax: 0.55
     - _ShadowBoarderMin: 0.499
-    - _ShadowCapBlend: 1.21
-    - _ShadowCapBlendMode: 3
+    - _ShadowCapBlend: 2.51
+    - _ShadowCapBlendMode: 2
     - _ShadowCapNormalMix: 0
     - _ShadowCasterCulling: 0
     - _ShadowIndirectIntensity: 0.25

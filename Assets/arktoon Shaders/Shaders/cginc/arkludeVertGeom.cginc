@@ -30,7 +30,7 @@ struct VertexOutput
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        noperspective float4 projPos : TEXCOORD7; // TODO:ラスタライザでの補間に深度を考慮しないよう指定？後で詳しく調べる
+        noperspective float2 grabUV : TEXCOORD7;
     #endif
 };
 
@@ -59,7 +59,7 @@ struct v2g
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        noperspective float4 projPos : TEXCOORD7; // TODO:ラスタライザでの補間に深度を考慮しないよう指定？後で詳しく調べる
+        noperspective float2 grabUV : TEXCOORD7;
     #endif
 };
 
@@ -85,7 +85,7 @@ struct g2f {
         float4 ambientIndirect : AMBIENT_INDIRECT;
     #endif
     #ifdef ARKTOON_REFRACTED
-        noperspective float4 projPos : TEXCOORD7; // TODO:ラスタライザでの補間に深度を考慮しないよう指定？後で詳しく調べる
+        noperspective float2 grabUV : TEXCOORD7;
     #endif
 };
 
@@ -160,8 +160,7 @@ VertexOutput vert(appdata_full v) {
     #endif
 
     #ifdef ARKTOON_REFRACTED
-        o.projPos = ComputeScreenPos (o.pos);
-        COMPUTE_EYEDEPTH(o.projPos.z);
+        o.grabUV = ComputeGrabScreenPos (o.pos).xy/o.pos.w;
     #endif
 
     return o;
@@ -197,7 +196,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
             #endif
 
             #ifdef ARKTOON_REFRACTED
-                o.projPos = IN[i].projPos;
+                o.grabUV = IN[i].grabUV;
             #endif
 
             #ifndef ARKTOON_ADD
@@ -235,7 +234,7 @@ void geom(triangle v2g IN[3], inout TriangleStream<g2f> tristream)
         #endif
 
         #ifdef ARKTOON_REFRACTED
-            o.projPos = IN[ii].projPos;
+            o.grabUV = IN[ii].grabUV;
         #endif
 
         #ifndef ARKTOON_ADD
